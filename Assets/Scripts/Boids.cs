@@ -29,17 +29,23 @@ public class Boids : MonoBehaviour
 
     private List<Rigidbody> physicalBoids = new();
 
+    private Vector3 MinBounds;
+    private Vector3 MaxBounds;
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(Space * 0.5f, Space);
+        Gizmos.DrawWireCube(transform.position, Space);
     }
 
     private void Start()
     {
+        MinBounds = transform.position - Space * 0.5f;
+        MaxBounds = transform.position + Space * 0.5f;
+
         for (int i = 0; i < NumBoids; i++)
         {
-            Vector3 position = new(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
+            Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
 
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -125,27 +131,27 @@ public class Boids : MonoBehaviour
 
         Vector3 deltaVelocity = Vector3.zero;
 
-        if (boid.position.x < Margin.x)
+        if (boid.position.x < MinBounds.x + Margin.x)
         {
             deltaVelocity.x += turnAmount;
         }
-        if (boid.position.x > Space.x - Margin.x)
+        if (boid.position.x > MaxBounds.x - Margin.x)
         {
             deltaVelocity.x -= turnAmount;
         }
-        if (boid.position.y < Margin.y)
+        if (boid.position.y < MinBounds.y + Margin.y)
         {
             deltaVelocity.y += turnAmount;
         }
-        if (boid.position.y > Space.y - Margin.y)
+        if (boid.position.y > MaxBounds.y - Margin.y)
         {
             deltaVelocity.y -= turnAmount;
         }
-        if (boid.position.z < Margin.z)
+        if (boid.position.z < MinBounds.z + Margin.z)
         {
             deltaVelocity.z += turnAmount;
         }
-        if (boid.position.z > Space.z - Margin.z)
+        if (boid.position.z > MaxBounds.z - Margin.z)
         {
             deltaVelocity.z -= turnAmount;
         }
@@ -155,19 +161,19 @@ public class Boids : MonoBehaviour
     {
         Vector3 velocity = boid.velocity;
 
-        if (boid.position.x < 0.0f && velocity.x < 0.0f || boid.position.x > Space.x && velocity.x > 0.0f)
+        if (boid.position.x < MinBounds.x && velocity.x < 0.0f || boid.position.x > MaxBounds.x && velocity.x > 0.0f)
         {
             float vel = Mathf.Abs(velocity.x);
             velocity.x = 0f;
             velocity += velocity.normalized * vel;
         }
-        if (boid.position.y < 0.0f && velocity.y < 0.0f || boid.position.y > Space.y && velocity.y > 0.0f)
+        if (boid.position.y < MinBounds.y && velocity.y < 0.0f || boid.position.y > MaxBounds.y && velocity.y > 0.0f)
         {
             float vel = Mathf.Abs(velocity.y);
             velocity.y = 0f;
             velocity += velocity.normalized * vel;
         }
-        if (boid.position.z < 0.0f && velocity.z < 0.0f || boid.position.z > Space.z && velocity.z > 0.0f)
+        if (boid.position.z < MinBounds.z && velocity.z < 0.0f || boid.position.z > MaxBounds.z && velocity.z > 0.0f)
         {
             float vel = Mathf.Abs(velocity.z);
             velocity.z = 0f;
@@ -175,9 +181,9 @@ public class Boids : MonoBehaviour
         }
 
         Vector3 pos = boid.position;
-        pos.x = Mathf.Clamp(pos.x, 0.0f, Space.x);
-        pos.y = Mathf.Clamp(pos.y, 0.0f, Space.y);
-        pos.z = Mathf.Clamp(pos.z, 0.0f, Space.z);
+        pos.x = Mathf.Clamp(pos.x, MinBounds.x, MaxBounds.x);
+        pos.y = Mathf.Clamp(pos.y, MinBounds.y, MaxBounds.y);
+        pos.z = Mathf.Clamp(pos.z, MinBounds.z, MaxBounds.z);
 
         boid.position = pos;
         boid.velocity = velocity;
