@@ -516,7 +516,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: d59b05a91d345544ea159faf1cc15894, type: 2}
   - {fileID: 2100000, guid: 6a21ad160a9b65242b8e89dcc7d4a61a, type: 2}
   Space: {x: 50, y: 50, z: 50}
-  NumBoids: 200
+  NumBoids: 1000
   VisualRange: 3
   MaxVelocity: 6
   MinVelocityFactor: 0.4
@@ -527,6 +527,8 @@ MonoBehaviour:
   BoundsMargin: 0.3
   TurnFactor: 1
   Gravity: 0.7
+  UseKDTree: 1
+  UpdateNumPerCycle: 100
 --- !u!4 &761799613
 Transform:
   m_ObjectHideFlags: 0

@@ -1,16 +1,14 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
-public enum BoidType
-{
-    A, B, C
-}
 public struct Boid
 {
     public Vector3 Position;
     public Vector3 Velocity;
-    public BoidType Type;
 
     public override bool Equals(object obj)
     {
@@ -18,7 +16,7 @@ public struct Boid
 
         Boid boid = (Boid)obj;
 
-        return boid.Position.Equals(Position) && boid.Velocity.Equals(Velocity) && boid.Type == Type;
+        return boid.Position.Equals(Position) && boid.Velocity.Equals(Velocity);
     }
 }
 
@@ -38,6 +36,10 @@ public class Boids : MonoBehaviour
     public float TurnFactor = 1f;
     public float Gravity = 0.7f;
 
+    public bool UseKDTree = true;
+    public int UpdateNumPerCycle = 100;
+    private int updateIndex = 0;
+
     private List<Boid> boids = new();
     private List<GameObject> physicalBoids = new();
 
@@ -56,40 +58,42 @@ public class Boids : MonoBehaviour
                 {
                     Position = new(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z),
                     Velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f),
-                    Type = (BoidType)Mathf.FloorToInt(Random.value * BoidType.GetNames(typeof(BoidType)).Length)
                 });
 
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.transform.position = boids[i].Position;
-            sphere.GetComponent<MeshRenderer>().material = BoidMaterials[(int)boids[i].Type];
+            sphere.GetComponent<MeshRenderer>().material = BoidMaterials[Random.Range(0, BoidMaterials.Count)];
             physicalBoids.Add(sphere);
         }
     }
 
-    private void FlyTowardsCenter(ref Boid boid)
+    private void FlyTowardsCenter(ref Boid boid, List<Boid> neighbours = null)
     {
+        if (neighbours == null) neighbours = boids;
+
         Vector3 centroid = Vector3.zero;
         int numBoids = 0;
         
         // Including self
-        foreach (Boid b in boids)
+        foreach (Boid b in neighbours)
         {
             if (Vector3.Distance(boid.Position, b.Position) < VisualRange)
             {
-                float alignment = boid.Type == BoidType.C ? -1 : 0.5f;
-                centroid += b.Position * (boid.Type == b.Type ? 1.0f : alignment);
+                centroid += b.Position;
                 numBoids++;
             }
         }
 
         centroid /= numBoids;
-        boid.Velocity += (centroid - boid.Position) * CenteringFactor * Time.deltaTime;
+        boid.Velocity += (centroid - boid.Position) * (CenteringFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
     }
-    private void AvoidOthers(ref Boid boid)
+    private void AvoidOthers(ref Boid boid, List<Boid> neighbours = null)
     {
+        if (neighbours == null) neighbours = boids;
+
         Vector3 move = Vector3.zero;
 
-        foreach (Boid b in boids)
+        foreach (Boid b in neighbours)
         {
             if (!boid.Equals(b) && Vector3.Distance(boid.Position, b.Position) < AvoidDistance)
             {
@@ -97,26 +101,27 @@ public class Boids : MonoBehaviour
             }
         }
 
-        boid.Velocity += move * AvoidFactor * Time.deltaTime;
+        boid.Velocity += move * (AvoidFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
     }
-    private void MatchVelocity(ref Boid boid)
+    private void MatchVelocity(ref Boid boid, List<Boid> neighbours = null)
     {
+        if (neighbours == null) neighbours = boids;
+
         Vector3 velocity = Vector3.zero;
         int numBoids = 0;
 
         // Including self
-        foreach (Boid b in boids)
+        foreach (Boid b in neighbours)
         {
             if (Vector3.Distance(boid.Position, b.Position) < VisualRange)
             {
-                float alignment = boid.Type == BoidType.C ? -1 : 0.5f;
-                velocity += b.Velocity * (boid.Type == b.Type ? 1.0f : alignment);
+                velocity += b.Velocity;
                 numBoids++;
             }
         }
 
         velocity /= numBoids;
-        boid.Velocity += (velocity - boid.Velocity) * MatchingFactor * Time.deltaTime;
+        boid.Velocity += (velocity - boid.Velocity) * (MatchingFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
     }
     private void LimitSpeed(ref Boid boid)
     {
@@ -132,32 +137,36 @@ public class Boids : MonoBehaviour
     private void KeepWithinBounds(ref Boid boid)
     {
         Vector3 Margin = Space * BoundsMargin;
+        float turnAmount = TurnFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle);
 
         if (boid.Position.x < Margin.x)
         {
-            boid.Velocity.x += TurnFactor * Time.deltaTime;
+            boid.Velocity.x += turnAmount;
         }
         if (boid.Position.x > Space.x - Margin.x)
         {
-            boid.Velocity.x -= TurnFactor * Time.deltaTime;
+            boid.Velocity.x -= turnAmount;
         }
         if (boid.Position.y < Margin.y)
         {
-            boid.Velocity.y += TurnFactor * Time.deltaTime;
+            boid.Velocity.y += turnAmount;
         }
         if (boid.Position.y > Space.y - Margin.y)
         {
-            boid.Velocity.y -= TurnFactor * Time.deltaTime;
+            boid.Velocity.y -= turnAmount;
         }
         if (boid.Position.z < Margin.z)
         {
-            boid.Velocity.z += TurnFactor * Time.deltaTime;
+            boid.Velocity.z += turnAmount;
         }
         if (boid.Position.z > Space.z - Margin.z)
         {
-            boid.Velocity.z -= TurnFactor * Time.deltaTime;
+            boid.Velocity.z -= turnAmount;
         }
+    }
 
+    private void HandleCollision(ref Boid boid)
+    {
         if (boid.Position.x < 0.0f && boid.Velocity.x < 0.0f || boid.Position.x > Space.x && boid.Velocity.x > 0.0f)
         {
             float vel = Mathf.Abs(boid.Velocity.x);
@@ -180,19 +189,37 @@ public class Boids : MonoBehaviour
 
     private void Update()
     {
+        KDTree<Boid> tree = new(boids.Select(b => (b, b.Position)).ToList());
+        for (int i = 0; i < UpdateNumPerCycle; i++)
+        {
+            Boid boid = boids[updateIndex];
+            List<Boid> neighbours = null;
+            if (UseKDTree)
+            {
+                neighbours = tree.NearestNeighbours(boid.Position, 10);
+            }
+
+            FlyTowardsCenter(ref boid, neighbours);
+            AvoidOthers(ref boid, neighbours);
+            MatchVelocity(ref boid, neighbours);
+            boid.Velocity += Vector3.down * (Gravity * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
+            LimitSpeed(ref boid);
+            KeepWithinBounds(ref boid);
+
+            boids[updateIndex] = boid;
+
+            updateIndex = (updateIndex + 1) % boids.Count;
+        }
+
         for (int i = 0; i < boids.Count; i++)
         {
             Boid boid = boids[i];
 
-            FlyTowardsCenter(ref boid);
-            AvoidOthers(ref boid);
-            MatchVelocity(ref boid);
-            boid.Velocity += Vector3.down * Gravity * Time.deltaTime;
-            LimitSpeed(ref boid);
-            KeepWithinBounds(ref boid);
+            HandleCollision(ref boid);
 
             boid.Position += boid.Velocity * Time.deltaTime;
             physicalBoids[i].transform.position = boid.Position;
+
             boids[i] = boid;
         }
     }
