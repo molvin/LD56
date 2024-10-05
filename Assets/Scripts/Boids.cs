@@ -1,31 +1,15 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
-public struct Boid
-{
-    public Vector3 Position;
-    public Vector3 Velocity;
-
-    public override bool Equals(object obj)
-    {
-        if (!(obj is Boid)) return false;
-
-        Boid boid = (Boid)obj;
-
-        return boid.Position.Equals(Position) && boid.Velocity.Equals(Velocity);
-    }
-}
 
 public class Boids : MonoBehaviour
 {
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
-    public int NumBoids = 200;
-    public float VisualRange = 2f;
+    public int NumBoids = 1000;
+    public float VisualRange = 3f;
     public float MaxVelocity = 6f;
     public float MinVelocityFactor = 0.4f;
     public float CenteringFactor = 0.2f;
@@ -37,11 +21,13 @@ public class Boids : MonoBehaviour
     public float Gravity = 0.7f;
 
     public bool UseKDTree = true;
-    public int UpdateNumPerCycle = 100;
+    public int DesiredUpdateNumPerCycle = 100;
     private int updateIndex = 0;
 
-    private List<Boid> boids = new();
-    private List<GameObject> physicalBoids = new();
+    public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, physicalBoids.Count / 10), physicalBoids.Count);
+    public float DeltaTime => Time.fixedDeltaTime * physicalBoids.Count / UpdateNumPerCycle;
+
+    private List<Rigidbody> physicalBoids = new();
 
     private void OnDrawGizmos()
     {
@@ -53,174 +39,186 @@ public class Boids : MonoBehaviour
     {
         for (int i = 0; i < NumBoids; i++)
         {
-            boids.Add(
-                new()
-                {
-                    Position = new(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z),
-                    Velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f),
-                });
+            Vector3 position = new(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
+            Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
 
             GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.transform.position = boids[i].Position;
+            sphere.transform.position = position;
             sphere.GetComponent<MeshRenderer>().material = BoidMaterials[Random.Range(0, BoidMaterials.Count)];
-            physicalBoids.Add(sphere);
+            Rigidbody rb = sphere.AddComponent<Rigidbody>();
+            rb.velocity = velocity;
+            physicalBoids.Add(rb);
         }
     }
 
-    private void FlyTowardsCenter(ref Boid boid, List<Boid> neighbours = null)
+    private void FlyTowardsCenter(Rigidbody boid, List<Rigidbody> neighbours = null)
     {
-        if (neighbours == null) neighbours = boids;
+        if (neighbours == null) neighbours = physicalBoids;
 
         Vector3 centroid = Vector3.zero;
         int numBoids = 0;
         
         // Including self
-        foreach (Boid b in neighbours)
+        foreach (Rigidbody b in neighbours)
         {
-            if (Vector3.Distance(boid.Position, b.Position) < VisualRange)
+            if (Vector3.Distance(boid.position, b.position) < VisualRange)
             {
-                centroid += b.Position;
+                centroid += b.position;
                 numBoids++;
             }
         }
 
         centroid /= numBoids;
-        boid.Velocity += (centroid - boid.Position) * (CenteringFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
+        boid.velocity += (centroid - boid.position) * (CenteringFactor * DeltaTime);
     }
-    private void AvoidOthers(ref Boid boid, List<Boid> neighbours = null)
+    private void AvoidOthers(Rigidbody boid, List<Rigidbody> neighbours = null)
     {
-        if (neighbours == null) neighbours = boids;
+        if (neighbours == null) neighbours = physicalBoids;
 
         Vector3 move = Vector3.zero;
 
-        foreach (Boid b in neighbours)
+        foreach (Rigidbody b in neighbours)
         {
-            if (!boid.Equals(b) && Vector3.Distance(boid.Position, b.Position) < AvoidDistance)
+            if (!boid.Equals(b) && Vector3.Distance(boid.position, b.position) < AvoidDistance)
             {
-                move += (boid.Position - b.Position);
+                move += (boid.position - b.position);
             }
         }
 
-        boid.Velocity += move * (AvoidFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
+        boid.velocity += move * (AvoidFactor * DeltaTime);
     }
-    private void MatchVelocity(ref Boid boid, List<Boid> neighbours = null)
+    private void MatchVelocity(Rigidbody boid, List<Rigidbody> neighbours = null)
     {
-        if (neighbours == null) neighbours = boids;
+        if (neighbours == null) neighbours = physicalBoids;
 
         Vector3 velocity = Vector3.zero;
         int numBoids = 0;
 
         // Including self
-        foreach (Boid b in neighbours)
+        foreach (Rigidbody b in neighbours)
         {
-            if (Vector3.Distance(boid.Position, b.Position) < VisualRange)
+            if (Vector3.Distance(boid.position, b.position) < VisualRange)
             {
-                velocity += b.Velocity;
+                velocity += b.velocity;
                 numBoids++;
             }
         }
 
         velocity /= numBoids;
-        boid.Velocity += (velocity - boid.Velocity) * (MatchingFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
+        boid.velocity += (velocity - boid.velocity) * (MatchingFactor * DeltaTime);
     }
-    private void LimitSpeed(ref Boid boid)
+    private void LimitSpeed(Rigidbody boid)
     {
-        if (boid.Velocity.magnitude > MaxVelocity)
+        if (boid.velocity.magnitude > MaxVelocity)
         {
-            boid.Velocity = boid.Velocity.normalized * MaxVelocity;
+            boid.velocity = boid.velocity.normalized * MaxVelocity;
         }
-        else if (boid.Velocity.magnitude < MaxVelocity * MinVelocityFactor)
+        else if (boid.velocity.magnitude < MaxVelocity * MinVelocityFactor)
         {
-            boid.Velocity = boid.Velocity.normalized * MaxVelocity * MinVelocityFactor;
+            boid.velocity = boid.velocity.normalized * MaxVelocity * MinVelocityFactor;
         }
     }
-    private void KeepWithinBounds(ref Boid boid)
+    private void KeepWithinBounds(Rigidbody boid)
     {
         Vector3 Margin = Space * BoundsMargin;
-        float turnAmount = TurnFactor * Time.deltaTime * (boids.Count / UpdateNumPerCycle);
+        float turnAmount = TurnFactor * DeltaTime;
 
-        if (boid.Position.x < Margin.x)
+        Vector3 deltaVelocity = Vector3.zero;
+
+        if (boid.position.x < Margin.x)
         {
-            boid.Velocity.x += turnAmount;
+            deltaVelocity.x += turnAmount;
         }
-        if (boid.Position.x > Space.x - Margin.x)
+        if (boid.position.x > Space.x - Margin.x)
         {
-            boid.Velocity.x -= turnAmount;
+            deltaVelocity.x -= turnAmount;
         }
-        if (boid.Position.y < Margin.y)
+        if (boid.position.y < Margin.y)
         {
-            boid.Velocity.y += turnAmount;
+            deltaVelocity.y += turnAmount;
         }
-        if (boid.Position.y > Space.y - Margin.y)
+        if (boid.position.y > Space.y - Margin.y)
         {
-            boid.Velocity.y -= turnAmount;
+            deltaVelocity.y -= turnAmount;
         }
-        if (boid.Position.z < Margin.z)
+        if (boid.position.z < Margin.z)
         {
-            boid.Velocity.z += turnAmount;
+            deltaVelocity.z += turnAmount;
         }
-        if (boid.Position.z > Space.z - Margin.z)
+        if (boid.position.z > Space.z - Margin.z)
         {
-            boid.Velocity.z -= turnAmount;
+            deltaVelocity.z -= turnAmount;
         }
     }
 
-    private void HandleCollision(ref Boid boid)
+    private void HandleCollision(Rigidbody boid)
     {
-        if (boid.Position.x < 0.0f && boid.Velocity.x < 0.0f || boid.Position.x > Space.x && boid.Velocity.x > 0.0f)
+        Vector3 velocity = boid.velocity;
+
+        if (boid.position.x < 0.0f && velocity.x < 0.0f || boid.position.x > Space.x && velocity.x > 0.0f)
         {
-            float vel = Mathf.Abs(boid.Velocity.x);
-            boid.Velocity.x = 0f;
-            boid.Velocity += boid.Velocity.normalized * vel;
+            float vel = Mathf.Abs(velocity.x);
+            velocity.x = 0f;
+            velocity += velocity.normalized * vel;
         }
-        if (boid.Position.y < 0.0f && boid.Velocity.y < 0.0f || boid.Position.y > Space.y && boid.Velocity.y > 0.0f)
+        if (boid.position.y < 0.0f && velocity.y < 0.0f || boid.position.y > Space.y && velocity.y > 0.0f)
         {
-            float vel = Mathf.Abs(boid.Velocity.y);
-            boid.Velocity.y = 0f;
-            boid.Velocity += boid.Velocity.normalized * vel;
+            float vel = Mathf.Abs(velocity.y);
+            velocity.y = 0f;
+            velocity += velocity.normalized * vel;
         }
-        if (boid.Position.z < 0.0f && boid.Velocity.z < 0.0f || boid.Position.z > Space.z && boid.Velocity.z > 0.0f)
+        if (boid.position.z < 0.0f && velocity.z < 0.0f || boid.position.z > Space.z && velocity.z > 0.0f)
         {
-            float vel = Mathf.Abs(boid.Velocity.z);
-            boid.Velocity.z = 0f;
-            boid.Velocity += boid.Velocity.normalized * vel;
+            float vel = Mathf.Abs(velocity.z);
+            velocity.z = 0f;
+            velocity += velocity.normalized * vel;
         }
+
+        Vector3 pos = boid.position;
+        pos.x = Mathf.Clamp(pos.x, 0.0f, Space.x);
+        pos.y = Mathf.Clamp(pos.y, 0.0f, Space.y);
+        pos.z = Mathf.Clamp(pos.z, 0.0f, Space.z);
+
+        boid.position = pos;
+        boid.velocity = velocity;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        KDTree<Boid> tree = new(boids.Select(b => (b, b.Position)).ToList());
+        KDTree<Rigidbody> tree = new(physicalBoids.Select(b => (b, b.position)).ToList());
         for (int i = 0; i < UpdateNumPerCycle; i++)
         {
-            Boid boid = boids[updateIndex];
-            List<Boid> neighbours = null;
+            Rigidbody boid = physicalBoids[updateIndex];
+
+            List<Rigidbody> neighbours = null;
             if (UseKDTree)
             {
-                neighbours = tree.NearestNeighbours(boid.Position, 10);
+                neighbours = tree.NearestNeighbours(boid.position, 10);
             }
 
-            FlyTowardsCenter(ref boid, neighbours);
-            AvoidOthers(ref boid, neighbours);
-            MatchVelocity(ref boid, neighbours);
-            boid.Velocity += Vector3.down * (Gravity * Time.deltaTime * (boids.Count / UpdateNumPerCycle));
-            LimitSpeed(ref boid);
-            KeepWithinBounds(ref boid);
+            FlyTowardsCenter(boid, neighbours);
+            AvoidOthers(boid, neighbours);
+            MatchVelocity(boid, neighbours);
+            //boid.Velocity += Vector3.down * (Gravity * Time.fixedDeltaTime * (boids.Count / UpdateNumPerCycle));
+            // Rigidbody gravity
+            boid.velocity += Vector3.down * ((Gravity - 9.81f) * DeltaTime);
+            LimitSpeed(boid);
+            KeepWithinBounds(boid);
 
-            boids[updateIndex] = boid;
+            //physicalBoids[updateIndex].GetComponent<Rigidbody>().AddForce(boid.velocity * Time.fixedDeltaTime * (physicalBoids.Count / UpdateNumPerCycle), ForceMode.VelocityChange);
 
-            updateIndex = (updateIndex + 1) % boids.Count;
+            updateIndex = (updateIndex + 1) % physicalBoids.Count;
         }
 
-        for (int i = 0; i < boids.Count; i++)
+        for (int i = 0; i < physicalBoids.Count; i++)
         {
-            Boid boid = boids[i];
+            Rigidbody boid = physicalBoids[i];
 
-            HandleCollision(ref boid);
+            HandleCollision(boid);
 
-            boid.Position += boid.Velocity * Time.deltaTime;
-            physicalBoids[i].transform.position = boid.Position;
+            //boid.Position += boid.Velocity * Time.fixedDeltaTime;
+            //physicalBoids[i].transform.position = boid.Position;
 
-            boids[i] = boid;
         }
     }
 }

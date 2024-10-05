@@ -528,7 +528,7 @@ MonoBehaviour:
   TurnFactor: 1
   Gravity: 0.7
   UseKDTree: 1
-  UpdateNumPerCycle: 100
+  DesiredUpdateNumPerCycle: 100
 --- !u!4 &761799613
 Transform:
   m_ObjectHideFlags: 0
