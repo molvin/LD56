@@ -24,6 +24,10 @@ public class PlayerStats : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            Player.Die();
+        }
         if (CurrentHealth > 0)
             ApplyBoidDamage();
     }

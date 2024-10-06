@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff9f59cd4536b9c47bed5445e9eb9c3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pool_start_size: 20
+  pool_start_size: 0
   loop_config_test: {fileID: 0}
   clip_config_test: {fileID: 11400000, guid: ccc08136b012de44e96842c7ae6c51f7, type: 2}
 --- !u!4 &1645657076

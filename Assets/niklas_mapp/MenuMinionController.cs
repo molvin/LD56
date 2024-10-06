@@ -47,10 +47,9 @@ public class MenuMinionController : MonoBehaviour
     {
         scatter();
         Debug.Log("Start_game");
+        loop_holder?.Stop();
 
         StartCoroutine(callAfterSec(0.5f, () => {
-                loop_holder.Stop();
-
                 SceneManager.LoadScene(1);
             }
         ));

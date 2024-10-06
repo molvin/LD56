@@ -25,8 +25,14 @@ public class Audioman : MonoBehaviour
 
     void Awake()
     {
-        sfx_queue = new Queue<AudioSource>();
-        SpawnAudioSources(pool_start_size);
+        Debug.Log("AUDIO AWAKE");
+        if(sfx_mixer == null) {
+            Debug.Log("CREATE QUEUE");
+
+            sfx_queue = new Queue<AudioSource>();
+            SpawnAudioSources(pool_start_size);
+        }
+       
     }
 
     private void SpawnAudioSources(int amount)
