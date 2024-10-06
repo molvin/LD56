@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb9b37626b66e94a8a06db6c2074d38, type: 3}
+  m_Name: wall_bonk
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: 3289609dea8928d4985b8bddd975ca40, type: 3}
+  - {fileID: 8300000, guid: f60658f142f30964ca2caddf89c5a179, type: 3}
+  - {fileID: 8300000, guid: b17cb6603b7378f48811ae62cf8f3e3d, type: 3}
+  - {fileID: 8300000, guid: 3dc246fa8a1a1854883ee60cd7f6de18, type: 3}
+  - {fileID: 8300000, guid: 9b189ab17ec550a42a1d091823a8f3b3, type: 3}
+  mixer: {fileID: -5741106158597400451, guid: ddad48f52d20f4b4dabf9f15031adc07, type: 2}
+  vol_min: 0.977
+  vol_max: 1
+  pitch_min: 0.41
+  pitch_max: 1.06

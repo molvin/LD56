@@ -6,7 +6,9 @@ public class Player : MonoBehaviour
     {
         Running,
         Dodging,
-        Attacking
+        Attacking,
+        Dead,
+        Shopping
     }
 
     [Header("Running")]
@@ -29,6 +31,13 @@ public class Player : MonoBehaviour
     public float ThrowSpeed;
     public BoomerangController BoomerangPrefab;
     public Inventory Inventory;
+    [Header("Death")]
+    public float DeathStoppingTime;
+    public float TimeBeforeFadeout;
+    public HUD HUD;
+    [Header("Shop")]
+    public Shop ShopPrefab;
+    public float ShopRespawnTime;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -46,12 +55,18 @@ public class Player : MonoBehaviour
     private float timeOfLastShot;
     private Vector3 throwDir;
     private bool fired;
+    private float timeOfDeath;
+    private bool deathDone;
+    private float timeOfLastShop;
+
+    private Shop shop;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
     private void Start()
     {
         state = State.Running;
+        timeOfLastShop = Time.time;
     }
 
     private void Update()
@@ -66,6 +81,9 @@ public class Player : MonoBehaviour
                 break;
             case State.Attacking:
                 UpdateAttacking();
+                break;
+            case State.Dead:
+                UpdateDead();
                 break;
         }
 
@@ -107,6 +125,8 @@ public class Player : MonoBehaviour
             Dodge();
         }
         Attack();
+
+        LookForShop();
     }
 
     private void Dodge()
@@ -167,12 +187,7 @@ public class Player : MonoBehaviour
             Weapon weapon = Inventory.UseNextWeapon();
 
             BoomerangController boomerang = Instantiate(BoomerangPrefab);
-            boomerang.Owner = this;
-            boomerang.Weapon = weapon;
-            boomerang.transform.position = transform.position + throwDir * 1.6f;
-
-            // Let it inherit some velocity to feel good
-            boomerang.velocity = new Vector2(velocity.x, velocity.z) * 0.5f + new Vector2(throwDir.x, throwDir.z) * ThrowSpeed;
+            boomerang.Init(this, weapon, transform.position + throwDir * 1.6f, new Vector2(throwDir.x, throwDir.z), new Vector2(velocity.x, velocity.z) * 0.5f);
             fired = true;
         }
 
@@ -182,6 +197,60 @@ public class Player : MonoBehaviour
             state = State.Running;
             fired = false;
         }
+    }
+
+    public void Die()
+    {
+        state = State.Dead;
+        timeOfDeath = Time.time;
+    }
+
+    private void UpdateDead()
+    {
+        velocity = Vector3.SmoothDamp(velocity, Vector3.zero, ref deceleration, DeathStoppingTime);
+
+        if(!deathDone && (Time.time - timeOfDeath) > TimeBeforeFadeout)
+        {
+            deathDone = true;
+            HUD.GameOver();
+        }
+    }
+
+    private void LookForShop()
+    {
+        if(shop != null)
+        {
+            float d = Vector3.Distance(transform.position, shop.transform.position);
+            if(d < shop.Radius)
+            {
+                HUD.Shop(Buy);
+                state = State.Shopping;
+                Time.timeScale = 0.0f;
+            }
+        }
+        else
+        {
+            if((Time.time - timeOfLastShop) > ShopRespawnTime)
+            {
+                // TODO: random point on the map (?)
+                shop = Instantiate(ShopPrefab, Vector3.zero, Quaternion.identity);
+                timeOfLastShop = Time.time;
+            }
+        }
+    }
+
+    private void Buy(Weapon weapon)
+    {
+        Time.timeScale = 1.0f;
+        state = State.Running;
+        if(weapon != null)
+        {
+            Inventory.AddWeapon(weapon);
+        }
+
+        Destroy(shop.gameObject);
+        shop = null;
+        timeOfLastShop = Time.time;
     }
 
     private void UpdateCollision()
@@ -270,6 +339,8 @@ public class Player : MonoBehaviour
     {
         Inventory.AddWeapon(weapon);
     }
+
+
 
     private void OnGUI()
     {
