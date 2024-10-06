@@ -28,6 +28,7 @@ public class Player : MonoBehaviour
     public float AttackStoppingTime;
     public float ThrowSpeed;
     public BoomerangController BoomerangPrefab;
+    public Inventory Inventory;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -144,8 +145,11 @@ public class Player : MonoBehaviour
                 Vector2 throwDirection = new Vector2(toMouse.x, toMouse.z).normalized;
                 throwDir = new Vector3(throwDirection.x, 0, throwDirection.y);
 
-                timeOfLastShot = Time.time;
-                state = State.Attacking;
+                if(Inventory.PeekNextWeapon() != null)
+                {
+                    timeOfLastShot = Time.time;
+                    state = State.Attacking;
+                }
             }
         }
     }
@@ -158,8 +162,11 @@ public class Player : MonoBehaviour
 
         if(!fired && (Time.time - timeOfLastShot) >= (AttackStunDuration * TimeBeforeFireFactor))
         {
+            Weapon weapon = Inventory.UseNextWeapon();
+
             BoomerangController boomerang = Instantiate(BoomerangPrefab);
-            boomerang.Owner = gameObject;
+            boomerang.Owner = this;
+            boomerang.Weapon = weapon;
             boomerang.transform.position = transform.position + throwDir * 1.6f;
 
             // Let it inherit some velocity to feel good
@@ -255,6 +262,11 @@ public class Player : MonoBehaviour
             pos.y = hitInfo.point.y + Collider.height / 2.0f;
             transform.position = pos;
         }
+    }
+
+    public void PickUp(Weapon weapon)
+    {
+        Inventory.AddWeapon(weapon);
     }
 
     private void OnGUI()

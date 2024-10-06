@@ -4,51 +4,34 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    public List<int> Equipment;
-    public float FollowSpacing;
-    public float FollowSmoothing;
-
-    public GameObject Follower;
-    private Queue<(int, GameObject)> followers = new Queue<(int, GameObject)>();
-    private Dictionary<int, GameObject> inUse = new Dictionary<int, GameObject>();
-
+    public HUD HUD;
+    private Queue<Weapon> weaponQueue = new();
+    
     private void Start()
     {
-        foreach(int i in Equipment)
-        {
-            SpawnFollower(i);
-        }
+        weaponQueue.Enqueue(new Weapon { Name = "BaseWeapon" });
+        weaponQueue.Enqueue(new Weapon { Name = "BaseWeapon" });
+        weaponQueue.Enqueue(new Weapon { Name = "BaseWeapon" });
+        HUD.SetWeapons(weaponQueue);
     }
 
-    private void Update()
+    public Weapon PeekNextWeapon()
     {
-        Vector3 targetPosition = transform.position - transform.forward * FollowSpacing;
-        foreach((int index, GameObject follower) in followers)
-        {
-            Vector3 velo = Vector3.zero;
-            follower.transform.position = Vector3.SmoothDamp(follower.transform.position, targetPosition, ref velo, FollowSmoothing);
-            targetPosition -= transform.forward * FollowSpacing;
-        }
+        bool found = weaponQueue.TryPeek(out Weapon result);
+        return found ? result : null;
     }
-
-    public void SpawnFollower(int i)
+    public Weapon UseNextWeapon()
     {
-        GameObject follower = Instantiate(Follower, transform.position, transform.rotation);
-        followers.Enqueue((i, follower));
+        if (weaponQueue.Count == 0)
+            return null;
+        Weapon weapon = weaponQueue.Dequeue();
+        HUD.SetWeapons(weaponQueue);
+        return weapon;
     }
 
-    public void UseNextEquipment()
+    public void AddWeapon(Weapon weapon)
     {
-        (int index, GameObject follower) = followers.Dequeue();
-        follower.SetActive(false);
-        inUse.Add(index, follower);
+        weaponQueue.Enqueue(weapon);
+        HUD.SetWeapons(weaponQueue);
     }
-
-    public void ReturnEquipment(int index)
-    {
-        GameObject follower = inUse[index];
-        follower.SetActive(true);
-        followers.Enqueue((index, follower));
-    }
-
 }

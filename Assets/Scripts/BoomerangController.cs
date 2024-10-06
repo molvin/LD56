@@ -15,7 +15,8 @@ public class BoomerangController : MonoBehaviour
 
     public bool GracePeriod => Time.time - spawnTime < MinLifeTime;
 
-    public GameObject Owner;
+    public Player Owner;
+    public Weapon Weapon;
 
     public float StayTime = 1.6f;
     public float Bouncyness = 0.24f;
@@ -57,6 +58,7 @@ public class BoomerangController : MonoBehaviour
         {
             // TODO: Phase
             Destroy(gameObject);
+            Owner.PickUp(Weapon);
         }
 
         GetComponent<MeshRenderer>().material = returning ? ReturnMat : ThrowMat;
@@ -70,6 +72,7 @@ public class BoomerangController : MonoBehaviour
         if (!GracePeriod && Vector3.Distance(transform.position, Owner.transform.position) < 1f)
         {
             Destroy(gameObject);
+            Owner.PickUp(Weapon);
         }
     }
 
