@@ -17,9 +17,11 @@ public class HUD : MonoBehaviour
     public float PostFadeOutTime;
     public Image FadeOut;
     [Header("Shop")]
+    public Inventory Inventory;
     public GameObject ShopParent;
     public Button SkipShopButton;
     public ShopOption[] ShopChoiceButtons;
+    public WeaponCard WillReplace;
 
     public WeaponCard WeaponCardPrefab;
     private List<WeaponCard> weaponCards = new();
@@ -50,7 +52,7 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void Shop(Action<Weapon> callback)
+    public void Shop(Action<Weapon, Weapon> callback)
     {
         IEnumerator Coroutine()
         {
@@ -58,7 +60,18 @@ public class HUD : MonoBehaviour
 
             bool choiceMade = false;
             Weapon chosenWeapon = null;
+            Weapon weaponToReplace = Inventory.GetRandom();
             SkipShopButton.onClick.AddListener(() => choiceMade = true);
+
+            if (Inventory.AtMax)
+            {
+                WillReplace.gameObject.SetActive(true);
+                WillReplace.Init(weaponToReplace);
+            }
+            else
+            {
+                WillReplace.gameObject.SetActive(false);
+            }
 
             var weapons = Weapons.GetShop(ShopChoiceButtons.Length).ToList();
             for(int i = 0; i < ShopChoiceButtons.Length; i++)
@@ -75,7 +88,7 @@ public class HUD : MonoBehaviour
             SkipShopButton.onClick.RemoveAllListeners();
 
             ShopParent.SetActive(false);
-            callback(chosenWeapon);
+            callback(chosenWeapon, weaponToReplace);
         }
 
         StartCoroutine(Coroutine());

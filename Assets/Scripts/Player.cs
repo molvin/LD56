@@ -89,6 +89,8 @@ public class Player : MonoBehaviour
         }
 
         UpdateCollision();
+
+        // TODO: shop indicator
     }
 
     private void Run()
@@ -245,13 +247,16 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Buy(Weapon weapon)
+    private void Buy(Weapon weapon, Weapon weaponToReplace)
     {
         Time.timeScale = 1.0f;
         state = State.Running;
         if(weapon != null)
         {
-            Inventory.AddWeapon(weapon);
+            if(Inventory.AtMax)
+                Inventory.ReplaceWeapon(weapon, weaponToReplace);
+            else
+                Inventory.AddWeapon(weapon);
         }
 
         Destroy(shop.gameObject);
