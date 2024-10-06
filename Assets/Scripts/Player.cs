@@ -98,7 +98,7 @@ public class Player : MonoBehaviour
         if(shop != null)
         {
             // TODO: indicate on hud that shop is active
-            
+
         }
     }
 

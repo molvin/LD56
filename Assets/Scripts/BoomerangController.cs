@@ -289,6 +289,7 @@ public class BoomerangController : MonoBehaviour
             loopHolderSteps = auido_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position);
         }
         loopHolderSteps.setVolume((velocity.magnitude / InitialSpeed ) * 2f);
+        loopHolderSteps.setWorldPosition(this.transform.position);
 
 
     }
