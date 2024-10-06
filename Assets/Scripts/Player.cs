@@ -21,6 +21,10 @@ public class Player : MonoBehaviour
     public float DodgeDuration;
     public float DodgeSpeed;
     public AnimationCurve DodgeSpeedCurve;
+    [Header("Attacking")]
+    public float AttackCooldown;
+    public float AttackStunDuration;
+    public float AttackStoppingTime;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -52,7 +56,7 @@ public class Player : MonoBehaviour
                 UpdateDodge();
                 break;
             case State.Attacking:
-                // TODO: attack
+                UpdateAttacking();
                 break;
         }
 
@@ -115,6 +119,23 @@ public class Player : MonoBehaviour
         {
             state = State.Running;
         }
+
+    }
+
+    private void Attack()
+    {
+        // TODO: get weapon we are using and spawn it
+
+        // TODO: get direction we fire in from mouse, on players plane
+
+        // TODO: when stun is over switch state to running
+
+        // 
+
+    }
+
+    private void UpdateAttacking()
+    {
 
     }
 
