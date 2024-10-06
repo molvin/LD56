@@ -44,7 +44,7 @@ public class KDTree<T>
 
     private void NeighbourSearch(KDNode<T> node, Vector3 target, int depth, int num)
     {
-        if (node == null) return;
+        if (node == null || node.Value == null) return;
 
         int axis = depth % K;
         double distance = Vector3.Distance(target, node.Position);
