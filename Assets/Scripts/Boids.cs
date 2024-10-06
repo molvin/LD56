@@ -31,6 +31,7 @@ public class Boids : MonoBehaviour
     public int DesiredUpdateNumPerCycle = 100;
     private int updateIndex = 0;
     private int lastSpawnTime = 0;
+    private float startTime;
 
     public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, allBoids.Count / 10), allBoids.Count);
     public float DeltaTime => Time.fixedDeltaTime * allBoids.Count / UpdateNumPerCycle;
@@ -68,6 +69,7 @@ public class Boids : MonoBehaviour
 
     private void Start()
     {
+        startTime = Time.time;
         Instance = this;
         player = FindObjectOfType<Player>();
 
@@ -232,7 +234,7 @@ public class Boids : MonoBehaviour
 
     private void FixedUpdate()
     {
-        int currentTime = (int)Time.time;
+        int currentTime = (int)(Time.time - startTime);
         if (currentTime != lastSpawnTime)
         {
             int toSpawn = 0;
