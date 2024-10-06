@@ -6,6 +6,16 @@ using UnityEngine.AI;
 
 public class BadController : MonoBehaviour
 {
+    public BoomerangController BoomerangPrefab;
+
+    public float ThrowSpeed = 30f;
+    public float ReturnAcc = 50f;
+    public float ReturnJerk = 200f;
+    public float Bouncy = 0.4f;
+    public float BoomDrag = 0.04f;
+    public float BoomStay = 1;
+    public float BoomStayEffect = 0.2f;
+
     public float Acceleration = 24f;
     public float Drag = 0.04f;
 
@@ -13,6 +23,33 @@ public class BadController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit mouseHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out mouseHit))
+            {
+                Vector3 toMouse = (mouseHit.point - transform.position);
+                Vector2 throwDirection = new Vector2(toMouse.x, toMouse.z).normalized;
+                Vector3 throwDir = new Vector3(throwDirection.x, 0, throwDirection.y);
+                BoomerangController boomerang = Instantiate(BoomerangPrefab);
+                boomerang.Owner = this;
+                boomerang.transform.position = transform.position + throwDir * 1.6f;
+
+                // Let it inherit some velocity to feel good
+                boomerang.velocity = velocity * 0.5f + throwDirection * ThrowSpeed;
+                /* DEBUG
+                boomerang.ReturnAcceleration = ReturnAcc;
+                boomerang.ReturnJerk = ReturnJerk;
+                boomerang.Bouncyness = Bouncy;
+                boomerang.ReturnDrag = BoomDrag;
+                boomerang.StayTime = BoomStay;
+                boomerang.StayEffect = BoomStayEffect;
+                */
+            }
+        }
+
         Vector2 input = Vector2.zero;
         if (Input.GetKey(KeyCode.A))
             input.x -= 1;
@@ -38,12 +75,9 @@ public class BadController : MonoBehaviour
             y = hit.position.y + 1f;
         }
 
-        if (Vector2.Distance(target, actual) > target.magnitude * 0.1f)
-        {
-            Vector2 normal = (actual - target).normalized;
-            Vector2 projection = normal * Vector2.Dot(velocity, normal);
-            velocity -= projection;
-        }
+        Vector2 normal = (actual - target).normalized;
+        Vector2 projection = normal * Vector2.Dot(velocity, normal);
+        velocity -= projection;
 
         transform.position = new Vector3(actual.x, y, actual.y);
     }
