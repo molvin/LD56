@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public delegate void HitTrigger(BoomerangController controller);
+public delegate void Trigger(BoomerangController controller);
 
 public class Weapon
 {
@@ -10,8 +10,10 @@ public class Weapon
     public int Damage = 60;
     public float ThrowSpeedModifier = 1.0f;
     public float Bouncyness = 0.24f;
-    public HitTrigger OnHit;
-    public HitTrigger OnProc;
+    public Trigger OnHit;
+    public Trigger OnProc;
+    public float PeriodTime = 10.0f;
+    public Trigger OnPeriod;
 }
 
 public static class Weapons
@@ -60,6 +62,19 @@ public static class Weapons
                 c.velocity = dir.normalized * c.velocity.magnitude;
                 break;
             }
+        },
+    };
+
+    public static Weapon Randomancer => new()
+    {
+        Name = "Randomancer",
+        ThrowSpeedModifier = 0.8f,
+        PeriodTime = 0.5f,
+        OnPeriod = c =>
+        {
+            float magnitude = c.velocity.magnitude * 1.2f;
+            Vector2 dir = Random.insideUnitCircle.normalized;
+            c.velocity = dir * magnitude;
         },
     };
 }

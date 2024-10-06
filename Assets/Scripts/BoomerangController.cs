@@ -32,6 +32,7 @@ public class BoomerangController : MonoBehaviour
     private float stuckTime = 0f;
     private float timeStayed = 0f;
     private float spawnTime;
+    private float lastPeriodProc;
 
     private Audioman.LoopHolder loopHolderSteps;
 
@@ -65,10 +66,17 @@ public class BoomerangController : MonoBehaviour
     {
         returning = false;
         spawnTime = Time.time;
+        lastPeriodProc = Time.time;
     }
 
     void Update()
     {
+        if (Time.time - lastPeriodProc > Weapon.PeriodTime)
+        {
+            Weapon.OnPeriod?.Invoke(this);
+            lastPeriodProc = Time.time;
+        }
+
         if (velocity.magnitude > SMALL_NUMBER)
         {
             stuckTime = 0f;
