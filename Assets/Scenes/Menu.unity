@@ -348,14 +348,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Menu
       objectReference: {fileID: 0}
-    - target: {fileID: 4051620524045784817, guid: 4bb5d202446182d43b3af903b2d56a1b, type: 3}
-      propertyPath: mixer
-      value: 
-      objectReference: {fileID: 24100000, guid: ddad48f52d20f4b4dabf9f15031adc07, type: 2}
-    - target: {fileID: 4051620524045784817, guid: 4bb5d202446182d43b3af903b2d56a1b, type: 3}
-      propertyPath: volumeChangeFactor
-      value: 0.2
-      objectReference: {fileID: 0}
     - target: {fileID: 6742519882667165055, guid: 4bb5d202446182d43b3af903b2d56a1b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
