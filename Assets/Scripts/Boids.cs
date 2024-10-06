@@ -7,12 +7,14 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
+    public const int MAX_BOIDS = 1000;
+
     public static Boids Instance;
     private Player player;
 
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
-    public int NumBoids = 1000;
+    public float SpawnRate = 0.3f;
     public float VisualRange = 3f;
     public float MaxVelocity = 6f;
     public float MinVelocityFactor = 0.4f;
@@ -28,6 +30,8 @@ public class Boids : MonoBehaviour
     public bool UseKDTree = true;
     public int DesiredUpdateNumPerCycle = 100;
     private int updateIndex = 0;
+    private int lastSpawnTime = 0;
+    private float startTime;
 
     public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, allBoids.Count / 10), allBoids.Count);
     public float DeltaTime => Time.fixedDeltaTime * allBoids.Count / UpdateNumPerCycle;
@@ -65,13 +69,19 @@ public class Boids : MonoBehaviour
 
     private void Start()
     {
+        startTime = Time.time;
         Instance = this;
         player = FindObjectOfType<Player>();
 
         MinBounds = transform.position - Space * 0.5f;
         MaxBounds = transform.position + Space * 0.5f;
+    }
 
-        for (int i = 0; i < NumBoids; i++)
+    private void Spawn(int num)
+    {
+        int numToSpawn = Mathf.Min(num, MAX_BOIDS - allBoids.Count);
+
+        for (int i = 0; i < numToSpawn; i++)
         {
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
@@ -224,6 +234,21 @@ public class Boids : MonoBehaviour
 
     private void FixedUpdate()
     {
+        int currentTime = (int)(Time.time - startTime);
+        if (currentTime != lastSpawnTime)
+        {
+            float toSpawn = 0;
+            while (lastSpawnTime < currentTime)
+            {
+                toSpawn += ++lastSpawnTime * SpawnRate;
+            }
+            
+            Spawn((int)toSpawn);
+        }
+
+        if (allBoids.Count == 0)
+            return;
+
         tree = new(allBoids.Select(b => (b, b.position)).ToList());
 
         updateIndex %= allBoids.Count;

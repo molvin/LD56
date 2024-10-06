@@ -8,8 +8,6 @@ public class BoomerangController : MonoBehaviour
     public const float InternalHitCooldown = 0.225f;
     public const float InternalProcCooldown = 0.15f;
 
-    public int Damage = 60;
-
     public Material ThrowMat;
     public Material ReturnMat;
 
@@ -41,6 +39,20 @@ public class BoomerangController : MonoBehaviour
     private float lastProcTime = 0f;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
+
+
+    public void Init(Player owner, Weapon weapon, Vector3 position, Vector2 throwDirection, Vector2 extraVelocity)
+    {
+        Owner = owner;
+        Weapon = weapon;
+        transform.position = position;
+
+        InitialSpeed *= weapon.ThrowSpeedModifier;
+        ReturnAcceleration *= weapon.ThrowSpeedModifier;
+        ReturnJerk *= weapon.ThrowSpeedModifier;
+
+        velocity = throwDirection * InitialSpeed + extraVelocity;
+    }
 
     private void Awake()
     {
@@ -174,7 +186,8 @@ public class BoomerangController : MonoBehaviour
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
                 Instantiate(Resources.Load("Effects/BiteEffect"), boidPos, Quaternion.identity);
-                Boids.Instance.DamageBoid(b, Damage);
+
+                Boids.Instance.DamageBoid(b, Weapon.Damage);
                 internalBoidCooldown[b] = Time.time;
 
                 if (Time.time - lastProcTime > InternalProcCooldown)
