@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
+using static Audioman;
 
 public class MenuMinionController : MonoBehaviour
 {
@@ -24,7 +25,8 @@ public class MenuMinionController : MonoBehaviour
     public GameObject settings_default_select;
 
 
-
+    Audioman.LoopHolder loop_holder;
+    public Audioman audio_man;
     public void Awake()
     {
         for(int i = 0; i < numberOfMinions; i++)
@@ -34,9 +36,11 @@ public class MenuMinionController : MonoBehaviour
             minions.Add(o.GetComponent<NavMeshAgent>());
         }
 
-
+        audio_man = GameObject.FindAnyObjectByType<Audioman>();
 
     }
+
+
 
     public void startGame()
     {
@@ -94,7 +98,10 @@ public class MenuMinionController : MonoBehaviour
 
     void Start()
     {
+        var loop_obj = Resources.Load<AudioLoopConfiguration>("object/creature_step_loop");
+        Debug.Log(loop_obj);
 
+        loop_holder = audio_man.PlayLoop(loop_obj, this.transform.position);
 
 
     }
@@ -113,7 +120,7 @@ public class MenuMinionController : MonoBehaviour
                 if (Input.GetMouseButtonDown(0))
                 {
                     ExecuteEvents.Execute(pos_des.gameObject, null, ExecuteEvents.submitHandler);
-                    Debug.Log(pos_des.name);
+                   // Debug.Log(pos_des.name);
                 }
                 
                // setMinionDestination(pos_des);
@@ -121,10 +128,15 @@ public class MenuMinionController : MonoBehaviour
             }
 
         }
-        /*else
+        var total_velocity_magnitude = 0f;
+        foreach (var item in minions)
         {
-            scatter();
-        }*/
+            total_velocity_magnitude += item.velocity.magnitude;
+        }
+        var avr_velocity = total_velocity_magnitude / minions.Count;
+       // Debug.Log(avr_velocity / 10f);
+
+        loop_holder.setVolume((avr_velocity / 10f) *1.5f);
 
     }
 
@@ -180,7 +192,7 @@ public class MenuMinionController : MonoBehaviour
                     );
                 limit = --limit;
             } while (!IsInsideMeshCollider(collider, result) && limit >= 0);
-            Debug.Log(limit);
+          //  Debug.Log(limit);
             if(IsInsideMeshCollider(collider, result))
             {
                 item.destination = result;

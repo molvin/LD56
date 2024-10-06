@@ -12,7 +12,9 @@ public class CustomSelectable : Selectable
     public void OnSelect(BaseEventData eventData)
     {
         Debug.Log("hej");
+        controller.audio_man.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position);
         controller.setMinionDestination(this.gameObject);
-    }
 
+    }
+    
 }

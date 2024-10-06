@@ -297,6 +297,66 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4bb5d202446182d43b3af903b2d56a1b, type: 3}
+--- !u!1 &1645657073
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1645657076}
+  - component: {fileID: 1645657075}
+  - component: {fileID: 1645657074}
+  m_Layer: 0
+  m_Name: AudioMan
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1645657074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1645657073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8955663f40a4a5247abf81756e246715, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1645657075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1645657073}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff9f59cd4536b9c47bed5445e9eb9c3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pool_start_size: 0
+  loop_config_test: {fileID: 0}
+  clip_config_test: {fileID: 11400000, guid: ccc08136b012de44e96842c7ae6c51f7, type: 2}
+--- !u!4 &1645657076
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1645657073}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.8852384, y: -0.056666136, z: -1.5734079}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1939395788
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,3 +501,4 @@ SceneRoots:
   - {fileID: 1939395791}
   - {fileID: 227532588}
   - {fileID: 330225472}
+  - {fileID: 1645657076}

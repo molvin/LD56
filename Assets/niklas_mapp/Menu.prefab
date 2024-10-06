@@ -271,6 +271,7 @@ MonoBehaviour:
   main_default_select: {fileID: 3331078777518379783}
   settings_button_group: {fileID: 7904324446420980210}
   settings_default_select: {fileID: 6246430524970327144}
+  audio_man: {fileID: 0}
 --- !u!1 &7904324446420980210
 GameObject:
   m_ObjectHideFlags: 0
