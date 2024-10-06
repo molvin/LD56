@@ -43,10 +43,15 @@ public class Boids : MonoBehaviour
         return tree.NearestNeighbours(pos, num);
     }
 
-    public void DamageBoid(Boid boid)
+    public void DamageBoid(Boid boid, int damage)
     {
-        allBoids.Remove(boid);
-        Destroy(boid.gameObject);
+        boid.TakeDamage(damage);
+
+        if (boid.IsDead)
+        {
+            allBoids.Remove(boid);
+            Destroy(boid.gameObject);
+        }
     }
 
     private void OnDrawGizmos()

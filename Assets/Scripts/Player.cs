@@ -47,6 +47,8 @@ public class Player : MonoBehaviour
     private Vector3 throwDir;
     private bool fired;
 
+    public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
+
     private void Start()
     {
         state = State.Running;
@@ -166,7 +168,10 @@ public class Player : MonoBehaviour
 
             BoomerangController boomerang = Instantiate(BoomerangPrefab);
             boomerang.Owner = this;
+<<<<<<< HEAD
             boomerang.Weapon = weapon;
+=======
+>>>>>>> afe4fa0 (boomerang stuff)
             boomerang.transform.position = transform.position + throwDir * 1.6f;
 
             // Let it inherit some velocity to feel good

@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class BoomerangController : MonoBehaviour
 {
     public const float SMALL_NUMBER = 0.001f;
+    public const float InternalHitCooldown = 0.225f;
+    public const float InternalProcCooldown = 0.15f;
+
+    public int Damage = 60;
 
     public Material ThrowMat;
     public Material ReturnMat;
 
     public const float PhaseTime = 3.0f;
-    public const float MinLifeTime = 3.0f;
+    public const float MinLifeTime = 1.5f;
 
     public bool GracePeriod => Time.time - spawnTime < MinLifeTime;
 
@@ -31,6 +34,9 @@ public class BoomerangController : MonoBehaviour
     private float stuckTime = 0f;
     private float timeStayed = 0f;
     private float spawnTime;
+
+    private Dictionary<Boid, float> internalBoidCooldown = new();
+    private float lastProcTime = 0f;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
@@ -71,10 +77,7 @@ public class BoomerangController : MonoBehaviour
 
         HitBoid();
 
-
-        Vector2 ownerPos = new Vector2(Owner.transform.position.x, Owner.transform.position.z);
-
-        if (!GracePeriod && Vector2.Distance(Position2D, ownerPos) < 1.5f)
+        if (!GracePeriod && Vector2.Distance(Position2D, Owner.Position2D) < 1.5f)
         {
             Destroy(gameObject);
             Owner.PickUp(Weapon);
@@ -83,8 +86,7 @@ public class BoomerangController : MonoBehaviour
 
     private void Accelerate()
     {
-        Vector3 toOwner = (Owner.transform.position - transform.position);
-        Vector2 accDir = new Vector2(toOwner.x, toOwner.z).normalized;
+        Vector2 accDir = (Owner.Position2D - Position2D).normalized;
 
         float deltaTime = Time.deltaTime * (returning && timeStayed < StayTime ? Mathf.Lerp(StayEffect, 1f, timeStayed / StayTime) : 1f);
 
@@ -154,12 +156,25 @@ public class BoomerangController : MonoBehaviour
 
         foreach (Boid b in boids)
         {
-            if (b == null) continue;
+            if (b == null || b.IsDead)
+                continue;
+
+            if (internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown)
+            {
+                continue;
+            }
 
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
-                Boids.Instance.DamageBoid(b);
+                Boids.Instance.DamageBoid(b, Damage);
+                internalBoidCooldown[b] = Time.time;
+
+                if (Time.time - lastProcTime > InternalProcCooldown)
+                {
+                    // TODO: Proc ability
+                    lastProcTime = Time.time;
+                }
             }
         }
     }
