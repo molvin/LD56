@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.AI;
+using UnityEngine.Animations;
 
 public class Player : MonoBehaviour
 {
@@ -47,6 +47,8 @@ public class Player : MonoBehaviour
     public float SkinWidth;
     public float Bounciness = 0.1f;
     public float PushingForce;
+    [Header("Animation")]
+    public Animator Anim;
 
     private Vector3 velocity;
     private Vector3 deceleration;
@@ -91,6 +93,7 @@ public class Player : MonoBehaviour
         UpdateCollision();
 
         // TODO: shop indicator
+        Anim.SetBool("Running", state == State.Running && velocity.magnitude > MaxSpeed * 0.3f);
     }
 
     private void Run()
