@@ -258,9 +258,9 @@ public class Player : MonoBehaviour
         if(weapon != null)
         {
             if(Inventory.AtMax)
-                Inventory.ReplaceWeapon(weapon, weaponToReplace);
+                Inventory.ReplaceWeapon(weaponToReplace, weapon);
             else
-                Inventory.AddWeapon(weapon);
+                Inventory.AddNewWeapon(weapon);
         }
 
         Destroy(shop.gameObject);
