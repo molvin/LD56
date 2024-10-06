@@ -185,8 +185,11 @@ public class BoomerangController : MonoBehaviour
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
-                Instantiate(Resources.Load("Effects/BiteEffect"), boidPos, Quaternion.identity);
-
+                Instantiate(
+                    Resources.Load<GameObject>("Effects/BiteEffect"),
+                    new Vector3(b.position.x, b.position.y + 0.5f, b.position.z), 
+                    Quaternion.LookRotation(Camera.main.transform.forward *-1, Camera.main.transform.up)
+                );
                 Boids.Instance.DamageBoid(b, Weapon.Damage);
                 internalBoidCooldown[b] = Time.time;
 
