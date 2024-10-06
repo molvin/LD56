@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb9b37626b66e94a8a06db6c2074d38, type: 3}
+  m_Name: Hurt
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: 5cd3fbd293b6bac4391ee0ed451c7fe4, type: 3}
+  - {fileID: 8300000, guid: 519c1388a44e5d146bfcd8c8353db051, type: 3}
+  - {fileID: 8300000, guid: 097e1c0775aa38b41bd797d025a6123e, type: 3}
+  - {fileID: 8300000, guid: 88f2e271970199d4e9a40a1ce88120e4, type: 3}
+  mixer: {fileID: 24300002, guid: ddad48f52d20f4b4dabf9f15031adc07, type: 2}
+  vol_min: 0.868
+  vol_max: 0.964
+  pitch_min: 1
+  pitch_max: 1
