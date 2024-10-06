@@ -8,8 +8,6 @@ public class BoomerangController : MonoBehaviour
     public const float InternalHitCooldown = 0.225f;
     public const float InternalProcCooldown = 0.15f;
 
-    public int Damage = 60;
-
     public Material ThrowMat;
     public Material ReturnMat;
 
@@ -34,13 +32,30 @@ public class BoomerangController : MonoBehaviour
     private float stuckTime = 0f;
     private float timeStayed = 0f;
     private float spawnTime;
+    private float lastPeriodProc;
 
     private Audioman.LoopHolder loopHolderSteps;
 
     private Dictionary<Boid, float> internalBoidCooldown = new();
     private float lastProcTime = 0f;
 
+    public bool IsInternalBoidCooldown(Boid b) => internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown;
+
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
+
+
+    public void Init(Player owner, Weapon weapon, Vector3 position, Vector2 throwDirection, Vector2 extraVelocity)
+    {
+        Owner = owner;
+        Weapon = weapon;
+        transform.position = position;
+
+        InitialSpeed *= weapon.ThrowSpeedModifier;
+        ReturnAcceleration *= weapon.ThrowSpeedModifier;
+        ReturnJerk *= weapon.ThrowSpeedModifier;
+
+        velocity = throwDirection * InitialSpeed + extraVelocity;
+    }
 
     private void Awake()
     {
@@ -51,10 +66,17 @@ public class BoomerangController : MonoBehaviour
     {
         returning = false;
         spawnTime = Time.time;
+        lastPeriodProc = Time.time;
     }
 
     void Update()
     {
+        if (Time.time - lastPeriodProc > Weapon.PeriodTime)
+        {
+            Weapon.OnPeriod?.Invoke(this);
+            lastPeriodProc = Time.time;
+        }
+
         if (velocity.magnitude > SMALL_NUMBER)
         {
             stuckTime = 0f;
@@ -159,12 +181,15 @@ public class BoomerangController : MonoBehaviour
 
         Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
 
+        bool hitBoid = false;
+        Vector3 hitPos = Vector3.zero;
+
         foreach (Boid b in boids)
         {
             if (b == null || b.IsDead)
                 continue;
 
-            if (internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown)
+            if (IsInternalBoidCooldown(b))
             {
                 continue;
             }
@@ -172,16 +197,29 @@ public class BoomerangController : MonoBehaviour
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
-                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
-
-                Boids.Instance.DamageBoid(b, Damage);
+                Boids.Instance.DamageBoid(b, Weapon.Damage);
                 internalBoidCooldown[b] = Time.time;
 
-                if (Time.time - lastProcTime > InternalProcCooldown)
-                {
-                    // TODO: Proc ability
-                    lastProcTime = Time.time;
-                }
+                hitBoid = true;
+                hitPos = b.position + Vector3.up * 0.5f;
+            }
+        }
+
+        if (hitBoid)
+        {
+            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+            Instantiate(
+                Resources.Load<GameObject>("Effects/BiteEffect"),
+                hitPos,
+                Quaternion.LookRotation(Camera.main.transform.forward *-1, Camera.main.transform.up)
+                );
+
+            Weapon.OnHit?.Invoke(this);
+
+            if (Time.time - lastProcTime > InternalProcCooldown)
+            {
+                Weapon.OnProc?.Invoke(this);
+                lastProcTime = Time.time;
             }
         }
     }

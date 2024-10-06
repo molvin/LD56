@@ -187,12 +187,7 @@ public class Player : MonoBehaviour
             Weapon weapon = Inventory.UseNextWeapon();
 
             BoomerangController boomerang = Instantiate(BoomerangPrefab);
-            boomerang.Owner = this;
-            boomerang.Weapon = weapon;
-            boomerang.transform.position = transform.position + throwDir * 1.6f;
-
-            // Let it inherit some velocity to feel good
-            boomerang.velocity = new Vector2(velocity.x, velocity.z) * 0.5f + new Vector2(throwDir.x, throwDir.z) * ThrowSpeed;
+            boomerang.Init(this, weapon, transform.position + throwDir * 1.6f, new Vector2(throwDir.x, throwDir.z), new Vector2(velocity.x, velocity.z) * 0.5f);
             fired = true;
         }
 

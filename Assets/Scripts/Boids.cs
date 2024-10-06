@@ -7,14 +7,14 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
-    public const int MAX_BOIDS = 1000;
+    public const int MAX_BOIDS = 200;
 
     public static Boids Instance;
     private Player player;
 
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
-    //public int NumBoids = 1000;
+    public float SpawnRate = 0.3f;
     public float VisualRange = 3f;
     public float MaxVelocity = 6f;
     public float MinVelocityFactor = 0.4f;
@@ -31,6 +31,7 @@ public class Boids : MonoBehaviour
     public int DesiredUpdateNumPerCycle = 100;
     private int updateIndex = 0;
     private int lastSpawnTime = 0;
+    private float startTime;
 
     public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, allBoids.Count / 10), allBoids.Count);
     public float DeltaTime => Time.fixedDeltaTime * allBoids.Count / UpdateNumPerCycle;
@@ -68,6 +69,7 @@ public class Boids : MonoBehaviour
 
     private void Start()
     {
+        startTime = Time.time;
         Instance = this;
         player = FindObjectOfType<Player>();
 
@@ -232,16 +234,16 @@ public class Boids : MonoBehaviour
 
     private void FixedUpdate()
     {
-        int currentTime = (int)Time.time;
+        int currentTime = (int)(Time.time - startTime);
         if (currentTime != lastSpawnTime)
         {
-            int toSpawn = 0;
+            float toSpawn = 0;
             while (lastSpawnTime < currentTime)
             {
-                toSpawn+=++lastSpawnTime;
+                toSpawn += ++lastSpawnTime * SpawnRate;
             }
             
-            Spawn(toSpawn);
+            Spawn((int)toSpawn);
         }
 
         if (allBoids.Count == 0)
