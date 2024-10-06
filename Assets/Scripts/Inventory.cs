@@ -9,9 +9,9 @@ public class Inventory : MonoBehaviour
     
     private void Start()
     {
-        weaponQueue.Enqueue(Weapons.Default);
-        weaponQueue.Enqueue(Weapons.Default);
-        weaponQueue.Enqueue(Weapons.Default);
+        weaponQueue.Enqueue(Weapons.Randomancer);
+        weaponQueue.Enqueue(Weapons.Randomancer);
+        weaponQueue.Enqueue(Weapons.Randomancer);
         HUD.SetWeapons(weaponQueue);
     }
 

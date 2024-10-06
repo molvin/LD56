@@ -2022,6 +2022,22 @@ PrefabInstance:
       propertyPath: Inventory
       value: 
       objectReference: {fileID: 722895254}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: AttackCooldown
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: AttackStoppingTime
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: AttackStunDuration
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: TimeBeforeFireFactor
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 5732735082239329094, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
