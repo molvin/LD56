@@ -37,6 +37,22 @@ public class Boid : MonoBehaviour
         // TODO: Hit effect
         renderer.enabled = true;
     }
+    public void Start()
+    {
+        StartCoroutine(LowChanceOfBulliBulli());
+    }
+
+    private IEnumerator LowChanceOfBulliBulli()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            if (UnityEngine.Random.Range(0 ,100) == 1)
+            {
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli_dark"), this.transform.position);
+            }
+        }
+    }
 
     public static Boid CreateBoid(Vector3 position, Vector3 velocity, Material material)
     {
