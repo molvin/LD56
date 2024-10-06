@@ -54,6 +54,8 @@ public class Player : MonoBehaviour
     private float timeOfDeath;
     private bool deathDone;
 
+    public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
+
     private void Start()
     {
         state = State.Running;

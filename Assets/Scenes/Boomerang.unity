@@ -3657,11 +3657,12 @@ MonoBehaviour:
   BoidMaterials:
   - {fileID: 2100000, guid: d59b05a91d345544ea159faf1cc15894, type: 2}
   Space: {x: 100, y: 15, z: 100}
-  NumBoids: 200
-  VisualRange: 3
+  NumBoids: 400
+  VisualRange: 5
   MaxVelocity: 6
   MinVelocityFactor: 0.4
   CenteringFactor: 0.2
+  SeekingFactor: 10
   AvoidDistance: 1.6
   AvoidFactor: 5
   MatchingFactor: 0.7

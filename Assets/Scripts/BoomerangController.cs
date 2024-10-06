@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class BoomerangController : MonoBehaviour
 {
     public const float SMALL_NUMBER = 0.001f;
+    public const float InternalHitCooldown = 0.225f;
+    public const float InternalProcCooldown = 0.15f;
+
+    public int Damage = 60;
 
     public Material ThrowMat;
     public Material ReturnMat;
 
     public const float PhaseTime = 3.0f;
-    public const float MinLifeTime = 3.0f;
+    public const float MinLifeTime = 1.5f;
 
     public bool GracePeriod => Time.time - spawnTime < MinLifeTime;
 
@@ -31,6 +34,13 @@ public class BoomerangController : MonoBehaviour
     private float stuckTime = 0f;
     private float timeStayed = 0f;
     private float spawnTime;
+
+    private Audioman.LoopHolder loopHolderSteps;
+
+    private Dictionary<Boid, float> internalBoidCooldown = new();
+    private float lastProcTime = 0f;
+
+    public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
     private void Awake()
     {
@@ -66,11 +76,14 @@ public class BoomerangController : MonoBehaviour
         Accelerate();
 
         Move();
+        RegulateMovementVolume();
 
         HitBoid();
 
-        if (!GracePeriod && Vector3.Distance(transform.position, Owner.transform.position) < 1f)
+        if (!GracePeriod && Vector2.Distance(Position2D, Owner.Position2D) < 1.5f)
         {
+            loopHolderSteps?.Stop();
+            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
             Destroy(gameObject);
             Owner.PickUp(Weapon);
         }
@@ -78,8 +91,7 @@ public class BoomerangController : MonoBehaviour
 
     private void Accelerate()
     {
-        Vector3 toOwner = (Owner.transform.position - transform.position);
-        Vector2 accDir = new Vector2(toOwner.x, toOwner.z).normalized;
+        Vector2 accDir = (Owner.Position2D - Position2D).normalized;
 
         float deltaTime = Time.deltaTime * (returning && timeStayed < StayTime ? Mathf.Lerp(StayEffect, 1f, timeStayed / StayTime) : 1f);
 
@@ -96,9 +108,20 @@ public class BoomerangController : MonoBehaviour
         {
             timeStayed += Time.deltaTime;
 
-            float dot = (Vector2.Dot(velocity.normalized, accDir) + 1f) / 2f;
-            float damping = Mathf.Lerp(ReturnDrag * .5f, ReturnDrag * 2f, dot);
-            velocity *= Mathf.Pow(damping, deltaTime);
+            //float dot = (Vector2.Dot(velocity.normalized, accDir) + 1f) / 2f;
+            //float damping = Mathf.Lerp(ReturnDrag * .5f, ReturnDrag * 2f, dot);
+            //velocity *= Mathf.Pow(damping, deltaTime);
+
+            if (Vector2.Dot(velocity, accDir) < 0)
+            {
+                velocity *= Mathf.Pow(ReturnDrag, Time.deltaTime);
+            }
+            else
+            {
+                Vector2 projection = accDir * Vector2.Dot(velocity, accDir);
+                Vector2 reflection = velocity - projection;
+                velocity = projection + reflection * Mathf.Pow(ReturnDrag, deltaTime);
+            }
         }
     }
 
@@ -132,19 +155,51 @@ public class BoomerangController : MonoBehaviour
     {
         if (Boids.Instance == null) return;
 
-        List<Rigidbody> boids = Boids.Instance.GetNearest(transform.position, 8);
+        List<Boid> boids = Boids.Instance.GetNearest(transform.position, 8);
 
         Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
 
-        foreach (Rigidbody b in boids)
+        foreach (Boid b in boids)
         {
-            if (b == null) continue;
+            if (b == null || b.IsDead)
+                continue;
+
+            if (internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown)
+            {
+                continue;
+            }
 
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
-            if (Vector2.Distance(thisPos, boidPos) < 1f)
+            if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
-                Boids.Instance.DamageBoid(b);
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+
+                Boids.Instance.DamageBoid(b, Damage);
+                internalBoidCooldown[b] = Time.time;
+
+                if (Time.time - lastProcTime > InternalProcCooldown)
+                {
+                    // TODO: Proc ability
+                    lastProcTime = Time.time;
+                }
             }
         }
+    }
+
+    private void RegulateMovementVolume()
+    {
+        var auido_man = Audioman.getInstance();
+        if(auido_man == null)
+        {
+            Debug.Log("No audioman in scene");
+            return;
+        }
+        if(loopHolderSteps == null)
+        {
+            loopHolderSteps = auido_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position);
+        }
+        loopHolderSteps.setVolume(velocity.magnitude > 0.1f ? velocity.magnitude / InitialSpeed : 0);
+
+
     }
 }

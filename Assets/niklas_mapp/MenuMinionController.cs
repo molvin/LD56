@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using static Audioman;
 
 public class MenuMinionController : MonoBehaviour
@@ -44,8 +45,17 @@ public class MenuMinionController : MonoBehaviour
 
     public void startGame()
     {
-        Debug.Log("Start_game");
         scatter();
+        Debug.Log("Start_game");
+
+        StartCoroutine(callAfterSec(0.5f, () => {
+                loop_holder.Stop();
+
+                SceneManager.LoadScene(1);
+            }
+        ));
+
+
     }
 
     public void quitGame()
@@ -62,7 +72,7 @@ public class MenuMinionController : MonoBehaviour
         settings_button_group.SetActive(true);
         main_button_group.SetActive(false);
 
-        StartCoroutine(callAfterSec(1, () => eventSystem.SetSelectedGameObject(settings_default_select)));
+        StartCoroutine(callAfterSec(0.5f, () => eventSystem.SetSelectedGameObject(settings_default_select)));
 
        
     }
@@ -90,7 +100,7 @@ public class MenuMinionController : MonoBehaviour
 
     }
 
-    IEnumerator callAfterSec(int secs, Action action)
+    IEnumerator callAfterSec(float secs, Action action)
     {
         yield return new WaitForSeconds(secs);
         action.Invoke();
