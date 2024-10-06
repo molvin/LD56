@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8055f50ffc4c1a04a91a569beb4eac31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxWeapons: 4
+  MaxWeapons: 3
   HUD: {fileID: 8779048857396013772}
 --- !u!114 &3481751476166892165
 MonoBehaviour:

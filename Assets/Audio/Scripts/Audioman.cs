@@ -23,19 +23,19 @@ public class Audioman : MonoBehaviour
     void Awake()
     {
         Debug.Log("AUDIO AWAKE");
-        if(sfx_mixer == null) {
+        if (sfx_mixer == null) {
             Debug.Log("CREATE QUEUE");
 
             sfx_queue = new Queue<AudioSource>();
             SpawnAudioSources(pool_start_size);
         }
-       
+
     }
 
     private void Start()
     {
-        PlayLoop(Resources.Load<AudioLoopConfiguration>("object/music"), this.transform.position);
-        PlayLoop(Resources.Load<AudioLoopConfiguration>("object/ambiance"), this.transform.position);
+        PlayLoop(Resources.Load<AudioLoopConfiguration>("object/music"), this.transform.position, true);
+        PlayLoop(Resources.Load<AudioLoopConfiguration>("object/ambiance"), this.transform.position, true);
 
     }
 
@@ -48,11 +48,15 @@ public class Audioman : MonoBehaviour
             AudioSource audioSource = g.AddComponent<AudioSource>();
             audioSource.outputAudioMixerGroup = sfx_mixer;
             audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 1.0f;
             sfx_queue.Enqueue(audioSource);
         }
     }
+    public LoopHolder PlayLoop(AudioLoopConfiguration loop, Vector3 world_pos) {
+        return PlayLoop(loop, world_pos, false);
 
-    public LoopHolder PlayLoop(AudioLoopConfiguration loop, Vector3 world_pos)
+    }
+    public LoopHolder PlayLoop(AudioLoopConfiguration loop, Vector3 world_pos, bool two_d)
     {
         AudioSource audioSource = GetAudioSourceFromQueue();
         audioSource.clip = loop.clip;
@@ -61,7 +65,7 @@ public class Audioman : MonoBehaviour
         audioSource.loop = true;
         audioSource.outputAudioMixerGroup = loop.mixer;
         audioSource.transform.position = world_pos;
-
+        audioSource.spatialBlend = two_d ? 0 : 1;
         audioSource.Play();
         return new LoopHolder(() =>
         {
@@ -71,6 +75,9 @@ public class Audioman : MonoBehaviour
         }, (volume) =>
         {
             audioSource.volume = volume;
+        }, (Vector3 worl_pos) =>
+        {
+
         });
     }
 
@@ -78,11 +85,12 @@ public class Audioman : MonoBehaviour
     {
         private Action onStop;
         Action<float> changeVolume;
-
-        public LoopHolder(Action onStop, Action<float> changeVolume)
+        Action<Vector3> setPosition;
+        public LoopHolder(Action onStop, Action<float> changeVolume, Action<Vector3> setPosition)
         {
             this.onStop = onStop;
             this.changeVolume = changeVolume;
+            this.setPosition = setPosition;
         }
 
         public void Stop()
@@ -92,6 +100,10 @@ public class Audioman : MonoBehaviour
 
         public void setVolume(float volume) { 
             changeVolume(volume);
+        }
+        public void setWorldPosition(Vector3 worldPos)
+        {
+            setPosition(worldPos);
         }
     }
 
@@ -104,8 +116,12 @@ public class Audioman : MonoBehaviour
 
         return sfx_queue.Dequeue();
     }
-
     public void PlaySound(AudioOneShotClipConfiguration conf, Vector3 world_pos)
+    {
+        PlaySound(conf, world_pos, false);
+    }
+
+    public void PlaySound(AudioOneShotClipConfiguration conf, Vector3 world_pos, bool two_d)
     {
         AudioSource audioSource = GetAudioSourceFromQueue();
         audioSource.transform.position = world_pos;
@@ -113,7 +129,7 @@ public class Audioman : MonoBehaviour
         audioSource.pitch = UnityEngine.Random.Range(conf.pitch_min, conf.pitch_max);
         audioSource.loop = false;
         audioSource.outputAudioMixerGroup = conf.mixer;
-
+        audioSource.spatialBlend = two_d ? 0 : 1;
         StartCoroutine(PlayAndWaitForFinish(audioSource, conf.clips[UnityEngine.Random.Range(0, conf.clips.Length)]));
     }
 

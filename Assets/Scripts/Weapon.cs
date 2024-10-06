@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public delegate void Trigger(BoomerangController controller);
+public delegate void Trigger(Weapon self, BoomerangController controller);
 
 public class Weapon
 {
+    public bool NonBuyable = false;
+
     public string Name;
     public int Damage = 60;
     public float SpeedModifier = 1.0f;
@@ -38,8 +40,9 @@ public static class Weapons
     public static Weapon Temporary => new()
     {
         Name = "Temporary",
+        NonBuyable = true,
         SpeedModifier = 1.6f,
-        OnApex = c =>
+        OnApex = (self, c) =>
         {
             GameObject.Destroy(c.gameObject);
         },
@@ -69,7 +72,7 @@ public static class Weapons
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.4f,
         Bouncyness = 0.6f,
-        OnHit = c =>
+        OnHit = (self, c) =>
         {
             Vector2 toOwner = (c.Owner.Position2D - c.Position2D).normalized;
             c.velocity = toOwner * c.velocity.magnitude * 0.8f;
@@ -79,7 +82,7 @@ public static class Weapons
     public static Weapon Chaining => new()
     {
         Name = "Chaining",
-        OnHit = c =>
+        OnHit = (self, c) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 3);
 
@@ -104,7 +107,7 @@ public static class Weapons
         Name = "Randomancer",
         SpeedModifier = 0.8f,
         PeriodTime = 0.5f,
-        OnPeriod = c =>
+        OnPeriod = (self, c) =>
         {
             float magnitude = c.velocity.magnitude * 1.2f;
             Vector2 dir = Random.insideUnitCircle.normalized;
@@ -117,7 +120,7 @@ public static class Weapons
         Name = "Zapper",
         SpeedModifier = 1.3f,
         Damage = 10,
-        OnProc = c =>
+        OnProc = (self, c) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4);
 
@@ -138,10 +141,10 @@ public static class Weapons
     {
         Name = "Forker",
         SpeedModifier = 1.4f,
-        OnHit = c =>
+        OnHit = (self, c) =>
         {
             float rad = Mathf.Deg2Rad * 45;
-            if ((c.Weapon.activationCount & 1) == 0)
+            if ((self.activationCount & 1) == 0)
             {
                 rad = -rad;
             }
@@ -161,13 +164,13 @@ public static class Weapons
             boomerang.Temporary = true;
             boomerang.transform.localScale *= 0.7f;
 
-            c.Weapon.activationCount++;
+            self.activationCount++;
         }
     };
     public static Weapon Multiballer => new()
     {
         Name = "Multiballer",
-        OnSpawn = c =>
+        OnSpawn = (self, c) =>
         {
             float rad = Mathf.Deg2Rad * 40;
             Vector2 dir = c.velocity.normalized;
@@ -194,7 +197,7 @@ public static class Weapons
     public static Weapon ExtremeBalls => new()
     {
         Name = "ExtremeBalls",
-        OnSpawn = c =>
+        OnSpawn = (self, c) =>
         {
             Vector2 dir = c.velocity.normalized;
 
@@ -220,7 +223,7 @@ public static class Weapons
         Name = "The Ultimate",
         Damage = 30,
         SpeedModifier = 1.1f,
-        OnProc = c =>
+        OnProc = (self, c) =>
         {
             Vector2 dir = c.velocity.normalized;
 
@@ -238,17 +241,18 @@ public static class Weapons
                 b.Init(c.Owner, Weapons.TheRecurer, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
                 b.transform.localScale *= 0.7f;
-                b.Weapon.Damage = Mathf.RoundToInt(c.Weapon.Damage * 0.7f);
+                b.Weapon.Damage = Mathf.RoundToInt(self.Damage * 0.6f);
             }
 
-            c.Weapon.activationCount++;
+            self.activationCount++;
         }
     };
     public static Weapon TheRecurer => new()
     {
         Name = "The Recurer",
+        NonBuyable = true,
         SpeedModifier = 1.4f,
-        OnProc = c =>
+        OnProc = (self, c) =>
         {
             bool recur = c.transform.localScale.x > .35f;
 
@@ -268,12 +272,12 @@ public static class Weapons
                 b.Init(c.Owner, recur ? Weapons.TheRecurer : Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
                 b.transform.localScale = c.transform.localScale * 0.7f;
-                b.Weapon.Damage = Mathf.RoundToInt(c.Weapon.Damage * 0.7f);
+                b.Weapon.Damage = Mathf.RoundToInt(self.Damage * 0.6f);
             }
 
-            c.Weapon.activationCount++;
+            self.activationCount++;
         },
-        OnApex = c =>
+        OnApex = (self, c) =>
         {
             GameObject.Destroy(c.gameObject);
         },
@@ -282,9 +286,9 @@ public static class Weapons
     {
         Name = "The Orb",
         PeriodTime = 1.0f / 8.0f,
-        OnPeriod = c =>
+        OnPeriod = (self, c) =>
         {
-            float rad = Mathf.Deg2Rad * 360f / 8f * (c.Weapon.activationCount % 8);
+            float rad = Mathf.Deg2Rad * 360f / 8f * (self.activationCount % 8);
             Vector2 dir = new(1, 0);
             dir = new(
                 dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
@@ -295,7 +299,7 @@ public static class Weapons
             boomerang.Temporary = true;
             boomerang.transform.localScale *= 0.7f;
 
-            c.Weapon.activationCount++;
+            self.activationCount++;
         }
     };
     public static Weapon GravityPull => new()
@@ -306,7 +310,7 @@ public static class Weapons
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.5f,
         StayModifier = 0.3f,
-        OnPeriod = c =>
+        OnPeriod = (self, c) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 12);
 
@@ -328,9 +332,9 @@ public static class Weapons
     {
         Name = "Meteor",
         Damage = 0,
-        OnHit = c =>
+        OnHit = (self, c) =>
         {
-            if (c.Weapon.activationCount == 0)
+            if (self.activationCount == 0)
             {
                 Vector2 rand = Random.insideUnitCircle;
                 List<Vector3> points = new()
@@ -341,9 +345,9 @@ public static class Weapons
                 c.Animate(points);
             }
 
-            c.Weapon.activationCount++;
+            self.activationCount++;
         },
-        OnAnimationDone = c =>
+        OnAnimationDone = (self, c) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8);
 
@@ -375,7 +379,10 @@ public static class Weapons
                 Weapon weapon = func.Invoke(null, null) as Weapon;
                 {
                     // TODO: filter based on something
-                    weapons.Add(weapon);
+                    if (!weapon.NonBuyable)
+                    {
+                        weapons.Add(weapon);
+                    }
                 }
             }
         }
