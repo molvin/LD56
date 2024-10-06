@@ -14,7 +14,7 @@ public class Boids : MonoBehaviour
 
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
-    //public int NumBoids = 1000;
+    public float SpawnRate = 0.3f;
     public float VisualRange = 3f;
     public float MaxVelocity = 6f;
     public float MinVelocityFactor = 0.4f;
@@ -237,13 +237,13 @@ public class Boids : MonoBehaviour
         int currentTime = (int)(Time.time - startTime);
         if (currentTime != lastSpawnTime)
         {
-            int toSpawn = 0;
+            float toSpawn = 0;
             while (lastSpawnTime < currentTime)
             {
-                toSpawn+=++lastSpawnTime;
+                toSpawn += ++lastSpawnTime * SpawnRate;
             }
             
-            Spawn(toSpawn);
+            Spawn((int)toSpawn);
         }
 
         if (allBoids.Count == 0)
