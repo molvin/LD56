@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -18,7 +19,7 @@ public class HUD : MonoBehaviour
     [Header("Shop")]
     public GameObject ShopParent;
     public Button SkipShopButton;
-    public Button[] ShopChoiceButtons;
+    public ShopOption[] ShopChoiceButtons;
 
     public WeaponCard WeaponCardPrefab;
     private List<WeaponCard> weaponCards = new();
@@ -56,17 +57,25 @@ public class HUD : MonoBehaviour
             ShopParent.SetActive(true);
 
             bool choiceMade = false;
+            Weapon chosenWeapon = null;
             SkipShopButton.onClick.AddListener(() => choiceMade = true);
 
-            while(!choiceMade)
+            var weapons = Weapons.GetShop(ShopChoiceButtons.Length).ToList();
+            for(int i = 0; i < ShopChoiceButtons.Length; i++)
             {
-                // TODO: choose weapon
+                Weapon w = weapons[i];
+                ShopChoiceButtons[i].Button.onClick.AddListener(() => chosenWeapon = w);
+                ShopChoiceButtons[i].Init(w);
+            }
+
+            while (!choiceMade && chosenWeapon == null)
+            {
                 yield return null;
             }
             SkipShopButton.onClick.RemoveAllListeners();
 
             ShopParent.SetActive(false);
-            callback(null);
+            callback(chosenWeapon);
         }
 
         StartCoroutine(Coroutine());

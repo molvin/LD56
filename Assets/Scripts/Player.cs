@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Player : MonoBehaviour
 {
@@ -232,8 +233,13 @@ public class Player : MonoBehaviour
         {
             if((Time.time - timeOfLastShop) > ShopRespawnTime)
             {
-                // TODO: random point on the map (?)
-                shop = Instantiate(ShopPrefab, Vector3.zero, Quaternion.identity);
+                Vector3 point = Vector3.zero;
+                var shopSpawns = FindObjectOfType<ShopSpawns>();
+                if (shopSpawns)
+                {
+                    point = shopSpawns.GetRandomPoint(this);
+                }
+                shop = Instantiate(ShopPrefab, point, Quaternion.identity);
                 timeOfLastShop = Time.time;
             }
         }

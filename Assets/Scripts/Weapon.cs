@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public delegate void Trigger(BoomerangController controller);
@@ -78,8 +79,26 @@ public static class Weapons
         },
     };
 
-    public static List<Weapon> GetShop(int count)
+    public static IEnumerable<Weapon> GetShop(int count)
     {
-        return null;
+        // Returns X random weapons for now
+        // TODO: filtering, weapon pool?
+
+        var cardFuncs = typeof(Weapons).GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+
+        List<Weapon> weapons = new();
+        foreach (var func in cardFuncs)
+        {
+            if (func.ReturnType == typeof(Weapon))
+            {
+                Weapon weapon = func.Invoke(null, null) as Weapon;
+                {
+                    // TODO: filter based on something
+                    weapons.Add(weapon);
+                }
+            }
+        }
+
+        return weapons.OrderBy(_ => Random.value).ToArray()[0..count];
     }
 }
