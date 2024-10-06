@@ -63,6 +63,11 @@ public class BoomerangController : MonoBehaviour
         Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
     }
 
+    private void OnDestroy()
+    {
+        loopHolderSteps?.Stop();
+    }
+
     private void Awake()
     {
         returning = false;
@@ -111,7 +116,6 @@ public class BoomerangController : MonoBehaviour
 
         if (!GracePeriod && Vector2.Distance(Position2D, Owner.Position2D) < 1.5f)
         {
-            loopHolderSteps?.Stop();
             Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
             Destroy(gameObject);
             if (!Temporary)

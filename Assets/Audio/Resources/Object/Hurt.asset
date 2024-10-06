@@ -13,12 +13,17 @@ MonoBehaviour:
   m_Name: Hurt
   m_EditorClassIdentifier: 
   clips:
-  - {fileID: 8300000, guid: 5cd3fbd293b6bac4391ee0ed451c7fe4, type: 3}
-  - {fileID: 8300000, guid: 519c1388a44e5d146bfcd8c8353db051, type: 3}
-  - {fileID: 8300000, guid: 097e1c0775aa38b41bd797d025a6123e, type: 3}
-  - {fileID: 8300000, guid: 88f2e271970199d4e9a40a1ce88120e4, type: 3}
+  - {fileID: 8300000, guid: e5b43ae43c48db34abb5678bb3e50d90, type: 3}
+  - {fileID: 8300000, guid: 514b8d2951887ec40a8b9b171326f14b, type: 3}
+  - {fileID: 8300000, guid: f51340a6293405f4fb0257558f788447, type: 3}
+  - {fileID: 8300000, guid: fe34a62899d0f6e429ef913cd1f950c5, type: 3}
+  - {fileID: 8300000, guid: 013938ccc9928b04da4cd223e1ca7ca8, type: 3}
+  - {fileID: 8300000, guid: 179a2c9d6e6fa7d4ea9f8a6667411f0b, type: 3}
+  - {fileID: 8300000, guid: e5ebfedb9e24f7f42b1a4ab2f98c813f, type: 3}
+  - {fileID: 8300000, guid: 1e3e8b543cc6c4a4e9b8e3ca2f5205a4, type: 3}
+  - {fileID: 8300000, guid: f2948bf86bd29a54e8d93839d015bd9b, type: 3}
   mixer: {fileID: 24300002, guid: ddad48f52d20f4b4dabf9f15031adc07, type: 2}
   vol_min: 0.868
   vol_max: 0.964
-  pitch_min: 1
-  pitch_max: 1
+  pitch_min: 1.17
+  pitch_max: 1.72
