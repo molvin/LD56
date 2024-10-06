@@ -13,8 +13,6 @@ public class Inventory : MonoBehaviour
     private void Start()
     {
         weaponQueue.Enqueue(Weapons.TheOrb);
-        weaponQueue.Enqueue(Weapons.TheOrb);
-        weaponQueue.Enqueue(Weapons.TheOrb);
         lastAquired = weaponQueue.Peek();
         HUD.SetWeapons(weaponQueue);
     }
