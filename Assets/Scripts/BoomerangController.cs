@@ -168,6 +168,7 @@ public class BoomerangController : MonoBehaviour
             Vector2 normal = (actual - target).normalized;
             Vector2 projection = normal * Vector2.Dot(velocity, normal);
             velocity -= projection * (1f + Bouncyness);
+            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/wall_bonk"), this.transform.position);
         }
 
         transform.position = new Vector3(actual.x, y, actual.y);
