@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 
 public class Boids : MonoBehaviour
 {
     public static Boids Instance;
+    private Player player;
 
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
@@ -15,6 +17,7 @@ public class Boids : MonoBehaviour
     public float MaxVelocity = 6f;
     public float MinVelocityFactor = 0.4f;
     public float CenteringFactor = 0.2f;
+    public float SeekingFactor = 10.0f;
     public float AvoidDistance = 1.6f;
     public float AvoidFactor = 5f;
     public float MatchingFactor = 0.7f;
@@ -63,6 +66,7 @@ public class Boids : MonoBehaviour
     private void Start()
     {
         Instance = this;
+        player = FindObjectOfType<Player>();
 
         MinBounds = transform.position - Space * 0.5f;
         MaxBounds = transform.position + Space * 0.5f;
@@ -143,6 +147,13 @@ public class Boids : MonoBehaviour
         {
             boid.velocity = boid.velocity.normalized * MaxVelocity * MinVelocityFactor;
         }
+    }
+    private void Seek(Boid boid)
+    {
+        Vector3 toTarget = (player.transform.position - boid.position);
+        bool close = toTarget.magnitude < VisualRange * 2f;
+
+        boid.velocity += toTarget.normalized * ((close ? 1f : 0.02f) * SeekingFactor * DeltaTime);
     }
     private void KeepWithinBounds(Boid boid)
     {
@@ -226,6 +237,7 @@ public class Boids : MonoBehaviour
                 neighbours = tree.NearestNeighbours(boid.position, 10);
             }
 
+            Seek(boid);
             FlyTowardsCenter(boid, neighbours);
             AvoidOthers(boid, neighbours);
             MatchVelocity(boid, neighbours);
