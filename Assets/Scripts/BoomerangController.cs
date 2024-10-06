@@ -31,6 +31,8 @@ public class BoomerangController : MonoBehaviour
     private float timeStayed = 0f;
     private float spawnTime;
 
+    private Audioman.LoopHolder loopHolderSteps;
+
     private void Awake()
     {
         returning = false;
@@ -64,11 +66,14 @@ public class BoomerangController : MonoBehaviour
         Accelerate();
 
         Move();
+        RegulateMovementVolume();
 
         HitBoid();
 
         if (!GracePeriod && Vector3.Distance(transform.position, Owner.transform.position) < 1f)
         {
+            loopHolderSteps?.Stop();
+            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
             Destroy(gameObject);
         }
     }
@@ -141,7 +146,26 @@ public class BoomerangController : MonoBehaviour
             if (Vector2.Distance(thisPos, boidPos) < 1f)
             {
                 Boids.Instance.DamageBoid(b);
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+
             }
         }
+    }
+
+    private void RegulateMovementVolume()
+    {
+        var auido_man = Audioman.getInstance();
+        if(auido_man == null)
+        {
+            Debug.Log("No audioman in scene");
+            return;
+        }
+        if(loopHolderSteps == null)
+        {
+            loopHolderSteps = auido_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position);
+        }
+        loopHolderSteps.setVolume(velocity.magnitude > 0.1f ? velocity.magnitude / InitialSpeed : 0);
+
+
     }
 }
