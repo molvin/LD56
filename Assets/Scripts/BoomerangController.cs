@@ -32,6 +32,8 @@ public class BoomerangController : MonoBehaviour
     private float timeStayed = 0f;
     private float spawnTime;
 
+    public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
+
     private void Awake()
     {
         returning = false;
@@ -69,7 +71,10 @@ public class BoomerangController : MonoBehaviour
 
         HitBoid();
 
-        if (!GracePeriod && Vector3.Distance(transform.position, Owner.transform.position) < 1f)
+
+        Vector2 ownerPos = new Vector2(Owner.transform.position.x, Owner.transform.position.z);
+
+        if (!GracePeriod && Vector2.Distance(Position2D, ownerPos) < 1.5f)
         {
             Destroy(gameObject);
             Owner.PickUp(Weapon);
@@ -96,9 +101,20 @@ public class BoomerangController : MonoBehaviour
         {
             timeStayed += Time.deltaTime;
 
-            float dot = (Vector2.Dot(velocity.normalized, accDir) + 1f) / 2f;
-            float damping = Mathf.Lerp(ReturnDrag * .5f, ReturnDrag * 2f, dot);
-            velocity *= Mathf.Pow(damping, deltaTime);
+            //float dot = (Vector2.Dot(velocity.normalized, accDir) + 1f) / 2f;
+            //float damping = Mathf.Lerp(ReturnDrag * .5f, ReturnDrag * 2f, dot);
+            //velocity *= Mathf.Pow(damping, deltaTime);
+
+            if (Vector2.Dot(velocity, accDir) < 0)
+            {
+                velocity *= Mathf.Pow(ReturnDrag, Time.deltaTime);
+            }
+            else
+            {
+                Vector2 projection = accDir * Vector2.Dot(velocity, accDir);
+                Vector2 reflection = velocity - projection;
+                velocity = projection + reflection * Mathf.Pow(ReturnDrag, deltaTime);
+            }
         }
     }
 
@@ -132,16 +148,16 @@ public class BoomerangController : MonoBehaviour
     {
         if (Boids.Instance == null) return;
 
-        List<Rigidbody> boids = Boids.Instance.GetNearest(transform.position, 8);
+        List<Boid> boids = Boids.Instance.GetNearest(transform.position, 8);
 
         Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
 
-        foreach (Rigidbody b in boids)
+        foreach (Boid b in boids)
         {
             if (b == null) continue;
 
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
-            if (Vector2.Distance(thisPos, boidPos) < 1f)
+            if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
                 Boids.Instance.DamageBoid(b);
             }

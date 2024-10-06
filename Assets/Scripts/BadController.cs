@@ -20,6 +20,7 @@ public class BadController : MonoBehaviour
     public float Drag = 0.04f;
 
     private Vector2 velocity;
+    public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
     void Update()
     {

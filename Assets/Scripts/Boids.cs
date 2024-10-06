@@ -26,16 +26,16 @@ public class Boids : MonoBehaviour
     public int DesiredUpdateNumPerCycle = 100;
     private int updateIndex = 0;
 
-    public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, physicalBoids.Count / 10), physicalBoids.Count);
-    public float DeltaTime => Time.fixedDeltaTime * physicalBoids.Count / UpdateNumPerCycle;
+    public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, allBoids.Count / 10), allBoids.Count);
+    public float DeltaTime => Time.fixedDeltaTime * allBoids.Count / UpdateNumPerCycle;
 
-    private List<Rigidbody> physicalBoids = new();
-    private KDTree<Rigidbody> tree;
+    private List<Boid> allBoids = new();
+    private KDTree<Boid> tree;
 
     private Vector3 MinBounds;
     private Vector3 MaxBounds;
 
-    public List<Rigidbody> GetNearest(Vector3 pos, int num)
+    public List<Boid> GetNearest(Vector3 pos, int num)
     {
         if (tree == null)
             return new();
@@ -43,9 +43,9 @@ public class Boids : MonoBehaviour
         return tree.NearestNeighbours(pos, num);
     }
 
-    public void DamageBoid(Rigidbody boid)
+    public void DamageBoid(Boid boid)
     {
-        physicalBoids.Remove(boid);
+        allBoids.Remove(boid);
         Destroy(boid.gameObject);
     }
 
@@ -67,24 +67,20 @@ public class Boids : MonoBehaviour
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
 
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.transform.position = position;
-            sphere.GetComponent<MeshRenderer>().material = BoidMaterials[Random.Range(0, BoidMaterials.Count)];
-            Rigidbody rb = sphere.AddComponent<Rigidbody>();
-            rb.velocity = velocity;
-            physicalBoids.Add(rb);
+            Boid boid = Boid.CreateBoid(position, velocity, BoidMaterials[Random.Range(0, BoidMaterials.Count)]);
+            allBoids.Add(boid);
         }
     }
 
-    private void FlyTowardsCenter(Rigidbody boid, List<Rigidbody> neighbours = null)
+    private void FlyTowardsCenter(Boid boid, List<Boid> neighbours = null)
     {
-        if (neighbours == null) neighbours = physicalBoids;
+        if (neighbours == null) neighbours = allBoids;
 
         Vector3 centroid = Vector3.zero;
         int numBoids = 0;
         
         // Including self
-        foreach (Rigidbody b in neighbours)
+        foreach (Boid b in neighbours)
         {
             if (Vector3.Distance(boid.position, b.position) < VisualRange)
             {
@@ -96,13 +92,13 @@ public class Boids : MonoBehaviour
         centroid /= numBoids;
         boid.velocity += (centroid - boid.position) * (CenteringFactor * DeltaTime);
     }
-    private void AvoidOthers(Rigidbody boid, List<Rigidbody> neighbours = null)
+    private void AvoidOthers(Boid boid, List<Boid> neighbours = null)
     {
-        if (neighbours == null) neighbours = physicalBoids;
+        if (neighbours == null) neighbours = allBoids;
 
         Vector3 move = Vector3.zero;
 
-        foreach (Rigidbody b in neighbours)
+        foreach (Boid b in neighbours)
         {
             if (!boid.Equals(b) && Vector3.Distance(boid.position, b.position) < AvoidDistance)
             {
@@ -112,15 +108,15 @@ public class Boids : MonoBehaviour
 
         boid.velocity += move * (AvoidFactor * DeltaTime);
     }
-    private void MatchVelocity(Rigidbody boid, List<Rigidbody> neighbours = null)
+    private void MatchVelocity(Boid boid, List<Boid> neighbours = null)
     {
-        if (neighbours == null) neighbours = physicalBoids;
+        if (neighbours == null) neighbours = allBoids;
 
         Vector3 velocity = Vector3.zero;
         int numBoids = 0;
 
         // Including self
-        foreach (Rigidbody b in neighbours)
+        foreach (Boid b in neighbours)
         {
             if (Vector3.Distance(boid.position, b.position) < VisualRange)
             {
@@ -132,7 +128,7 @@ public class Boids : MonoBehaviour
         velocity /= numBoids;
         boid.velocity += (velocity - boid.velocity) * (MatchingFactor * DeltaTime);
     }
-    private void LimitSpeed(Rigidbody boid)
+    private void LimitSpeed(Boid boid)
     {
         if (boid.velocity.magnitude > MaxVelocity)
         {
@@ -143,7 +139,7 @@ public class Boids : MonoBehaviour
             boid.velocity = boid.velocity.normalized * MaxVelocity * MinVelocityFactor;
         }
     }
-    private void KeepWithinBounds(Rigidbody boid)
+    private void KeepWithinBounds(Boid boid)
     {
         Vector3 Margin = Space * BoundsMargin;
         float turnAmount = TurnFactor * DeltaTime;
@@ -178,7 +174,7 @@ public class Boids : MonoBehaviour
         boid.velocity += deltaVelocity;
     }
 
-    private void HandleCollision(Rigidbody boid)
+    private void HandleCollision(Boid boid)
     {
         Vector3 velocity = boid.velocity;
 
@@ -212,14 +208,14 @@ public class Boids : MonoBehaviour
 
     private void FixedUpdate()
     {
-        tree = new(physicalBoids.Select(b => (b, b.position)).ToList());
+        tree = new(allBoids.Select(b => (b, b.position)).ToList());
 
-        updateIndex %= physicalBoids.Count;
+        updateIndex %= allBoids.Count;
         for (int i = 0; i < UpdateNumPerCycle; i++)
         {
-            Rigidbody boid = physicalBoids[updateIndex];
+            Boid boid = allBoids[updateIndex];
 
-            List<Rigidbody> neighbours = null;
+            List<Boid> neighbours = null;
             if (UseKDTree)
             {
                 neighbours = tree.NearestNeighbours(boid.position, 10);
@@ -234,19 +230,19 @@ public class Boids : MonoBehaviour
             LimitSpeed(boid);
             KeepWithinBounds(boid);
 
-            //physicalBoids[updateIndex].GetComponent<Rigidbody>().AddForce(boid.velocity * Time.fixedDeltaTime * (physicalBoids.Count / UpdateNumPerCycle), ForceMode.VelocityChange);
+            //allBoids[updateIndex].GetComponent<Rigidbody>().AddForce(boid.velocity * Time.fixedDeltaTime * (allBoids.Count / UpdateNumPerCycle), ForceMode.VelocityChange);
 
-            updateIndex = (updateIndex + 1) % physicalBoids.Count;
+            updateIndex = (updateIndex + 1) % allBoids.Count;
         }
 
-        for (int i = 0; i < physicalBoids.Count; i++)
+        for (int i = 0; i < allBoids.Count; i++)
         {
-            Rigidbody boid = physicalBoids[i];
+            Boid boid = allBoids[i];
 
             HandleCollision(boid);
 
             //boid.Position += boid.Velocity * Time.fixedDeltaTime;
-            //physicalBoids[i].transform.position = boid.Position;
+            //allBoids[i].transform.position = boid.Position;
 
         }
     }
