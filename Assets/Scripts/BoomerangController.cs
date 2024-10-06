@@ -55,6 +55,8 @@ public class BoomerangController : MonoBehaviour
         ReturnJerk *= weapon.ThrowSpeedModifier;
 
         velocity = throwDirection * InitialSpeed + extraVelocity;
+
+        Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
     }
 
     private void Awake()
