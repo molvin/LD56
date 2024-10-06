@@ -15,9 +15,18 @@ public class HUD : MonoBehaviour
     public float FadeOutTime;
     public float PostFadeOutTime;
     public Image FadeOut;
+    [Header("Shop")]
+    public GameObject ShopParent;
+    public Button SkipShopButton;
+    public Button[] ShopChoiceButtons;
 
     public WeaponCard WeaponCardPrefab;
     private List<WeaponCard> weaponCards = new();
+
+    private void Start()
+    {
+        ShopParent.SetActive(false);
+    }
 
     public void SetHealth(float t)
     {
@@ -38,6 +47,29 @@ public class HUD : MonoBehaviour
             card.Init(item);
             weaponCards.Add(card);
         }
+    }
+
+    public void Shop(Action<Weapon> callback)
+    {
+        IEnumerator Coroutine()
+        {
+            ShopParent.SetActive(true);
+
+            bool choiceMade = false;
+            SkipShopButton.onClick.AddListener(() => choiceMade = true);
+
+            while(!choiceMade)
+            {
+                // TODO: choose weapon
+                yield return null;
+            }
+            SkipShopButton.onClick.RemoveAllListeners();
+
+            ShopParent.SetActive(false);
+            callback(null);
+        }
+
+        StartCoroutine(Coroutine());
     }
 
     public void GameOver()

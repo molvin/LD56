@@ -7,7 +7,8 @@ public class Player : MonoBehaviour
         Running,
         Dodging,
         Attacking,
-        Dead
+        Dead,
+        Shopping
     }
 
     [Header("Running")]
@@ -34,6 +35,9 @@ public class Player : MonoBehaviour
     public float DeathStoppingTime;
     public float TimeBeforeFadeout;
     public HUD HUD;
+    [Header("Shop")]
+    public Shop ShopPrefab;
+    public float ShopRespawnTime;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -53,12 +57,16 @@ public class Player : MonoBehaviour
     private bool fired;
     private float timeOfDeath;
     private bool deathDone;
+    private float timeOfLastShop;
+
+    private Shop shop;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
     private void Start()
     {
         state = State.Running;
+        timeOfLastShop = Time.time;
     }
 
     private void Update()
@@ -117,6 +125,8 @@ public class Player : MonoBehaviour
             Dodge();
         }
         Attack();
+
+        LookForShop();
     }
 
     private void Dodge()
@@ -200,7 +210,7 @@ public class Player : MonoBehaviour
         timeOfDeath = Time.time;
     }
 
-    public void UpdateDead()
+    private void UpdateDead()
     {
         velocity = Vector3.SmoothDamp(velocity, Vector3.zero, ref deceleration, DeathStoppingTime);
 
@@ -209,6 +219,43 @@ public class Player : MonoBehaviour
             deathDone = true;
             HUD.GameOver();
         }
+    }
+
+    private void LookForShop()
+    {
+        if(shop != null)
+        {
+            float d = Vector3.Distance(transform.position, shop.transform.position);
+            if(d < shop.Radius)
+            {
+                HUD.Shop(Buy);
+                state = State.Shopping;
+                Time.timeScale = 0.0f;
+            }
+        }
+        else
+        {
+            if((Time.time - timeOfLastShop) > ShopRespawnTime)
+            {
+                // TODO: random point on the map (?)
+                shop = Instantiate(ShopPrefab, Vector3.zero, Quaternion.identity);
+                timeOfLastShop = Time.time;
+            }
+        }
+    }
+
+    private void Buy(Weapon weapon)
+    {
+        Time.timeScale = 1.0f;
+        state = State.Running;
+        if(weapon != null)
+        {
+            Inventory.AddWeapon(weapon);
+        }
+
+        Destroy(shop.gameObject);
+        shop = null;
+        timeOfLastShop = Time.time;
     }
 
     private void UpdateCollision()
