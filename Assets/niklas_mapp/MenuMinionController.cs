@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Audio;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using static Audioman;
 
@@ -25,7 +27,9 @@ public class MenuMinionController : MonoBehaviour
     public GameObject settings_button_group;
     public GameObject settings_default_select;
 
-
+    public AudioMixer mixer;
+    private float volume = 1;
+    public float volumeChangeFactor = 0.2f;
     Audioman.LoopHolder loop_holder;
     public Audioman audio_man;
     public void Awake()
@@ -75,16 +79,19 @@ public class MenuMinionController : MonoBehaviour
 
        
     }
-
- 
+    
     public void increaseVolume()
     {
+        volume = Mathf.Clamp((float)volume + volumeChangeFactor, 0.01f, 1);
+        mixer.SetFloat("master", Mathf.Log10(volume) * 20);
         Debug.Log("Increase volume");
 
     }
 
     public void decreaseVolume()
     {
+        volume = Mathf.Clamp((float)volume - volumeChangeFactor, 0.01f, 1);
+        mixer.SetFloat("master", Mathf.Log10(volume) * 20);
         Debug.Log("Decrease volume");
     }
 
