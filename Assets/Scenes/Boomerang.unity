@@ -2022,6 +2022,22 @@ PrefabInstance:
       propertyPath: Inventory
       value: 
       objectReference: {fileID: 722895254}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: AttackCooldown
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: AttackStoppingTime
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: AttackStunDuration
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
+      propertyPath: TimeBeforeFireFactor
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 5732735082239329094, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3691,7 +3707,7 @@ MonoBehaviour:
   BoidMaterials:
   - {fileID: 2100000, guid: d59b05a91d345544ea159faf1cc15894, type: 2}
   Space: {x: 100, y: 15, z: 100}
-  NumBoids: 400
+  SpawnRate: 0.3
   VisualRange: 5
   MaxVelocity: 6
   MinVelocityFactor: 0.4

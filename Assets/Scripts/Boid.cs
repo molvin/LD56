@@ -7,10 +7,12 @@ public class Boid : MonoBehaviour
     public Rigidbody Rigidbody;
     private new MeshRenderer renderer;
 
-    private int health = 100;
+    private int health = 10;
 
     public bool IsDead => health <= 0;
 
+
+    public Vector2 Position2D => new Vector2(position.x, position.z);
     public Vector3 position 
     {
         get { return transform.position; }

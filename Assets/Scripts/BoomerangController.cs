@@ -38,6 +38,8 @@ public class BoomerangController : MonoBehaviour
     private Dictionary<Boid, float> internalBoidCooldown = new();
     private float lastProcTime = 0f;
 
+    public bool IsInternalBoidCooldown(Boid b) => internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown;
+
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
 
@@ -171,12 +173,14 @@ public class BoomerangController : MonoBehaviour
 
         Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
 
+        bool hitBoid = false;
+
         foreach (Boid b in boids)
         {
             if (b == null || b.IsDead)
                 continue;
 
-            if (internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown)
+            if (IsInternalBoidCooldown(b))
             {
                 continue;
             }
@@ -184,16 +188,23 @@ public class BoomerangController : MonoBehaviour
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
-                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
-
                 Boids.Instance.DamageBoid(b, Weapon.Damage);
                 internalBoidCooldown[b] = Time.time;
 
-                if (Time.time - lastProcTime > InternalProcCooldown)
-                {
-                    // TODO: Proc ability
-                    lastProcTime = Time.time;
-                }
+                hitBoid = true;
+            }
+        }
+
+        if (hitBoid)
+        {
+            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+
+            Weapon.OnHit?.Invoke(this);
+
+            if (Time.time - lastProcTime > InternalProcCooldown)
+            {
+                Weapon.OnProc?.Invoke(this);
+                lastProcTime = Time.time;
             }
         }
     }

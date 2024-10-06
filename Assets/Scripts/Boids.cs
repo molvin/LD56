@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
-    public const int MAX_BOIDS = 1000;
+    public const int MAX_BOIDS = 200;
 
     public static Boids Instance;
     private Player player;
