@@ -168,10 +168,7 @@ public class Player : MonoBehaviour
 
             BoomerangController boomerang = Instantiate(BoomerangPrefab);
             boomerang.Owner = this;
-<<<<<<< HEAD
             boomerang.Weapon = weapon;
-=======
->>>>>>> afe4fa0 (boomerang stuff)
             boomerang.transform.position = transform.position + throwDir * 1.6f;
 
             // Let it inherit some velocity to feel good
