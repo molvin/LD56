@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb9b37626b66e94a8a06db6c2074d38, type: 3}
+  m_Name: back_to_pouch
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: 88a842653ed5c1e4ba7f8c2caba257bd, type: 3}
+  - {fileID: 8300000, guid: 80b8bb92e8085c948b4684661c4e59d0, type: 3}
+  - {fileID: 8300000, guid: a2375c6084ea44b448be19d73cbc65fd, type: 3}
+  - {fileID: 8300000, guid: 1908457415ba74447b2dea66f9b20c6d, type: 3}
+  - {fileID: 8300000, guid: 883ae18092e7c70498ea2100a319e3e1, type: 3}
+  - {fileID: 8300000, guid: f5a602474b3bce046ae4fb0e8bd213a4, type: 3}
+  mixer: {fileID: 24300002, guid: ddad48f52d20f4b4dabf9f15031adc07, type: 2}
+  vol_min: 0.5
+  vol_max: 1
+  pitch_min: 1.28
+  pitch_max: 1.94

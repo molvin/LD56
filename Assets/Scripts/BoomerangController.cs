@@ -35,6 +35,8 @@ public class BoomerangController : MonoBehaviour
     private float timeStayed = 0f;
     private float spawnTime;
 
+    private Audioman.LoopHolder loopHolderSteps;
+
     private Dictionary<Boid, float> internalBoidCooldown = new();
     private float lastProcTime = 0f;
 
@@ -74,11 +76,14 @@ public class BoomerangController : MonoBehaviour
         Accelerate();
 
         Move();
+        RegulateMovementVolume();
 
         HitBoid();
 
         if (!GracePeriod && Vector2.Distance(Position2D, Owner.Position2D) < 1.5f)
         {
+            loopHolderSteps?.Stop();
+            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
             Destroy(gameObject);
             Owner.PickUp(Weapon);
         }
@@ -167,6 +172,8 @@ public class BoomerangController : MonoBehaviour
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+
                 Boids.Instance.DamageBoid(b, Damage);
                 internalBoidCooldown[b] = Time.time;
 
@@ -177,5 +184,22 @@ public class BoomerangController : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void RegulateMovementVolume()
+    {
+        var auido_man = Audioman.getInstance();
+        if(auido_man == null)
+        {
+            Debug.Log("No audioman in scene");
+            return;
+        }
+        if(loopHolderSteps == null)
+        {
+            loopHolderSteps = auido_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position);
+        }
+        loopHolderSteps.setVolume(velocity.magnitude > 0.1f ? velocity.magnitude / InitialSpeed : 0);
+
+
     }
 }

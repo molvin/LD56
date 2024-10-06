@@ -18,6 +18,10 @@ public class Audioman : MonoBehaviour
 
     public AudioOneShotClipConfiguration clip_config_test;
 
+    public static Audioman getInstance()
+    {
+        return FindAnyObjectByType<Audioman>();
+    }
 
     void Awake()
     {
