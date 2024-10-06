@@ -77,4 +77,9 @@ public static class Weapons
             c.velocity = dir * magnitude;
         },
     };
+
+    public static List<Weapon> GetShop(int count)
+    {
+        return null;
+    }
 }
