@@ -12,9 +12,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        weaponQueue.Enqueue(Weapons.Default);
-        lastAquired = weaponQueue.Peek();
-        HUD.SetWeapons(weaponQueue);
+        AddWeapon(Weapons.Default);
     }
 
     public Weapon PeekNextWeapon()
