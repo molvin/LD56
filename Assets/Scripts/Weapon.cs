@@ -10,7 +10,7 @@ public class Weapon
     public bool NonBuyable = false;
 
     public string Name;
-    public int Damage = 60;
+    public int BaseDamage = 15;
     public float SpeedModifier = 1.0f;
     public float InitialSpeedBoost = 1.0f;
     public float StayModifier = 1.0f;
@@ -24,6 +24,10 @@ public class Weapon
     public Trigger OnAnimationDone;
 
     public int activationCount = 0;
+
+    public int Level = 0;
+
+    public int GetDamage() => Mathf.RoundToInt(BaseDamage * Mathf.Pow(1.5f, Level));
 
     public void Reset()
     {
@@ -40,6 +44,7 @@ public static class Weapons
     public static Weapon Temporary => new()
     {
         Name = "Temporary",
+        BaseDamage = 10,
         NonBuyable = true,
         SpeedModifier = 1.6f,
         OnApex = (self, c) =>
@@ -69,6 +74,7 @@ public static class Weapons
     public static Weapon Returner => new()
     {
         Name = "Returner",
+        BaseDamage = 50,
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.4f,
         Bouncyness = 0.6f,
@@ -82,6 +88,7 @@ public static class Weapons
     public static Weapon Chaining => new()
     {
         Name = "Chaining",
+        BaseDamage = 35,
         OnHit = (self, c) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 3);
@@ -119,7 +126,7 @@ public static class Weapons
     {
         Name = "Zapper",
         SpeedModifier = 1.3f,
-        Damage = 10,
+        BaseDamage = 0,
         OnProc = (self, c) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4);
@@ -131,7 +138,8 @@ public static class Weapons
                 float dist = Vector2.Distance(b.Position2D, c.Position2D);
                 if (dist < 4.0f)
                 {
-                    Boids.Instance.DamageBoid(b, 10);
+                    int damage = Mathf.RoundToInt(20 * Mathf.Pow(1.5f, self.Level));
+                    Boids.Instance.DamageBoid(b, damage);
                 }
             }
         },
@@ -163,6 +171,7 @@ public static class Weapons
             boomerang.Init(c.Owner, Weapons.Temporary, c.transform.position, dir2, Vector2.zero);
             boomerang.Temporary = true;
             boomerang.transform.localScale *= 0.7f;
+            boomerang.Weapon.BaseDamage = self.BaseDamage;
 
             self.activationCount++;
         }
@@ -187,11 +196,13 @@ public static class Weapons
             b1.Init(c.Owner, Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
             b1.Temporary = true;
             b1.transform.localScale *= 0.7f;
+            b1.Weapon.BaseDamage = 12;
 
             BoomerangController b2 = GameObject.Instantiate(c.Owner.BoomerangPrefab);
             b2.Init(c.Owner, Weapons.Temporary, c.transform.position, dir2, Vector2.zero);
             b2.Temporary = true;
             b2.transform.localScale *= 0.7f;
+            b2.Weapon.BaseDamage = 12;
         }
     };
     public static Weapon ExtremeBalls => new()
@@ -221,7 +232,7 @@ public static class Weapons
     public static Weapon TheUltimate => new()
     {
         Name = "The Ultimate",
-        Damage = 30,
+        BaseDamage = 30,
         SpeedModifier = 1.1f,
         OnProc = (self, c) =>
         {
@@ -241,7 +252,7 @@ public static class Weapons
                 b.Init(c.Owner, Weapons.TheRecurer, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
                 b.transform.localScale *= 0.7f;
-                b.Weapon.Damage = Mathf.RoundToInt(self.Damage * 0.6f);
+                b.Weapon.BaseDamage = Mathf.RoundToInt(self.BaseDamage * 0.6f);
             }
 
             self.activationCount++;
@@ -272,7 +283,7 @@ public static class Weapons
                 b.Init(c.Owner, recur ? Weapons.TheRecurer : Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
                 b.transform.localScale = c.transform.localScale * 0.7f;
-                b.Weapon.Damage = Mathf.RoundToInt(self.Damage * 0.6f);
+                b.Weapon.BaseDamage = Mathf.RoundToInt(self.BaseDamage * 0.6f);
             }
 
             self.activationCount++;
@@ -305,7 +316,7 @@ public static class Weapons
     public static Weapon GravityPull => new()
     {
         Name = "Gravity Pull",
-        Damage = 1,
+        BaseDamage = 1,
         PeriodTime = 0.1f,
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.5f,
@@ -331,7 +342,7 @@ public static class Weapons
     public static Weapon Meteor => new()
     {
         Name = "Meteor",
-        Damage = 0,
+        BaseDamage = 0,
         OnHit = (self, c) =>
         {
             if (self.activationCount == 0)
@@ -359,7 +370,8 @@ public static class Weapons
                 Vector2 dir = (c.Position2D - b.Position2D);
                 if (dir.magnitude < 5f)
                 {
-                    Boids.Instance.DamageBoid(b, 180);
+                    int damage = Mathf.RoundToInt(90 * Mathf.Pow(1.5f, self.Level));
+                    Boids.Instance.DamageBoid(b, damage);
                 }
             }
         }
