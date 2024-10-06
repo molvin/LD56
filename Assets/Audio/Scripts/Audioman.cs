@@ -14,9 +14,6 @@ public class Audioman : MonoBehaviour
 
     private Queue<AudioSource> sfx_queue;
 
-    public AudioLoopConfiguration loop_config_test;
-
-    public AudioOneShotClipConfiguration clip_config_test;
 
     public static Audioman getInstance()
     {
@@ -25,8 +22,21 @@ public class Audioman : MonoBehaviour
 
     void Awake()
     {
-        sfx_queue = new Queue<AudioSource>();
-        SpawnAudioSources(pool_start_size);
+        Debug.Log("AUDIO AWAKE");
+        if(sfx_mixer == null) {
+            Debug.Log("CREATE QUEUE");
+
+            sfx_queue = new Queue<AudioSource>();
+            SpawnAudioSources(pool_start_size);
+        }
+       
+    }
+
+    private void Start()
+    {
+        PlayLoop(Resources.Load<AudioLoopConfiguration>("object/music"), this.transform.position);
+        PlayLoop(Resources.Load<AudioLoopConfiguration>("object/ambiance"), this.transform.position);
+
     }
 
     private void SpawnAudioSources(int amount)

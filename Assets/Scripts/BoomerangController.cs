@@ -60,6 +60,7 @@ public class BoomerangController : MonoBehaviour
         velocity = throwDirection * InitialSpeed + extraVelocity;
 
         Weapon.OnSpawn?.Invoke(this);
+        Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
     }
 
     private void Awake()
@@ -245,7 +246,7 @@ public class BoomerangController : MonoBehaviour
         {
             loopHolderSteps = auido_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position);
         }
-        loopHolderSteps.setVolume(velocity.magnitude > 0.1f ? velocity.magnitude / InitialSpeed : 0);
+        loopHolderSteps.setVolume((velocity.magnitude / InitialSpeed ) * 2f);
 
 
     }

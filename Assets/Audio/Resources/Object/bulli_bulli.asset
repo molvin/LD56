@@ -19,7 +19,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 0dc218d0ca8e40b4a880f5761394b92c, type: 3}
   - {fileID: 8300000, guid: 353f8605423ef934c9e6e06c5431d515, type: 3}
   mixer: {fileID: 24300002, guid: ddad48f52d20f4b4dabf9f15031adc07, type: 2}
-  vol_min: 0.05
-  vol_max: 0.1
+  vol_min: 0.123
+  vol_max: 0.177
   pitch_min: 1.42
   pitch_max: 1.8
