@@ -12,7 +12,7 @@ public class BoomerangController : MonoBehaviour
     public Material ReturnMat;
 
     public const float PhaseTime = 3.0f;
-    public const float MinLifeTime = 1.5f;
+    public const float MinLifeTime = 0.3f;
 
     public bool GracePeriod => Time.time - spawnTime < MinLifeTime;
 
@@ -26,6 +26,7 @@ public class BoomerangController : MonoBehaviour
     public float ReturnJerk = 46f;
     public float ReturnDrag = 0.1f;
     public float StayEffect = 0.16f;
+    public float EndStayEffect = 0.92f;
 
     public Vector2 velocity;
     private bool returning = false;
@@ -34,6 +35,8 @@ public class BoomerangController : MonoBehaviour
     private float spawnTime;
     private float lastPeriodProc;
 
+    public bool Animated = false;
+    private List<Vector3> animationPoints;
     public bool Temporary = false;
 
     private Audioman.LoopHolder loopHolderSteps;
@@ -53,9 +56,12 @@ public class BoomerangController : MonoBehaviour
         Weapon.Reset();
         transform.position = position;
 
-        InitialSpeed *= weapon.ThrowSpeedModifier;
-        ReturnAcceleration *= weapon.ThrowSpeedModifier;
-        ReturnJerk *= weapon.ThrowSpeedModifier;
+        InitialSpeed *= weapon.InitialSpeedBoost * weapon.SpeedModifier;
+        ReturnAcceleration *= weapon.SpeedModifier;
+        ReturnJerk *= weapon.SpeedModifier;
+        StayEffect *= weapon.StayModifier;
+        EndStayEffect *= weapon.StayModifier;
+        StayTime /= weapon.StayModifier;
 
         velocity = throwDirection * InitialSpeed + extraVelocity;
 
@@ -80,8 +86,40 @@ public class BoomerangController : MonoBehaviour
         lastPeriodProc = Time.time;
     }
 
+    public void Animate(List<Vector3> points)
+    {
+        Animated = true;
+        velocity = Vector2.zero;
+        animationPoints = points;
+    }
+
+    private void RunAnimation()
+    {
+        Vector3 toTarget = (animationPoints[0] - transform.position);
+        Vector3 desiredVec = toTarget.normalized * Mathf.Min(Time.deltaTime * InitialSpeed, toTarget.magnitude);
+        transform.position += desiredVec;
+        if (Vector3.Distance(animationPoints[0], transform.position) < SMALL_NUMBER)
+        {
+            if (animationPoints.Count == 1)
+            {
+                Animated = false;
+                Weapon.OnAnimationDone?.Invoke(this);
+            }
+            else
+            {
+                animationPoints.RemoveAt(0);
+            }
+        }
+    }
+
     void Update()
     {
+        if (Animated)
+        {
+            RunAnimation();
+            return;
+        }
+
         if (Time.time - lastPeriodProc > Weapon.PeriodTime)
         {
             Weapon.OnPeriod?.Invoke(this);
@@ -127,7 +165,7 @@ public class BoomerangController : MonoBehaviour
     {
         Vector2 accDir = (Owner.Position2D - Position2D).normalized;
 
-        float deltaTime = Time.deltaTime * (returning && timeStayed < StayTime ? Mathf.Lerp(StayEffect, 1f, timeStayed / StayTime) : 1f);
+        float deltaTime = Time.deltaTime * (returning && timeStayed < StayTime ? Mathf.Lerp(StayEffect, EndStayEffect, timeStayed / StayTime) : 1f);
 
         velocity += accDir * ReturnAcceleration * deltaTime;
         ReturnAcceleration += ReturnJerk * deltaTime;

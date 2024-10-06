@@ -94,6 +94,12 @@ public class Player : MonoBehaviour
 
         // TODO: shop indicator
         Anim.SetBool("Running", state == State.Running && velocity.magnitude > MaxSpeed * 0.3f);
+
+        if(shop != null)
+        {
+            // TODO: indicate on hud that shop is active
+
+        }
     }
 
     private void Run()

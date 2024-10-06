@@ -14,9 +14,6 @@ public class Inventory : MonoBehaviour
     private void Start()
     {
         AddNewWeapon(Weapons.Default);
-        AddNewWeapon(Weapons.Default);
-        AddNewWeapon(Weapons.Default);
-        AddNewWeapon(Weapons.Default);
     }
 
     public Weapon PeekNextWeapon()

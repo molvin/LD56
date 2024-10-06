@@ -164,6 +164,7 @@ MonoBehaviour:
   SkinWidth: 0.03
   Bounciness: 0.75
   PushingForce: 15
+  Anim: {fileID: 245646292914298393}
 --- !u!114 &2411236606351500817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -323,7 +324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5659395811959388519
 Transform:
   m_ObjectHideFlags: 0
@@ -541,6 +542,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 124
       objectReference: {fileID: 0}
+    - target: {fileID: 6313359141071400469, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
+      propertyPath: Inventory
+      value: 
+      objectReference: {fileID: 2411236606351500817}
     - target: {fileID: 6313359141071400469, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
       propertyPath: WillReplace
       value: 
