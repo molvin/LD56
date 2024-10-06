@@ -34,6 +34,8 @@ public class BoomerangController : MonoBehaviour
     private float spawnTime;
     private float lastPeriodProc;
 
+    public bool Temporary = false;
+
     private Audioman.LoopHolder loopHolderSteps;
 
     private Dictionary<Boid, float> internalBoidCooldown = new();
@@ -48,6 +50,7 @@ public class BoomerangController : MonoBehaviour
     {
         Owner = owner;
         Weapon = weapon;
+        Weapon.Reset();
         transform.position = position;
 
         InitialSpeed *= weapon.ThrowSpeedModifier;
@@ -56,6 +59,7 @@ public class BoomerangController : MonoBehaviour
 
         velocity = throwDirection * InitialSpeed + extraVelocity;
 
+        Weapon.OnSpawn?.Invoke(this);
         Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
     }
 
@@ -92,7 +96,8 @@ public class BoomerangController : MonoBehaviour
         {
             // TODO: Phase
             Destroy(gameObject);
-            Owner.PickUp(Weapon);
+            if (!Temporary)
+                Owner.PickUp(Weapon);
         }
 
         GetComponent<MeshRenderer>().material = returning ? ReturnMat : ThrowMat;
@@ -109,7 +114,8 @@ public class BoomerangController : MonoBehaviour
             loopHolderSteps?.Stop();
             Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
             Destroy(gameObject);
-            Owner.PickUp(Weapon);
+            if (!Temporary)
+                Owner.PickUp(Weapon);
         }
     }
 
@@ -122,10 +128,11 @@ public class BoomerangController : MonoBehaviour
         velocity += accDir * ReturnAcceleration * deltaTime;
         ReturnAcceleration += ReturnJerk * deltaTime;
 
-        if (!returning && Vector2.Dot(velocity, accDir) > 0)
+        if (!returning && Vector2.Dot(velocity, accDir) > 0 && velocity.magnitude < InitialSpeed)
         {
             returning = true;
             timeStayed = 0f;
+            Weapon.OnApex?.Invoke(this);
         }
 
         if (returning)
