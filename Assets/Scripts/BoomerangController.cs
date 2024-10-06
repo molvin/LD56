@@ -174,6 +174,7 @@ public class BoomerangController : MonoBehaviour
         Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
 
         bool hitBoid = false;
+        Vector3 hitPos = Vector3.zero;
 
         foreach (Boid b in boids)
         {
@@ -192,12 +193,18 @@ public class BoomerangController : MonoBehaviour
                 internalBoidCooldown[b] = Time.time;
 
                 hitBoid = true;
+                hitPos = b.position + Vector3.up * 0.5f;
             }
         }
 
         if (hitBoid)
         {
             Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+            Instantiate(
+                Resources.Load<GameObject>("Effects/BiteEffect"),
+                hitPos,
+                Quaternion.LookRotation(Camera.main.transform.forward *-1, Camera.main.transform.up)
+                );
 
             Weapon.OnHit?.Invoke(this);
 

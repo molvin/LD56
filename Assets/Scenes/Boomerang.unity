@@ -4168,6 +4168,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5651025060098674771, guid: 71bea90fa59cdbe49b3e4fabb267af7b, type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 1015
+      objectReference: {fileID: 0}
     - target: {fileID: 7050968903288563220, guid: 71bea90fa59cdbe49b3e4fabb267af7b, type: 3}
       propertyPath: Follow
       value: 
