@@ -155,6 +155,8 @@ public class Boids : MonoBehaviour
         {
             deltaVelocity.z -= turnAmount;
         }
+
+        boid.velocity += deltaVelocity;
     }
 
     private void HandleCollision(Rigidbody boid)
