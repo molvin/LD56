@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BoomerangController : MonoBehaviour
@@ -10,8 +11,11 @@ public class BoomerangController : MonoBehaviour
     public Material ReturnMat;
 
     public const float PhaseTime = 3.0f;
+    public const float MinLifeTime = 3.0f;
 
-    public BadController Owner;
+    public bool GracePeriod => Time.time - spawnTime < MinLifeTime;
+
+    public GameObject Owner;
 
     public float StayTime = 1.6f;
     public float Bouncyness = 0.24f;
@@ -25,14 +29,17 @@ public class BoomerangController : MonoBehaviour
     private bool returning = false;
     private float stuckTime = 0f;
     private float timeStayed = 0f;
+    private float spawnTime;
 
     private void Awake()
     {
         returning = false;
+        spawnTime = Time.time;
     }
     private void OnEnable()
     {
         returning = false;
+        spawnTime = Time.time;
     }
 
     void Update()
@@ -46,7 +53,7 @@ public class BoomerangController : MonoBehaviour
             stuckTime += Time.deltaTime;
         }
 
-        if (stuckTime > PhaseTime)
+        if (!GracePeriod && stuckTime > PhaseTime)
         {
             // TODO: Phase
             Destroy(gameObject);
@@ -54,6 +61,20 @@ public class BoomerangController : MonoBehaviour
 
         GetComponent<MeshRenderer>().material = returning ? ReturnMat : ThrowMat;
 
+        Accelerate();
+
+        Move();
+
+        HitBoid();
+
+        if (!GracePeriod && Vector3.Distance(transform.position, Owner.transform.position) < 1f)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Accelerate()
+    {
         Vector3 toOwner = (Owner.transform.position - transform.position);
         Vector2 accDir = new Vector2(toOwner.x, toOwner.z).normalized;
 
@@ -76,7 +97,10 @@ public class BoomerangController : MonoBehaviour
             float damping = Mathf.Lerp(ReturnDrag * .5f, ReturnDrag * 2f, dot);
             velocity *= Mathf.Pow(damping, deltaTime);
         }
+    }
 
+    private void Move()
+    {
         Vector2 actual = new Vector2(transform.position.x, transform.position.z);
         Vector2 target = actual + velocity * Time.deltaTime;
         float y = transform.position.y;
@@ -99,10 +123,25 @@ public class BoomerangController : MonoBehaviour
         }
 
         transform.position = new Vector3(actual.x, y, actual.y);
+    }
 
-        if (Vector3.Distance(transform.position, Owner.transform.position) < 1.5f)
+    private void HitBoid()
+    {
+        if (Boids.Instance == null) return;
+
+        List<Rigidbody> boids = Boids.Instance.GetNearest(transform.position, 8);
+
+        Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
+
+        foreach (Rigidbody b in boids)
         {
-            Destroy(gameObject);
+            if (b == null) continue;
+
+            Vector2 boidPos = new Vector2(b.position.x, b.position.z);
+            if (Vector2.Distance(thisPos, boidPos) < 1f)
+            {
+                Boids.Instance.DamageBoid(b);
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ public class BadController : MonoBehaviour
                 Vector2 throwDirection = new Vector2(toMouse.x, toMouse.z).normalized;
                 Vector3 throwDir = new Vector3(throwDirection.x, 0, throwDirection.y);
                 BoomerangController boomerang = Instantiate(BoomerangPrefab);
-                boomerang.Owner = this;
+                boomerang.Owner = gameObject;
                 boomerang.transform.position = transform.position + throwDir * 1.6f;
 
                 // Let it inherit some velocity to feel good

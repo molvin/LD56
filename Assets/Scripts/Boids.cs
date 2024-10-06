@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
+    public static Boids Instance;
+
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
     public int NumBoids = 1000;
@@ -28,9 +30,24 @@ public class Boids : MonoBehaviour
     public float DeltaTime => Time.fixedDeltaTime * physicalBoids.Count / UpdateNumPerCycle;
 
     private List<Rigidbody> physicalBoids = new();
+    private KDTree<Rigidbody> tree;
 
     private Vector3 MinBounds;
     private Vector3 MaxBounds;
+
+    public List<Rigidbody> GetNearest(Vector3 pos, int num)
+    {
+        if (tree == null)
+            return new();
+
+        return tree.NearestNeighbours(pos, num);
+    }
+
+    public void DamageBoid(Rigidbody boid)
+    {
+        physicalBoids.Remove(boid);
+        Destroy(boid.gameObject);
+    }
 
     private void OnDrawGizmos()
     {
@@ -40,6 +57,8 @@ public class Boids : MonoBehaviour
 
     private void Start()
     {
+        Instance = this;
+
         MinBounds = transform.position - Space * 0.5f;
         MaxBounds = transform.position + Space * 0.5f;
 
@@ -193,7 +212,9 @@ public class Boids : MonoBehaviour
 
     private void FixedUpdate()
     {
-        KDTree<Rigidbody> tree = new(physicalBoids.Select(b => (b, b.position)).ToList());
+        tree = new(physicalBoids.Select(b => (b, b.position)).ToList());
+
+        updateIndex %= physicalBoids.Count;
         for (int i = 0; i < UpdateNumPerCycle; i++)
         {
             Rigidbody boid = physicalBoids[updateIndex];

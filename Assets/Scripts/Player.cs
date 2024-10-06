@@ -23,8 +23,11 @@ public class Player : MonoBehaviour
     public AnimationCurve DodgeSpeedCurve;
     [Header("Attacking")]
     public float AttackCooldown;
+    public float TimeBeforeFireFactor;
     public float AttackStunDuration;
     public float AttackStoppingTime;
+    public float ThrowSpeed;
+    public BoomerangController BoomerangPrefab;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -39,6 +42,9 @@ public class Player : MonoBehaviour
     private State state;
     private float timeOfLastDodge;
     private Vector3 dodgeDirection;
+    private float timeOfLastShot;
+    private Vector3 throwDir;
+    private bool fired;
 
     private void Start()
     {
@@ -61,10 +67,6 @@ public class Player : MonoBehaviour
         }
 
         UpdateCollision();
-
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        if (input.magnitude > 0.3f)
-            transform.forward = input.normalized;
     }
 
     private void Run()
@@ -94,10 +96,14 @@ public class Player : MonoBehaviour
             velocity = Vector3.SmoothDamp(velocity, Vector3.zero, ref deceleration, StoppingTime);
         }
 
-        if(Input.GetButtonDown("Jump"))
+        if (input.magnitude > 0.3f)
+            transform.forward = input.normalized;
+
+        if (Input.GetButtonDown("Jump"))
         {
             Dodge();
         }
+        Attack();
     }
 
     private void Dodge()
@@ -115,7 +121,9 @@ public class Player : MonoBehaviour
         float speed = DodgeSpeed * DodgeSpeedCurve.Evaluate(t);
         velocity = dodgeDirection * speed;
 
-        if(t > 1.0f)
+        transform.forward = dodgeDirection;
+
+        if (t > 1.0f)
         {
             state = State.Running;
         }
@@ -124,19 +132,47 @@ public class Player : MonoBehaviour
 
     private void Attack()
     {
-        // TODO: get weapon we are using and spawn it
+        // TODO: controller support
+        if (Input.GetMouseButtonDown(0) && (Time.time - timeOfLastShot) > AttackCooldown)
+        {
+            RaycastHit mouseHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            
+            if (Physics.Raycast(ray, out mouseHit))
+            {
+                Vector3 toMouse = (mouseHit.point - transform.position);
+                Vector2 throwDirection = new Vector2(toMouse.x, toMouse.z).normalized;
+                throwDir = new Vector3(throwDirection.x, 0, throwDirection.y);
 
-        // TODO: get direction we fire in from mouse, on players plane
-
-        // TODO: when stun is over switch state to running
-
-        // 
-
+                timeOfLastShot = Time.time;
+                state = State.Attacking;
+            }
+        }
     }
 
     private void UpdateAttacking()
     {
+        velocity = Vector3.SmoothDamp(velocity, Vector3.zero, ref deceleration, AttackStoppingTime);
 
+        transform.forward = throwDir;
+
+        if(!fired && (Time.time - timeOfLastShot) >= (AttackStunDuration * TimeBeforeFireFactor))
+        {
+            BoomerangController boomerang = Instantiate(BoomerangPrefab);
+            boomerang.Owner = gameObject;
+            boomerang.transform.position = transform.position + throwDir * 1.6f;
+
+            // Let it inherit some velocity to feel good
+            boomerang.velocity = new Vector2(velocity.x, velocity.z) * 0.5f + new Vector2(throwDir.x, throwDir.z) * ThrowSpeed;
+            fired = true;
+        }
+
+
+        if ((Time.time - timeOfLastShot) > AttackStunDuration)
+        {
+            state = State.Running;
+            fired = false;
+        }
     }
 
     private void UpdateCollision()
