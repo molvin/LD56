@@ -6,7 +6,8 @@ public class Player : MonoBehaviour
     {
         Running,
         Dodging,
-        Attacking
+        Attacking,
+        Dead
     }
 
     [Header("Running")]
@@ -29,6 +30,10 @@ public class Player : MonoBehaviour
     public float ThrowSpeed;
     public BoomerangController BoomerangPrefab;
     public Inventory Inventory;
+    [Header("Death")]
+    public float DeathStoppingTime;
+    public float TimeBeforeFadeout;
+    public HUD HUD;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -46,6 +51,8 @@ public class Player : MonoBehaviour
     private float timeOfLastShot;
     private Vector3 throwDir;
     private bool fired;
+    private float timeOfDeath;
+    private bool deathDone;
 
     private void Start()
     {
@@ -64,6 +71,9 @@ public class Player : MonoBehaviour
                 break;
             case State.Attacking:
                 UpdateAttacking();
+                break;
+            case State.Dead:
+                UpdateDead();
                 break;
         }
 
@@ -182,6 +192,23 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void Die()
+    {
+        state = State.Dead;
+        timeOfDeath = Time.time;
+    }
+
+    public void UpdateDead()
+    {
+        velocity = Vector3.SmoothDamp(velocity, Vector3.zero, ref deceleration, DeathStoppingTime);
+
+        if(!deathDone && (Time.time - timeOfDeath) > TimeBeforeFadeout)
+        {
+            deathDone = true;
+            HUD.GameOver();
+        }
+    }
+
     private void UpdateCollision()
     {
         bool Move(Vector3 position)
@@ -268,6 +295,8 @@ public class Player : MonoBehaviour
     {
         Inventory.AddWeapon(weapon);
     }
+
+
 
     private void OnGUI()
     {
