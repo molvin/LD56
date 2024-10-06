@@ -249,7 +249,7 @@ public class BoomerangController : MonoBehaviour
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
-                Boids.Instance.DamageBoid(b, Weapon.Damage);
+                Boids.Instance.DamageBoid(b, Weapon.GetDamage());
                 internalBoidCooldown[b] = Time.time;
 
                 hitBoid = true;

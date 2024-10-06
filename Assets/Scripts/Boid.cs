@@ -7,7 +7,7 @@ public class Boid : MonoBehaviour
     public Rigidbody Rigidbody;
     private new MeshRenderer renderer;
 
-    private int health = 20;
+    private int health = 10;
 
     public bool IsDead => health <= 0;
 
