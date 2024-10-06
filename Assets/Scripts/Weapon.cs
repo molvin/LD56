@@ -7,6 +7,8 @@ public delegate void Trigger(BoomerangController controller);
 
 public class Weapon
 {
+    public bool NonBuyable = false;
+
     public string Name;
     public int Damage = 60;
     public float SpeedModifier = 1.0f;
@@ -38,6 +40,7 @@ public static class Weapons
     public static Weapon Temporary => new()
     {
         Name = "Temporary",
+        NonBuyable = true,
         SpeedModifier = 1.6f,
         OnApex = c =>
         {
@@ -238,7 +241,7 @@ public static class Weapons
                 b.Init(c.Owner, Weapons.TheRecurer, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
                 b.transform.localScale *= 0.7f;
-                b.Weapon.Damage = Mathf.RoundToInt(c.Weapon.Damage * 0.7f);
+                b.Weapon.Damage = Mathf.RoundToInt(c.Weapon.Damage * 0.6f);
             }
 
             c.Weapon.activationCount++;
@@ -247,6 +250,7 @@ public static class Weapons
     public static Weapon TheRecurer => new()
     {
         Name = "The Recurer",
+        NonBuyable = true,
         SpeedModifier = 1.4f,
         OnProc = c =>
         {
@@ -268,7 +272,7 @@ public static class Weapons
                 b.Init(c.Owner, recur ? Weapons.TheRecurer : Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
                 b.transform.localScale = c.transform.localScale * 0.7f;
-                b.Weapon.Damage = Mathf.RoundToInt(c.Weapon.Damage * 0.7f);
+                b.Weapon.Damage = Mathf.RoundToInt(c.Weapon.Damage * 0.6f);
             }
 
             c.Weapon.activationCount++;
@@ -375,7 +379,10 @@ public static class Weapons
                 Weapon weapon = func.Invoke(null, null) as Weapon;
                 {
                     // TODO: filter based on something
-                    weapons.Add(weapon);
+                    if (!weapon.NonBuyable)
+                    {
+                        weapons.Add(weapon);
+                    }
                 }
             }
         }

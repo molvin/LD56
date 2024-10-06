@@ -7,7 +7,7 @@ public class Boid : MonoBehaviour
     public Rigidbody Rigidbody;
     private new MeshRenderer renderer;
 
-    private int health = 10;
+    private int health = 20;
 
     public bool IsDead => health <= 0;
 
@@ -54,11 +54,13 @@ public class Boid : MonoBehaviour
         }
     }
 
-    public static Boid CreateBoid(Vector3 position, Vector3 velocity, Material material)
+    public static Boid CreateBoid(Vector3 position, Vector3 velocity, int level, Material material)
     {
         GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         sphere.transform.position = position;
         Boid boid = sphere.AddComponent<Boid>();
+
+        boid.health = Mathf.RoundToInt(boid.health * Mathf.Pow(2, level));
 
         boid.renderer = sphere.GetComponent<MeshRenderer>();
         boid.renderer.material = material;
