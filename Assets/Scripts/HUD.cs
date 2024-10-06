@@ -22,6 +22,7 @@ public class HUD : MonoBehaviour
     public Button SkipShopButton;
     public ShopOption[] ShopChoiceButtons;
     public WeaponCard WillReplace;
+    public RectTransform ShopIndicator;
 
     public WeaponCard WeaponCardPrefab;
     private List<WeaponCard> weaponCards = new();
@@ -120,4 +121,45 @@ public class HUD : MonoBehaviour
         }
         StartCoroutine(Coroutine());
     }
+
+    public void ShowShopIndicator(float angle)
+    {
+        ShopIndicator.gameObject.SetActive(true);
+        Canvas canvas = GetComponent<Canvas>();
+        float halfScreenWidth = (Screen.width / canvas.scaleFactor) / 2f;
+        float halfScreenHeight = (Screen.height / canvas.scaleFactor) / 2f;
+
+        Debug.Log($"{angle}, {halfScreenWidth}, {halfScreenHeight}");
+
+        if(Mathf.Abs(angle) < 45)
+        {
+            // up -45 <-> 45
+            float t = (angle + 45) / 90;
+            float x = Mathf.Lerp(-halfScreenWidth, halfScreenWidth, t);
+            ShopIndicator.anchoredPosition = new Vector2(x, halfScreenHeight);
+        }
+        else if(Mathf.Abs(angle) > 135)
+        {
+            // down 
+            // left side 135-180, right side -180 - -135
+            float angleSign = Mathf.Sign(angle);
+            float t = (angle - 180 * angleSign) / (-45 * angleSign);
+            float x = Mathf.Lerp(0, Screen.width * angleSign, t);
+            ShopIndicator.anchoredPosition = new Vector2(x, -halfScreenHeight);
+        }
+        else
+        {
+            float angleSign = Mathf.Sign(angle);
+            float t = (angle - 45 * angleSign) / (angleSign * 90);
+            float y = Mathf.Lerp(Screen.height, -Screen.height, t);
+            ShopIndicator.anchoredPosition = new Vector2(angleSign * halfScreenWidth, y);
+        }
+    }
+
+    public void DisableShopIndicator()
+    {
+        ShopIndicator.gameObject.SetActive(false);
+
+    }
+
 }

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -97,8 +98,33 @@ public class Player : MonoBehaviour
 
         if(shop != null)
         {
-            // TODO: indicate on hud that shop is active
+            Vector3 shopPos = shop.transform.position;
+            Vector2 screenPoint = Camera.main.WorldToScreenPoint(shopPos);
+            bool visible = (screenPoint.x > 0 && screenPoint.x < Screen.width && screenPoint.y > 0 && screenPoint.y < Screen.height);
+            if(!visible)
+            {
+                shopPos.y = transform.position.y;
+                Vector3 dir = shopPos - transform.position;
 
+                float angle = Mathf.Atan(dir.x / dir.z) * 180f / Mathf.PI;
+                if (dir.z < 0)
+                {
+                    if (dir.x >= 0)
+                        angle += 180f;
+                    else
+                        angle -= 180f;
+                }
+
+                HUD.ShowShopIndicator(angle);
+            }
+            else
+            {
+                HUD.DisableShopIndicator();
+            }
+        }
+        else
+        {
+            HUD.DisableShopIndicator();
         }
     }
 
@@ -250,6 +276,11 @@ public class Player : MonoBehaviour
                 if (shopSpawns)
                 {
                     point = shopSpawns.GetRandomPoint(this);
+                }
+                bool hit = Physics.Raycast(point + Vector3.up * 1000.0f, Vector3.down, out RaycastHit hitInfo, 10000.0f, GroundLayer);
+                if(hit)
+                {
+                    point = hitInfo.point;
                 }
                 shop = Instantiate(ShopPrefab, point, Quaternion.identity);
                 timeOfLastShop = Time.time;
