@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour
         if(!_pause)
         {
             Vector3 targetPosition = Follow.transform.position;
-            targetPosition.y = original_position.y;
+            
 
             transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, Smoothing);
         }
