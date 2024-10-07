@@ -13,6 +13,7 @@ public class Audioman : MonoBehaviour
     AudioMixerGroup sfx_mixer;
 
     private Queue<AudioSource> sfx_queue;
+    private Dictionary<string, AudioOneShotClipConfiguration> configs = new();
 
 
     public static Audioman getInstance()
@@ -118,6 +119,16 @@ public class Audioman : MonoBehaviour
         }
 
         return sfx_queue.Dequeue();
+    }
+    public void PlaySound(string sound, Vector3 worldPosition)
+    {
+        if (!configs.ContainsKey(sound))
+        {
+            var config = Resources.Load<AudioOneShotClipConfiguration>($"object/{sound}");
+            configs.Add(sound, config);
+        }
+
+        PlaySound(configs[sound], worldPosition);
     }
     public void PlaySound(AudioOneShotClipConfiguration conf, Vector3 world_pos)
     {
