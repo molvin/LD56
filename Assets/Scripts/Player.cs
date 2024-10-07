@@ -33,6 +33,10 @@ public class Player : MonoBehaviour
     public float ThrowSpeed;
     public BoomerangController BoomerangPrefab;
     public Inventory Inventory;
+    [Header("Leveling")]
+    public int Level = 0;
+    public int BaseKillsPerLevel;
+    public float LevelUpFactor;
     [Header("Death")]
     public float DeathStoppingTime;
     public float TimeBeforeFadeout;
@@ -41,7 +45,6 @@ public class Player : MonoBehaviour
     public Shop ShopPrefab;
     public float ShopRespawnTime;
     public PlayerStats Stats;
-    public int ShopLevel;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -77,6 +80,8 @@ public class Player : MonoBehaviour
     {
         state = State.Running;
         timeOfLastShop = Time.time;
+
+        UpdateKills(0);
     }
 
     private void Update()
@@ -270,7 +275,7 @@ public class Player : MonoBehaviour
             {
                 Stats.FullHeal();
 
-                HUD.Shop(ShopLevel, Buy);
+                HUD.Shop(Level, Buy);
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
             }
@@ -311,8 +316,6 @@ public class Player : MonoBehaviour
         Destroy(shop.gameObject);
         shop = null;
         timeOfLastShop = Time.time;
-
-        ShopLevel++;
     }
 
     private void UpdateCollision()
@@ -419,14 +422,14 @@ public class Player : MonoBehaviour
         Inventory.AddWeapon(weapon);
     }
 
-
-    private void OnGUI()
+    public void UpdateKills(int kills)
     {
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        GUILayout.Label($"Velocity: {velocity}");
-        GUILayout.Label($"Speed: {velocity.magnitude}");
-        float overSpeedAmount = Mathf.Max(Vector3.Dot(input.normalized, velocity) - MaxSpeed, 0);
-        GUILayout.Label($"Overspeed: {overSpeedAmount}");
+        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * (1 + (Level * LevelUpFactor)));
+        if (kills >= killsForLevelUp)
+        {
+            Level++;
+            killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel + (1 + (Level * LevelUpFactor)));
+        }
+        HUD.SetKills(kills, killsForLevelUp, Level);
     }
-
 }

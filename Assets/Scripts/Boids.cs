@@ -95,6 +95,7 @@ public class Boids : MonoBehaviour
             boid.Die();
             killCount++;
             Debug.Log($"[{Time.time}]. kills: {killCount}");
+            player.UpdateKills(killCount);
         }
     }
 
