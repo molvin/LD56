@@ -78,18 +78,35 @@ public class HUD : MonoBehaviour
             //ShopParent.SetActive(true);
             var camera = Camera.main.GetComponentInParent<CameraController>();
             camera?.pause(true);
-            Vector3 targetPosition = shop.transform.position;
+            Vector3 targetPosition = shop.CameraPos.transform.position;
             var smoothing = 10f;
             Vector3 camera_delta = camera.transform.position - camera.GetComponentInChildren<Camera>().transform.position;
             //targetPosition += camera_delta / 3f;
             Quaternion original_rotation = camera.transform.rotation;
+            Vector3 original_position = camera.transform.position;
+            var startTime = Time.unscaledTime;
+
+            // Calculate the journey length.
+            var journeyLength = Vector3.Distance(original_position, targetPosition);
+            var speed = 5f;
+            var player_original_position = GetComponentInParent<Player>().transform.position;
+            var player_target_pos = shop.PlayerPos.transform.position;
+            player_target_pos.y = player_original_position.y;
             while ((camera.transform.position - targetPosition).magnitude > 0.1f)
             {
-                camera.transform.position = Vector3.MoveTowards(camera.transform.position, targetPosition, smoothing * Time.unscaledDeltaTime);
-                camera.transform.rotation = Quaternion.Lerp(original_rotation, shop.transform.rotation, smoothing * Time.unscaledDeltaTime);
+                // Distance moved equals elapsed time times speed..
+                float distCovered = (Time.unscaledTime - startTime) * speed;
+
+                // Fraction of journey completed equals current distance divided by total distance.
+                float fractionOfJourney = distCovered / journeyLength;
+
+                camera.transform.position = Vector3.Lerp(original_position, targetPosition, fractionOfJourney);
+                camera.transform.rotation = Quaternion.Lerp(original_rotation, shop.CameraPos.transform.rotation, fractionOfJourney);
+                GetComponentInParent<Player>().transform.position = Vector3.Lerp(player_original_position, player_target_pos, fractionOfJourney);
+                GetComponentInParent<Player>().Anim.updateMode = AnimatorUpdateMode.UnscaledTime;
                 yield return new WaitForEndOfFrame();
             }
-
+            GetComponentInParent<Player>().Anim.SetBool("Running", false);
 
 
             bool choiceMade = false;
@@ -120,9 +137,9 @@ public class HUD : MonoBehaviour
             {
                 RaycastHit hit = default;
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                hovering?.showDescription(false);
                 if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
                 {
-                    hovering?.showDescription(false);
                     hovering = hit.collider.GetComponentInChildren<WeaponCard>();
                     if (Input.GetMouseButtonDown(0))
                     {
@@ -134,6 +151,9 @@ public class HUD : MonoBehaviour
             
                 yield return null;
             }
+            camera.transform.rotation = original_rotation;
+            GetComponentInParent<Player>().Anim.updateMode = AnimatorUpdateMode.Normal;
+
             camera?.pause(false);
 
             for (int i = 0; i < ShopChoices.Length; i++)
