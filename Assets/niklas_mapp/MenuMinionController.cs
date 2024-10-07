@@ -88,6 +88,7 @@ public class MenuMinionController : MonoBehaviour
     public void quitGame()
     {
         Debug.Log("quits");
+        Application.Quit();
         scatter();
     }
 
