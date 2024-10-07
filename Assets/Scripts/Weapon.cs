@@ -184,8 +184,8 @@ public static class Weapons
                     Boids.Instance.DamageBoid(b, damage);
 
                     GameObject zap = FxManager.Get("LineZap");
-                    zap.transform.position = c.transform.position;
-                    zap.GetComponent<MoveToPoint>().desiredPos = b.transform.position;
+                    zap.transform.position = c.transform.position + Vector3.up * 0.3f;
+                    zap.GetComponent<MoveToPoint>().desiredPos = b.transform.position + Vector3.up * 0.4f;
                 }
             }
         },
