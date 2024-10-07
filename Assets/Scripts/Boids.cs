@@ -45,25 +45,39 @@ public class Boids : MonoBehaviour
 
     private Vector3 MinBounds;
     private Vector3 MaxBounds;
-    private Collider[] colliderBuffer;
+    private Collider[] colliderBuffer = new Collider[1024];
 
-    public List<Boid> GetNearest(Vector3 pos, int num)
+    public List<Boid> GetNearest(Vector3 pos, int num, float radius)
+    {
+        if (UseKDTree)
+        {
+            return _GetNearest(pos, num);
+        }
+        else
+        {
+            return GetInRange(pos, radius);
+        }
+    }
+    private List<Boid> _GetNearest(Vector3 pos, int num)
     {
         if (tree == null)
             return new();
 
         return tree.NearestNeighbours(pos, num);
     }
-    public List<Boid> GetInRange(Vector3 pos, float radius)
+    private List<Boid> GetInRange(Vector3 pos, float radius)
     {
-        if (Physics.OverlapSphereNonAlloc(pos, radius, colliderBuffer, BoidLayer) > 0)
+        List<Boid> boids = new();
+
+        //int hits = Physics.OverlapSphereNonAlloc(pos, radius, colliderBuffer, BoidLayer);
+        colliderBuffer = Physics.OverlapSphere(pos, radius, BoidLayer);
+        int hits = colliderBuffer.Length;
+        for (int i = 0; i < hits; i++)
         {
-            return colliderBuffer.Select(c => c.GetComponent<Boid>()).ToList();
+            boids.Add(colliderBuffer[i].GetComponent<Boid>());
         }
-        else
-        {
-            return new();
-        }
+
+        return boids;
     }
 
     public void DamageBoid(Boid boid, int damage)
@@ -277,11 +291,7 @@ public class Boids : MonoBehaviour
         {
             Boid boid = allBoids[updateIndex];
 
-            List<Boid> neighbours = null;
-            if (UseKDTree)
-            {
-                neighbours = tree.NearestNeighbours(boid.position, 10);
-            }
+            List<Boid> neighbours = GetNearest(boid.position, 10, VisualRange);
 
             Seek(boid);
             FlyTowardsCenter(boid, neighbours);

@@ -44,6 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a727988cb938749898ce266c2b6396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  BoidLayer:
+    serializedVersion: 2
+    m_Bits: 4096
   BoidMaterials:
   - {fileID: 2100000, guid: 7d240eb4f41a98a4e945f0c876927abb, type: 2}
   - {fileID: 2100000, guid: f406f77f56576e74fbe322675cbb94e9, type: 2}
