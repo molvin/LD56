@@ -525,6 +525,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HUD
       objectReference: {fileID: 0}
+    - target: {fileID: 924436320164609130, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 924436320164609130, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 1777966538990232109, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -632,6 +640,18 @@ PrefabInstance:
     - target: {fileID: 3681782725064166773, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461017516748148272, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: ea73179a30293d74f90c1aee15193821, type: 3}
+    - target: {fileID: 4461017516748148272, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4461017516748148272, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
+      propertyPath: m_Color.g
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4461017516748148272, guid: ae69b9c7f6918954fb4105f7168b9c4b, type: 3}
       propertyPath: m_RaycastTarget

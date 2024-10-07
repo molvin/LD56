@@ -49,7 +49,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3460403114159801216}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -212,6 +212,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4292274474963795324, guid: b65418018aadb9b4d9d6ce1736dd5e1b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2929055ede0e09a4290590fc8d863276, type: 2}
     - target: {fileID: 7716767754827154921, guid: b65418018aadb9b4d9d6ce1736dd5e1b, type: 3}
       propertyPath: m_Name
       value: Cage
@@ -466,6 +470,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4292274474963795324, guid: b65418018aadb9b4d9d6ce1736dd5e1b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2929055ede0e09a4290590fc8d863276, type: 2}
     - target: {fileID: 7716767754827154921, guid: b65418018aadb9b4d9d6ce1736dd5e1b, type: 3}
       propertyPath: m_Name
       value: Cage (2)
@@ -638,6 +646,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4292274474963795324, guid: b65418018aadb9b4d9d6ce1736dd5e1b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2929055ede0e09a4290590fc8d863276, type: 2}
     - target: {fileID: 7716767754827154921, guid: b65418018aadb9b4d9d6ce1736dd5e1b, type: 3}
       propertyPath: m_Name
       value: Cage (1)

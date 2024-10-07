@@ -19,9 +19,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        AddNewWeapon(Weapons.Meteor);
-        AddNewWeapon(Weapons.Zapper);
-        AddNewWeapon(Weapons.Chaining);
+        AddNewWeapon(Weapons.Default);
         FollowPoints = new Vector3[MaxWeapons];
     }
 
