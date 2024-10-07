@@ -70,7 +70,10 @@ public class BoomerangController : MonoBehaviour
         velocity = throwDirection * InitialSpeed + extraVelocity;
 
         Weapon.OnSpawn?.Invoke(Weapon, this);
-        Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
+        if (!Temporary)
+        {
+            Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
+        }
 
         GetComponentInChildren<Animator>()?.SetTrigger("Toss");
     }
@@ -163,7 +166,10 @@ public class BoomerangController : MonoBehaviour
         float catchRadius = 0.75f + Weapon.SizeModifier * 0.75f;
         if (!GracePeriod && Vector2.Distance(Position2D, Owner.Position2D) < catchRadius)
         {
-            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
+            if (!Temporary)
+            {
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
+            }
             Destroy(gameObject);
             if (!Temporary)
                 Owner.PickUp(Weapon);
@@ -239,7 +245,10 @@ public class BoomerangController : MonoBehaviour
             Vector2 normal = (actual - target).normalized;
             Vector2 projection = normal * Vector2.Dot(velocity, normal);
             velocity -= projection * (1f + Bouncyness);
-            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/wall_bonk"), this.transform.position);
+            if (!Temporary)
+            {
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/wall_bonk"), this.transform.position);
+            }
         }
 
         transform.position = new Vector3(actual.x, y, actual.y);
@@ -280,13 +289,16 @@ public class BoomerangController : MonoBehaviour
 
         if (hitBoid != null)
         {
-            // Only play once vfx/sfx per hit
-            Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
-            Instantiate(
-                Resources.Load<GameObject>("Effects/BiteEffect"),
-                hitBoid.position + Vector3.up * 0.5f,
-                Quaternion.LookRotation(Camera.main.transform.forward *-1, Camera.main.transform.up)
-                );
+            // Only play once vfx/sfx per hit & not on secondary projectiles
+            if (!Temporary)
+            {
+                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+                Instantiate(
+                    Resources.Load<GameObject>("Effects/BiteEffect"),
+                    hitBoid.position + Vector3.up * 0.5f,
+                    Quaternion.LookRotation(Camera.main.transform.forward *-1, Camera.main.transform.up)
+                    );
+            }
 
             if (Time.time - lastProcTime > Weapon.ProcCooldown)
             {
@@ -298,6 +310,9 @@ public class BoomerangController : MonoBehaviour
 
     private void RegulateMovementVolume()
     {
+        if (Temporary)
+            return;
+
         var auido_man = Audioman.getInstance();
         if(auido_man == null)
         {
