@@ -10,35 +10,38 @@ public class WeaponCard : MonoBehaviour
     public TextMeshProUGUI Damage;
     public TextMeshProUGUI Description;
     public Image Icon;
-    public Button Button;
+    //public Button Button;
     public GameObject DescriptionObject;
     public OnHover HoverHelper;
     private bool hoverable;
-
+    private System.Action callback;
     public void Init(Weapon w, System.Action callback, bool hoverable)
     {
         this.hoverable = hoverable;
         Name.text = w.Name;
         Damage.text = $"{w.GetDisplayDamage()}";
-        Description.text = w.Name;
 
-        if(callback != null)
-        {
-            Button.interactable = true;
-            Button.onClick.AddListener(() => callback());
-        }
-        else
-        {
-            Button.interactable = false;
-        }
+        Description.text = w.Description;
+
+        this.callback = callback;
+    }
+
+    public void Call()
+    {
+        Debug.Log("im called00");
+        callback?.Invoke();
     }
 
     public void DeInit()
     {
         hoverable = false;
         DescriptionObject.SetActive(false);
-        Button.onClick.RemoveAllListeners();
-        Button.interactable = false;
+        callback = null;
+    }
+
+    public void showDescription(bool show)
+    {
+        DescriptionObject.SetActive(show);
     }
 
     private void Update()
@@ -47,6 +50,5 @@ public class WeaponCard : MonoBehaviour
             return;
 
         // Show details if hovered, else hide
-        DescriptionObject.SetActive(HoverHelper.Hovered);
     }
 }

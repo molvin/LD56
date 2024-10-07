@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     public Inventory Inventory;
     [Header("Leveling")]
     public int Level = 0;
-    public int BaseKillsPerLevel;
+    public int BaseKillsPerLevel = 16;
     public float LevelUpFactor;
     [Header("Death")]
     public float DeathStoppingTime;
@@ -77,6 +77,8 @@ public class Player : MonoBehaviour
 
     private Shop shop;
 
+
+
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
     private void Start()
@@ -85,6 +87,7 @@ public class Player : MonoBehaviour
         timeOfLastShop = Time.time;
 
         UpdateKills(0);
+
     }
 
     private void Update()
@@ -137,6 +140,8 @@ public class Player : MonoBehaviour
         {
             HUD.DisableShopIndicator();
         }
+
+      
     }
 
     private void Run()
@@ -283,9 +288,12 @@ public class Player : MonoBehaviour
             float d = Vector3.Distance(transform.position, shop.transform.position);
             if(d < shop.Radius)
             {
+
                 Stats.FullHeal();
 
-                HUD.Shop(Level, Buy);
+                // NOTE: Upgrade shop every 2 levels
+                HUD.Shop(Level / 2, Buy, shop);
+
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
             }

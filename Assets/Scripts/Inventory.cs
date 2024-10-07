@@ -11,9 +11,25 @@ public class Inventory : MonoBehaviour
     private Weapon lastAquired;
     public bool AtMax => ownedWeapons.Count == MaxWeapons;
 
+    [Header("Follow")]
+    public Vector3[] FollowPoints;
+    public float FollowSpacing;
+    public Follower FollowerPrefab;
+    private Dictionary<Weapon, Follower> followers = new();
+    
+
     private void Start()
     {
-        AddNewWeapon(Weapons.ApexEploder);
+        AddNewWeapon(Weapons.Default);
+        FollowPoints = new Vector3[MaxWeapons];
+    }
+
+    private void Update()
+    {
+        for (int i = 0; i < MaxWeapons; i++)
+        {
+            FollowPoints[i] = transform.position - transform.forward * FollowSpacing * (i + 1);
+        }
     }
 
     public Weapon PeekNextWeapon()
@@ -27,6 +43,11 @@ public class Inventory : MonoBehaviour
             return null;
         Weapon weapon = weaponQueue.Dequeue();
         HUD.SetWeapons(weaponQueue);
+
+        // TODO: remove relevant follower
+        // followers[weapon].DeleteFollow();
+        // followers.Remove(weapon);
+
         return weapon;
     }
 

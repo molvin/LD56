@@ -41,14 +41,7 @@ public class BoomerangController : MonoBehaviour
 
     public bool Animated = false;
 
-    [System.Serializable]
-    public struct WeaponHat
-    {
-        public string WeaponName;
-        public GameObject Hat;
-        public Color Color;
-    }
-    public List<WeaponHat> WeaponHats;
+    public HatSelector HatSelector;
 
     private List<Vector3> animationPoints;
     private bool Temporary = false;
@@ -109,16 +102,7 @@ public class BoomerangController : MonoBehaviour
 
         GetComponentInChildren<Animator>()?.SetTrigger("Toss");
 
-        foreach(WeaponHat hat in WeaponHats)
-        {
-            if (weapon.Name == hat.WeaponName)
-            {
-                hat.Hat.gameObject.SetActive(true);
-                hat.Hat.GetComponent<MeshRenderer>().material.color = hat.Color;
-            }
-            else
-                hat.Hat.gameObject.SetActive(false);
-        }
+        HatSelector.SetHat(weapon);
     }
 
     public void Delete()
