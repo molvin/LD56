@@ -8,14 +8,14 @@ using UnityEngine.SceneManagement;
 public class EndSceneMenuButton : MonoBehaviour
 {
 
-    public NavMeshAgent minionPrefab;
+    public GameObject minionPrefab;
     public int numberOfMinions = 100;
     public Transform minionSpawn;
     void Start()
     {
         for (int j = 0; j < numberOfMinions; j++)
         {
-            setMinionDestination(gameObject, Instantiate(minionPrefab, RandomNavmeshLocation(40), Quaternion.identity));
+            setMinionDestination(gameObject, Instantiate(minionPrefab, RandomNavmeshLocation(20), Quaternion.identity));
         }
     }
 
@@ -50,9 +50,11 @@ public class EndSceneMenuButton : MonoBehaviour
         return finalPosition;
     }
 
-    public void setMinionDestination(GameObject destination, NavMeshAgent agent)
+    public void setMinionDestination(GameObject destination, GameObject agent)
     {
 
+        //agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+        agent.GetComponent<Animator>().SetBool("IsRunning",true);
 
         Vector3 result;
         MeshCollider collider = destination.GetComponent<MeshCollider>();
@@ -71,10 +73,22 @@ public class EndSceneMenuButton : MonoBehaviour
         //  Debug.Log(limit);
         if (IsInsideMeshCollider(collider, result))
         {
-            agent.destination = result;
+            //agent.destination = result;
+            StartCoroutine(moveMinion(result, agent));
         }
 
 
+    }
+
+    IEnumerator moveMinion(Vector3 target, GameObject agent)
+    {
+        while ((target - agent.transform.position).magnitude > 0.01f)
+        {
+            agent.transform.position += (target - agent.transform.position).normalized * 15f * Time.deltaTime;
+            yield return null;
+
+        }
+        yield return null;
     }
 
     public static bool IsInside(MeshCollider c, Vector3 point)
