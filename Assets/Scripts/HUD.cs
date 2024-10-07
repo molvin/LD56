@@ -20,7 +20,7 @@ public class HUD : MonoBehaviour
     public Inventory Inventory;
     public GameObject ShopParent;
     public Button SkipShopButton;
-    public ShopOption[] ShopChoiceButtons;
+    public WeaponCard[] ShopChoices;
     public WeaponCard WillReplace;
     public RectTransform ShopIndicator;
 
@@ -48,7 +48,7 @@ public class HUD : MonoBehaviour
         foreach(var item in weapons)
         {
             var card = Instantiate(WeaponCardPrefab, EquipmentFrame);
-            card.Init(item);
+            card.Init(item, null, false);
             weaponCards.Add(card);
         }
     }
@@ -67,23 +67,27 @@ public class HUD : MonoBehaviour
             if (Inventory.AtMax)
             {
                 WillReplace.gameObject.SetActive(true);
-                WillReplace.Init(weaponToReplace);
+                WillReplace.Init(weaponToReplace, null, true);
             }
             else
             {
                 WillReplace.gameObject.SetActive(false);
             }
 
-            var weapons = Weapons.GetShop(ShopChoiceButtons.Length).ToList();
-            for(int i = 0; i < ShopChoiceButtons.Length; i++)
+            var weapons = Weapons.GetShop(ShopChoices.Length).ToList();
+            for(int i = 0; i < ShopChoices.Length; i++)
             {
                 Weapon w = weapons[i];
-                ShopChoiceButtons[i].Button.onClick.AddListener(() => chosenWeapon = w);
-                ShopChoiceButtons[i].Init(w);
+                ShopChoices[i].Init(w, () => chosenWeapon = w, true);
             }
 
             while (!choiceMade && chosenWeapon == null)
             {
+
+                // TODO: while hovering an option or the will replace
+                //       show details window
+
+
                 yield return null;
             }
             SkipShopButton.onClick.RemoveAllListeners();
