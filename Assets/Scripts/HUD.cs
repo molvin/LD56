@@ -81,10 +81,12 @@ public class HUD : MonoBehaviour
             Vector3 targetPosition = shop.transform.position;
             var smoothing = 10f;
             Vector3 camera_delta = camera.transform.position - camera.GetComponentInChildren<Camera>().transform.position;
-            targetPosition += camera_delta / 3f;
+            //targetPosition += camera_delta / 3f;
+            Quaternion original_rotation = camera.transform.rotation;
             while ((camera.transform.position - targetPosition).magnitude > 0.1f)
             {
                 camera.transform.position = Vector3.MoveTowards(camera.transform.position, targetPosition, smoothing * Time.unscaledDeltaTime);
+                camera.transform.rotation = Quaternion.Lerp(original_rotation, shop.transform.rotation, smoothing * Time.unscaledDeltaTime);
                 yield return new WaitForEndOfFrame();
             }
 
