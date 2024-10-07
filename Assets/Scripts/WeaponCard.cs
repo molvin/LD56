@@ -39,12 +39,16 @@ public class WeaponCard : MonoBehaviour
         callback = null;
     }
 
+    public void showDescription(bool show)
+    {
+        DescriptionObject.SetActive(show);
+    }
+
     private void Update()
     {
         if (!hoverable)
             return;
 
         // Show details if hovered, else hide
-        //DescriptionObject.SetActive(HoverHelper.Hovered); :TODO
     }
 }

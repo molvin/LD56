@@ -113,17 +113,22 @@ public class HUD : MonoBehaviour
                 ShopChoices[i].Init(w, () => chosenWeapon = w, true);
             }
 
+            WeaponCard hovering = null;
             while (!choiceMade && chosenWeapon == null)
             {
-                if(Input.GetMouseButtonDown(0))
+                RaycastHit hit = default;
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
                 {
-                    RaycastHit hit = default;
-                    var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
+                    hovering?.showDescription(false);
+                    hovering = hit.collider.GetComponentInChildren<WeaponCard>();
+                    if (Input.GetMouseButtonDown(0))
                     {
-                        hit.collider.GetComponentInChildren<WeaponCard>()?.Call();
+                        hovering?.Call();
                     }
+                    hovering?.showDescription(true);
                 }
+
             
                 yield return null;
             }
