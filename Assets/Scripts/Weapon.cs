@@ -324,6 +324,7 @@ public static class Weapons
         BaseLevel = 4,
         BaseDamage = 42,
         SpeedModifier = 1.1f,
+        Knockback = 6f,
         ProcCooldown = 0.3f,
         OnProc = (self, c, target) =>
         {
@@ -358,7 +359,7 @@ public static class Weapons
         SpeedModifier = 1.4f,
         SizeModifier = 0.7f,
         ProcCooldown = 0.3f,
-        Knockback = 6f,
+        Knockback = 4f,
         OnProc = (self, c, target) =>
         {
             bool recur = self.SizeModifier > .5f;

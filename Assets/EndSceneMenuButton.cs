@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class EndSceneMenuButton : MonoBehaviour
 {
@@ -11,8 +12,33 @@ public class EndSceneMenuButton : MonoBehaviour
     public GameObject minionPrefab;
     public int numberOfMinions = 100;
     public Transform minionSpawn;
+
+    [Header("GameOver")]
+    public float FadeOutTime;
+    public float PostFadeOutTime;
+    public Image FadeOut;
     void Start()
     {
+
+        IEnumerator Coroutine()
+        {
+            float t = FadeOutTime;
+            while (t > 0.0f)
+            {
+                t -= Time.unscaledDeltaTime;
+                Color color = FadeOut.color;
+                color.a = t / FadeOutTime;
+                FadeOut.color = color;
+                yield return null;
+            }
+            Color c = FadeOut.color;
+            c.a = 0.0f;
+            FadeOut.color = c;
+
+            yield return new WaitForSecondsRealtime(PostFadeOutTime);
+        }
+        StartCoroutine(Coroutine());
+
         Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position, true);
 
         for (int j = 0; j < numberOfMinions; j++)
@@ -31,7 +57,7 @@ public class EndSceneMenuButton : MonoBehaviour
             if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
             {
                 if(hit.collider.gameObject == this.gameObject) {
-                    SceneManager.LoadScene(0);
+                    menu();
                 }
 
             }
@@ -39,6 +65,32 @@ public class EndSceneMenuButton : MonoBehaviour
         
       
     }
+  
+
+    public void menu()
+    {
+
+        IEnumerator Coroutine()
+        {
+            float t = 0.0f;
+            while (t < FadeOutTime)
+            {
+                t += Time.unscaledDeltaTime;
+                Color color = FadeOut.color;
+                color.a = t / FadeOutTime;
+                FadeOut.color = color;
+                yield return null;
+            }
+            Color c = FadeOut.color;
+            c.a = 1.0f;
+            FadeOut.color = c;
+
+            yield return new WaitForSecondsRealtime(PostFadeOutTime);
+            SceneManager.LoadScene(0);
+        }
+        StartCoroutine(Coroutine());
+    }
+
     public Vector3 RandomNavmeshLocation(float radius)
     {
         Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * radius;

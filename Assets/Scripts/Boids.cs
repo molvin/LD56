@@ -142,7 +142,7 @@ public class Boids : MonoBehaviour
             float rand = Random.value;
             int difficulty = (rand > 0.85 ? 2 : (rand > 0.55 ? 1 : 0));
             
-            Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
+            Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f);
 
             // Give player a 30m "safe zone"

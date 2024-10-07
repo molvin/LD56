@@ -7,6 +7,7 @@ using UnityEngine.Audio;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static Audioman;
 
 public class MenuMinionController : MonoBehaviour
@@ -32,6 +33,13 @@ public class MenuMinionController : MonoBehaviour
     public float volumeChangeFactor = 0.2f;
     Audioman.LoopHolder loop_holder;
     public Audioman audio_man;
+
+    [Header("GameOver")]
+    public float FadeOutTime;
+    public float PostFadeOutTime;
+    public Image FadeOut;
+
+
     public void Awake()
     {
         for(int i = 0; i < numberOfMinions; i++)
@@ -46,20 +54,36 @@ public class MenuMinionController : MonoBehaviour
     }
 
 
-
-    public void startGame()
+     public void startGame()
     {
+        // TODO: fade out
+
+        // TODO: load new scene
         scatter();
         Debug.Log("Start_game");
         getLoopHolder()?.Stop();
 
-        StartCoroutine(callAfterSec(0.5f, () => {
-                SceneManager.LoadScene(1);
+        IEnumerator Coroutine()
+        {
+            float t = 0.0f;
+            while(t < FadeOutTime)
+            {
+                t += Time.unscaledDeltaTime;
+                Color color = FadeOut.color;
+                color.a = t / FadeOutTime;
+                FadeOut.color = color;
+                yield return null;
             }
-        ));
+            Color c = FadeOut.color;
+            c.a = 1.0f;
+            FadeOut.color = c;
 
-
+            yield return new WaitForSecondsRealtime(PostFadeOutTime);
+            SceneManager.LoadScene(1);
+        }
+        StartCoroutine(Coroutine());
     }
+
 
     public void quitGame()
     {
