@@ -74,7 +74,7 @@ public class Player : MonoBehaviour
     private float timeOfDeath;
     private bool deathDone;
     private float timeOfLastShop;
-
+    private int previousKillsForLevelUp = 0;
     private Shop shop;
 
     private Audioman.LoopHolder footsteps;
@@ -443,9 +443,10 @@ public class Player : MonoBehaviour
         if (kills >= killsForLevelUp)
         {
             Level++;
+            previousKillsForLevelUp = killsForLevelUp;
             killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel + (1 + (Level * LevelUpFactor)));
 
-            // if ((Time.time - timeOfLastShop) > ShopRespawnTime)
+            if (shop == null)
             {
                 Vector3 point = Vector3.zero;
                 var shopSpawns = FindObjectOfType<ShopSpawns>();
@@ -462,6 +463,6 @@ public class Player : MonoBehaviour
                 // timeOfLastShop = Time.time;
             }
         }
-        HUD.SetKills(kills, killsForLevelUp, Level);
+        HUD.SetKills(kills, killsForLevelUp, previousKillsForLevelUp, Level);
     }
 }
