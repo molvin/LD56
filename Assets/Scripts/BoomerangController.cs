@@ -49,6 +49,7 @@ public class BoomerangController : MonoBehaviour
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
 
+
     public void Init(Player owner, Weapon weapon, Vector3 position, Vector2 throwDirection, Vector2 extraVelocity)
     {
         Owner = owner;
@@ -67,6 +68,8 @@ public class BoomerangController : MonoBehaviour
 
         Weapon.OnSpawn?.Invoke(this);
         Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
+
+        GetComponentInChildren<Animator>()?.SetTrigger("Toss");
     }
 
     private void OnDestroy()
@@ -119,6 +122,8 @@ public class BoomerangController : MonoBehaviour
             RunAnimation();
             return;
         }
+        GetComponentInChildren<Animator>()?.SetBool("IsRunning", velocity.magnitude > SMALL_NUMBER);
+
 
         if (Time.time - lastPeriodProc > Weapon.PeriodTime)
         {
@@ -143,7 +148,7 @@ public class BoomerangController : MonoBehaviour
                 Owner.PickUp(Weapon);
         }
 
-        GetComponent<MeshRenderer>().material = returning ? ReturnMat : ThrowMat;
+        GetComponentInChildren<SkinnedMeshRenderer>().material = returning ? ReturnMat : ThrowMat;
 
         Accelerate();
 
@@ -203,6 +208,7 @@ public class BoomerangController : MonoBehaviour
         Vector2 actual = new Vector2(transform.position.x, transform.position.z);
         Vector2 target = actual + velocity * Time.deltaTime;
         float y = transform.position.y;
+        transform.forward = new Vector3(velocity.normalized.x, 0, velocity.normalized.y);
 
         if (UnityEngine.AI.NavMesh.SamplePosition(
             new Vector3(target.x, transform.position.y - 1f, target.y),
