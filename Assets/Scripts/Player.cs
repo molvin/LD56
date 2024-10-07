@@ -444,12 +444,20 @@ public class Player : MonoBehaviour
 
     public void UpdateKills(int kills)
     {
-        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * ((Mathf.Pow(LevelUpFactor, Level))));
+        float baseMulti = Mathf.Pow(1.15f, Level);
+        float multi = baseMulti * (1f + Mathf.Log(baseMulti)) + Level;
+        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * multi);
+
+        //int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * ((Mathf.Pow(LevelUpFactor, Level))));
         if (kills >= killsForLevelUp)
         {
             Level++;
             previousKillsForLevelUp = killsForLevelUp;
-            killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * ((Mathf.Pow(LevelUpFactor, Level))));
+
+            baseMulti = Mathf.Pow(1.15f, Level);
+            multi = baseMulti * (1f + Mathf.Log(baseMulti)) + Level;
+            killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * multi);
+            //killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * ((Mathf.Pow(LevelUpFactor, Level))));
 
             if (shop == null)
             {
