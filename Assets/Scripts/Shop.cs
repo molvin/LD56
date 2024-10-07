@@ -19,6 +19,7 @@ public class Shop : MonoBehaviour
         }
         if(replace != null)
         {
+            WillReplaceFollower.gameObject.SetActive(true);
             WillReplace.GetComponentInParent<Canvas>().enabled = true;
             WillReplace.Init(replace, null, true);
             WillReplaceFollower.Init(replace, null, false);

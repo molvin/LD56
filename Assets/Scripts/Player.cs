@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Animations;
-using UnityEngine.UIElements;
+using System.Linq;
+using System.Collections.Generic;
 
 public class Player : MonoBehaviour
 {
@@ -78,7 +78,10 @@ public class Player : MonoBehaviour
     private Shop shop;
 
     private Audioman.LoopHolder footsteps;
+    private List<Weapon> shopWeapons;
 
+    public float startTime = 0.0f;
+    public float dieTime = 0.0f;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
@@ -86,6 +89,7 @@ public class Player : MonoBehaviour
     {
         state = State.Running;
         timeOfLastShop = Time.time;
+        startTime = Time.time;
 
         UpdateKills(0);
 
@@ -272,6 +276,7 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
+        dieTime = Time.time;
         Anim.SetTrigger("Die");
         state = State.Dead;
         timeOfDeath = Time.time;
@@ -298,7 +303,7 @@ public class Player : MonoBehaviour
 
                 Stats.FullHeal();
 
-                HUD.Shop(Level, Buy, shop);
+                HUD.Shop(Level, Buy, shop, shopWeapons);
 
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
@@ -460,7 +465,16 @@ public class Player : MonoBehaviour
                     point = hitInfo.point;
                 }
                 shop = Instantiate(ShopPrefab, point, Quaternion.identity);
-                // timeOfLastShop = Time.time;
+
+                // fake init the shop
+                var ShopChoices = shop.GetComponentsInChildren<WeaponCard>();
+                shopWeapons = Weapons.GetShop(ShopChoices.Length, Level).ToList();
+                for (int i = 0; i < ShopChoices.Length; i++)
+                {
+                    Weapon w = shopWeapons[i];
+                    ShopChoices[i].Init(w, null, true);
+                }
+                FindObjectOfType<Shop>().Init(shopWeapons.ToArray(), null);
             }
         }
         HUD.SetKills(kills, killsForLevelUp, previousKillsForLevelUp, Level);

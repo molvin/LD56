@@ -11,6 +11,7 @@ public class MenuMinion : MonoBehaviour
 
     private Animator animator;
     private NavMeshAgent navMeshAgent;
+    public bool isInEnd = false;
     void Start()
     {
         navMeshAgent = this.GetComponent<NavMeshAgent>();
@@ -18,8 +19,12 @@ public class MenuMinion : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
+        if (isInEnd && navMeshAgent.velocity.magnitude <= 0.1f)
+        {
+            navMeshAgent.enabled = false;
+        }
         animator.SetBool(isRunning, navMeshAgent.velocity.magnitude >= 0.1f);
     }
 }
