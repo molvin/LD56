@@ -12,7 +12,7 @@ public class SpawnNumbers : MonoBehaviour
     public int testNumber = 230;
     public float offset;
 
-    public NavMeshAgent minionPrefab;
+    public GameObject minionPrefab;
     public int numberOfMinions = 100;
     public Transform minionSpawn;
 
@@ -21,17 +21,11 @@ public class SpawnNumbers : MonoBehaviour
     public float secs_to_number = 1.5f;
 
     List<NavMeshAgent> minions = new List<NavMeshAgent>();
-    void Start()
+ 
+
+    public IEnumerator playAfterWait()
     {
-        GetComponentInChildren<TextMeshPro>().text = text; ;
-
-        StartCoroutine(playAfterWait());
-
-
-    }
-
-    IEnumerator playAfterWait()
-    {
+        GetComponentInChildren<TextMeshPro>().text = this.text; 
         yield return new WaitForSeconds(secs_to_enter);
 
         GetComponentInChildren<Animation>().Play();
@@ -69,10 +63,12 @@ public class SpawnNumbers : MonoBehaviour
         return finalPosition;
     }
 
-    public void setMinionDestination(GameObject destination, NavMeshAgent agent)
+    public void setMinionDestination(GameObject destination, GameObject agent)
     {
 
-       
+        //agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+        agent.GetComponent<Animator>().SetBool("IsRunning", true);
+
         Vector3 result;
         MeshCollider collider = destination.GetComponentInChildren<MeshCollider>();
         float margin = 0.0f;
@@ -90,10 +86,22 @@ public class SpawnNumbers : MonoBehaviour
         //  Debug.Log(limit);
         if (IsInsideMeshCollider(collider, result))
         {
-            agent.destination = result;
+            //agent.destination = result;
+            StartCoroutine(moveMinion(result, agent));
         }
-      
-        
+
+
+    }
+
+    IEnumerator moveMinion(Vector3 target, GameObject agent)
+    {
+        while ((target - agent.transform.position).magnitude > 0.01f)
+        {
+            agent.transform.position += (target - agent.transform.position).normalized * 15f * Time.deltaTime;
+            yield return null;
+
+        }
+        yield return null;
     }
 
     public static bool IsInside(MeshCollider c, Vector3 point)
