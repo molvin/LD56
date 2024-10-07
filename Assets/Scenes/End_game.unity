@@ -1193,7 +1193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minionPrefab: {fileID: 5701778217567596114, guid: 86a2b322ff8220b43a3bf2c6adb99864, type: 3}
-  numberOfMinions: 180
+  numberOfMinions: 253
   minionSpawn: {fileID: 1823720508}
   FadeOutTime: 1
   PostFadeOutTime: 0.5
