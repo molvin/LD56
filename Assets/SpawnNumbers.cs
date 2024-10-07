@@ -29,7 +29,9 @@ public class SpawnNumbers : MonoBehaviour
         yield return new WaitForSeconds(secs_to_enter);
 
         GetComponentInChildren<Animation>().Play();
-        var numbers = testNumber.ToString().ToCharArray().Select(e => Int32.Parse(e.ToString())).ToList();
+        var numbers = testNumber.ToString().ToCharArray().Select(e => {
+            return Int32.Parse(e.ToString());
+        }).ToList();
         yield return new WaitForSeconds(secs_to_number);
 
 
