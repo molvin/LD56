@@ -18,8 +18,9 @@ public class WeaponCard : MonoBehaviour
     public void Init(Weapon w, System.Action callback, bool hoverable)
     {
         this.hoverable = hoverable;
-        Name?.SetText(w.Name);
-        Damage.text = $"{w.GetDamage()}";
+        Name.text = w.Name;
+        Damage.text = $"{w.GetDisplayDamage()}";
+
         Description.text = w.Name;
 
         this.callback = callback;

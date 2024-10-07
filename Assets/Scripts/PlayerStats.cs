@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,8 +18,7 @@ public class PlayerStats : MonoBehaviour
 
     private void Start()
     {
-        CurrentHealth = MaxHealth;
-        HUD.SetHealth(1.0f);
+        FullHeal();
     }
 
     private void Update()
@@ -38,12 +38,12 @@ public class PlayerStats : MonoBehaviour
         float dmg = 0;
         foreach(var boid in boids)
         {
-            if (boid == null)
+            if (boid == null || boid.IsDead)
                 continue;
-            float dist = Vector3.Distance(boid.transform.position, transform.position);
+            float dist = Mathf.Max((Vector3.Distance(boid.transform.position, transform.position) - boid.Radius), 0);
             if (dist < BoidDamageRadius)
             {
-                dmg += boid.damage;
+                dmg = Mathf.Max(boid.damage, dmg);
             }
         }
 
@@ -63,5 +63,11 @@ public class PlayerStats : MonoBehaviour
         {
             Player.Die();
         }
+    }
+
+    public void FullHeal()
+    {
+        CurrentHealth = MaxHealth;
+        HUD.SetHealth(1.0f);
     }
 }
