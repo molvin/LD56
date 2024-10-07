@@ -117,8 +117,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   AttackCooldown: 0.35
   TimeBeforeFireFactor: 0.25
-  AttackStunDuration: 0.4
-  AttackStoppingTime: 0.35
+  AttackStunDuration: 0.35
+  AttackStoppingTime: 0.3
   ThrowSpeed: 25
   BoomerangPrefab: {fileID: 5857261029421428862, guid: 53315f523db55dd43a4a3d2a673c98d2, type: 3}
   Inventory: {fileID: 2411236606351500817}
