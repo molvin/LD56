@@ -77,6 +77,8 @@ public class Player : MonoBehaviour
 
     private Shop shop;
 
+
+
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
     private void Start()
@@ -85,6 +87,7 @@ public class Player : MonoBehaviour
         timeOfLastShop = Time.time;
 
         UpdateKills(0);
+
     }
 
     private void Update()
@@ -137,6 +140,8 @@ public class Player : MonoBehaviour
         {
             HUD.DisableShopIndicator();
         }
+
+      
     }
 
     private void Run()
