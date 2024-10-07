@@ -114,7 +114,7 @@ public class MenuMinionController : MonoBehaviour
 
     void Start()
     {
-        loop_holder = audio_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position, true);
+        loop_holder = Audioman.getInstance().PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position, true);
     }
 
     // Update is called once per frame

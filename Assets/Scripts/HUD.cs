@@ -198,7 +198,7 @@ public class HUD : MonoBehaviour
             FadeOut.color = c;
 
             yield return new WaitForSecondsRealtime(PostFadeOutTime);
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(2);
         }
         StartCoroutine(Coroutine());
     }
