@@ -34,6 +34,10 @@ public class Player : MonoBehaviour
     public float ThrowSpeed;
     public BoomerangController BoomerangPrefab;
     public Inventory Inventory;
+    [Header("Leveling")]
+    public int Level = 0;
+    public int BaseKillsPerLevel;
+    public float LevelUpFactor;
     [Header("Death")]
     public float DeathStoppingTime;
     public float TimeBeforeFadeout;
@@ -42,7 +46,6 @@ public class Player : MonoBehaviour
     public Shop ShopPrefab;
     public float ShopRespawnTime;
     public PlayerStats Stats;
-    public int ShopLevel;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -57,6 +60,8 @@ public class Player : MonoBehaviour
     public float BoidPushRadius;
     [Header("Animation")]
     public Animator Anim;
+    public float BaseAnimSpeed = 1.0f;
+    public float DodgeAnimSpeed = 3.0f;
 
     private Vector3 velocity;
     private Vector3 deceleration;
@@ -78,6 +83,8 @@ public class Player : MonoBehaviour
     {
         state = State.Running;
         timeOfLastShop = Time.time;
+
+        UpdateKills(0);
     }
 
     private void Update()
@@ -100,8 +107,8 @@ public class Player : MonoBehaviour
 
         UpdateCollision();
 
-        // TODO: shop indicator
-        Anim.SetBool("Running", state == State.Running && velocity.magnitude > MaxSpeed * 0.3f);
+        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        Anim.SetBool("Running", state == State.Running && input.magnitude > 0.1f);
 
         if(shop != null)
         {
@@ -180,6 +187,8 @@ public class Player : MonoBehaviour
         {
             timeOfLastDodge = Time.time;
             state = State.Dodging;
+            Anim.SetTrigger("Dodge");
+            Anim.speed = DodgeAnimSpeed;
         }
     }
 
@@ -194,6 +203,7 @@ public class Player : MonoBehaviour
         if (t > 1.0f)
         {
             state = State.Running;
+            Anim.speed = BaseAnimSpeed;
         }
 
     }
@@ -247,6 +257,7 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
+        Anim.SetTrigger("Die");
         state = State.Dead;
         timeOfDeath = Time.time;
     }
@@ -271,7 +282,7 @@ public class Player : MonoBehaviour
             {
                 Stats.FullHeal();
 
-                HUD.Shop(ShopLevel, Buy);
+                HUD.Shop(Level, Buy);
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
             }
@@ -312,8 +323,6 @@ public class Player : MonoBehaviour
         Destroy(shop.gameObject);
         shop = null;
         timeOfLastShop = Time.time;
-
-        ShopLevel++;
     }
 
     private void UpdateCollision()
@@ -426,14 +435,14 @@ public class Player : MonoBehaviour
         Inventory.AddWeapon(weapon);
     }
 
-
-    private void OnGUI()
+    public void UpdateKills(int kills)
     {
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        GUILayout.Label($"Velocity: {velocity}");
-        GUILayout.Label($"Speed: {velocity.magnitude}");
-        float overSpeedAmount = Mathf.Max(Vector3.Dot(input.normalized, velocity) - MaxSpeed, 0);
-        GUILayout.Label($"Overspeed: {overSpeedAmount}");
+        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * (1 + (Level * LevelUpFactor)));
+        if (kills >= killsForLevelUp)
+        {
+            Level++;
+            killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel + (1 + (Level * LevelUpFactor)));
+        }
+        HUD.SetKills(kills, killsForLevelUp, Level);
     }
-
 }

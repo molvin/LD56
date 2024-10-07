@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,6 +11,11 @@ public class HUD : MonoBehaviour
 {
     [Header("Health")]
     public Image HealthFill;
+    [Header("Kills")]
+    public Image KillsFill;
+    public TextMeshProUGUI Kills;
+    public TextMeshProUGUI KillsToNextLevel;
+    public TextMeshProUGUI CurrentLevel;
     [Header("Weapons")]
     public RectTransform EquipmentFrame;
     [Header("GameOver")]
@@ -36,6 +42,14 @@ public class HUD : MonoBehaviour
     public void SetHealth(float t)
     {
         HealthFill.fillAmount = t;
+    }
+
+    public void SetKills(int kills, int requiredKills, int currentLevel)
+    {
+        KillsFill.fillAmount = (kills / (float)requiredKills);
+        Kills.text = $"Kills: {kills}";
+        KillsToNextLevel.text = $"Kills to next level {requiredKills - kills}";
+        CurrentLevel.text = $"{currentLevel + 1}";
     }
 
     public void SetWeapons(IEnumerable<Weapon> weapons)
