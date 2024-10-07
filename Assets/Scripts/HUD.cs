@@ -113,7 +113,7 @@ public class HUD : MonoBehaviour
 
             // Calculate the journey length.
             var journeyLength = Vector3.Distance(original_position, targetPosition);
-            var speed = 5f;
+            var speed = 20f;
             var player_original_position = GetComponentInParent<Player>().transform.position;
             var player_target_pos = shop.PlayerPos.transform.position;
             player_target_pos.y = player_original_position.y;
