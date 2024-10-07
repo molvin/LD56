@@ -31,6 +31,7 @@ public class Weapon
     public Trigger OnPeriod;
     public Trigger OnApex;
     public Trigger OnAnimationDone;
+    public Trigger OnEnd;
 
     public int activationCount = 0;
 
@@ -369,6 +370,9 @@ public static class Weapons
         StayModifier = 0.3f,
         OnPeriod = (self, c) =>
         {
+            GameObject fx = FxManager.GetWithKey("MagnetPull", self);
+            fx.transform.position = c.transform.position;
+
             float aoe = 8f * self.LevelModifier;
             float force = 3.5f * self.LevelModifier;
 
@@ -387,14 +391,20 @@ public static class Weapons
                     b.velocity += vec.normalized * force;
                 }
             }
-        }
+        },
+        OnEnd = (self, c) =>
+        {
+            GameObject fx = FxManager.GetWithKey("MagnetPull", self);
+            ObjectPool.Return(fx);
+            FxManager.ClearKey(self);
+        },
     };
     public static Weapon Meteor => new()
     {
         // level 3
         Name = "Meteor",
         BaseDamage = 0,
-        DisplayDamageFunc = w => Mathf.RoundToInt(120 * w.LevelModifier),
+        DisplayDamageFunc = w => Mathf.RoundToInt(100 * w.LevelModifier),
         OnHit = (self, c, target) =>
         {
             if (self.activationCount == 0)
@@ -412,6 +422,11 @@ public static class Weapons
         },
         OnAnimationDone = (self, c) =>
         {
+            GameObject impactFx = FxManager.Get("ApexExploder");
+            impactFx.transform.position = c.transform.position;
+            GameObject shockwave = FxManager.Get("MeteorImpact");
+            shockwave.transform.position = c.transform.position;
+
             float aoe = 4f * self.LevelModifier;
 
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8, aoe);
@@ -424,7 +439,7 @@ public static class Weapons
                 Vector2 dir = (c.Position2D - b.Position2D);
                 if (dir.magnitude < aoe)
                 {
-                    int damage = Mathf.RoundToInt(120 * self.LevelModifier);
+                    int damage = Mathf.RoundToInt(100 * self.LevelModifier);
                     Boids.Instance.DamageBoid(b, damage);
                 }
             }
