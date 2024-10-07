@@ -100,6 +100,7 @@ public class BoomerangController : MonoBehaviour
 
     public void Delete()
     {
+        Weapon.OnEnd?.Invoke(Weapon, this);
         loopHolderSteps?.Stop();
         ObjectPool.Return(this);
     }
