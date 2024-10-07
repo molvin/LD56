@@ -36,7 +36,7 @@ public class Player : MonoBehaviour
     public Inventory Inventory;
     [Header("Leveling")]
     public int Level = 0;
-    public int BaseKillsPerLevel;
+    public int BaseKillsPerLevel = 16;
     public float LevelUpFactor;
     [Header("Death")]
     public float DeathStoppingTime;
@@ -286,7 +286,8 @@ public class Player : MonoBehaviour
 
                 Stats.FullHeal();
 
-                HUD.Shop(Level, Buy, shop);
+                // NOTE: Upgrade shop every 2 levels
+                HUD.Shop(Level / 2, Buy, shop);
 
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
