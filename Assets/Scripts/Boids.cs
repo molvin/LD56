@@ -7,14 +7,15 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
-    public const int MAX_BOIDS = 200;
+    public const int MAX_BOIDS = 300;
 
+    public static int killCount;
     public static Boids Instance;
     private Player player;
 
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
-    public float SpawnRate = 0.3f;
+    public int SpawnRate = 3;
     public float VisualRange = 3f;
     public float MaxVelocity = 6f;
     public float MinVelocityFactor = 0.4f;
@@ -58,6 +59,8 @@ public class Boids : MonoBehaviour
         {
             allBoids.Remove(boid);
             Destroy(boid.gameObject);
+            killCount++;
+            Debug.Log($"[{Time.time}]. kills: {killCount}");
         }
     }
 
@@ -75,18 +78,25 @@ public class Boids : MonoBehaviour
 
         MinBounds = transform.position - Space * 0.5f;
         MaxBounds = transform.position + Space * 0.5f;
+
+        Spawn(SpawnRate * 10);
     }
 
     private void Spawn(int num)
     {
         int numToSpawn = Mathf.Min(num, MAX_BOIDS - allBoids.Count);
 
+        int level = (int)(Time.time - startTime) / 60;
+
         for (int i = 0; i < numToSpawn; i++)
         {
+            float rand = Random.value;
+            int difficulty = (rand > 0.85 ? 2 : (rand > 0.55 ? 1 : 0));
+
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
 
-            Boid boid = Boid.CreateBoid(position, velocity, BoidMaterials[Random.Range(0, BoidMaterials.Count)]);
+            Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1, BoidMaterials[difficulty]);
             allBoids.Add(boid);
         }
     }
@@ -237,13 +247,9 @@ public class Boids : MonoBehaviour
         int currentTime = (int)(Time.time - startTime);
         if (currentTime != lastSpawnTime)
         {
-            float toSpawn = 0;
-            while (lastSpawnTime < currentTime)
-            {
-                toSpawn += ++lastSpawnTime * SpawnRate;
-            }
-            
-            Spawn((int)toSpawn);
+            lastSpawnTime = currentTime;
+            int extra = currentTime / 60;
+            Spawn(SpawnRate + extra);
         }
 
         if (allBoids.Count == 0)

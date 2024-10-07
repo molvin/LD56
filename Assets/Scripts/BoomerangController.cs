@@ -66,7 +66,7 @@ public class BoomerangController : MonoBehaviour
 
         velocity = throwDirection * InitialSpeed + extraVelocity;
 
-        Weapon.OnSpawn?.Invoke(this);
+        Weapon.OnSpawn?.Invoke(Weapon, this);
         Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
 
         GetComponentInChildren<Animator>()?.SetTrigger("Toss");
@@ -106,7 +106,7 @@ public class BoomerangController : MonoBehaviour
             if (animationPoints.Count == 1)
             {
                 Animated = false;
-                Weapon.OnAnimationDone?.Invoke(this);
+                Weapon.OnAnimationDone?.Invoke(Weapon, this);
             }
             else
             {
@@ -127,7 +127,7 @@ public class BoomerangController : MonoBehaviour
 
         if (Time.time - lastPeriodProc > Weapon.PeriodTime)
         {
-            Weapon.OnPeriod?.Invoke(this);
+            Weapon.OnPeriod?.Invoke(Weapon, this);
             lastPeriodProc = Time.time;
         }
 
@@ -179,7 +179,7 @@ public class BoomerangController : MonoBehaviour
         {
             returning = true;
             timeStayed = 0f;
-            Weapon.OnApex?.Invoke(this);
+            Weapon.OnApex?.Invoke(Weapon, this);
         }
 
         if (returning)
@@ -255,7 +255,7 @@ public class BoomerangController : MonoBehaviour
             Vector2 boidPos = new Vector2(b.position.x, b.position.z);
             if (Vector2.Distance(thisPos, boidPos) < 1.05f)
             {
-                Boids.Instance.DamageBoid(b, Weapon.Damage);
+                Boids.Instance.DamageBoid(b, Weapon.GetDamage());
                 internalBoidCooldown[b] = Time.time;
 
                 hitBoid = true;
@@ -272,11 +272,11 @@ public class BoomerangController : MonoBehaviour
                 Quaternion.LookRotation(Camera.main.transform.forward *-1, Camera.main.transform.up)
                 );
 
-            Weapon.OnHit?.Invoke(this);
+            Weapon.OnHit?.Invoke(Weapon, this);
 
             if (Time.time - lastProcTime > InternalProcCooldown)
             {
-                Weapon.OnProc?.Invoke(this);
+                Weapon.OnProc?.Invoke(Weapon, this);
                 lastProcTime = Time.time;
             }
         }
