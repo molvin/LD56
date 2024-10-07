@@ -519,6 +519,7 @@ public static class Weapons
         Description = "Creates an explosion when reaching its apex and returning back",
         BaseLevel = 2,
         BaseDamage = 0,
+        InitialSpeedBoost = 0.7f,
         Knockback = 0,
         DisplayDamageFunc = w => Mathf.RoundToInt(60 * w.LevelModifier),
         OnApex = (self, c) =>
