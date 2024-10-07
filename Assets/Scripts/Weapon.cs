@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.UI;
 using UnityEngine;
 
 public delegate void Trigger(Weapon self, BoomerangController controller);
@@ -22,6 +21,7 @@ public class Weapon
     public float PeriodTime = 10.0f;
     public float ProcCooldown = 0.15f;
     public float SizeModifier = 1.0f;
+    public float Knockback = 8.0f;
 
     public DisplayDamage DisplayDamageFunc;
 
@@ -38,6 +38,7 @@ public class Weapon
     public int BaseLevel = 0;
     public int Level = 0;
     public int GetLevel() => Level + BaseLevel;
+    public float KnockbackForce => Knockback * LevelModifier;
 
     public float LevelModifier => Mathf.Pow(1.5f, Level);
     public int GetDamage() => Mathf.RoundToInt(BaseDamage * LevelModifier);
@@ -62,6 +63,7 @@ public static class Weapons
         NonBuyable = true,
         SpeedModifier = 1.6f,
         SizeModifier = 0.7f,
+        Knockback = 6,
         OnApex = (self, c) =>
         {
             c.Delete();
@@ -73,6 +75,7 @@ public static class Weapons
         Name = "Quick Draw",
         BaseDamage = 17,
         SpeedModifier = 2.1f,
+        Knockback = 10f,
     };
 
     public static Weapon SlowBoy => new()
@@ -80,6 +83,7 @@ public static class Weapons
         Name = "Slow Boy",
         BaseDamage = 15,
         SpeedModifier = 0.3f,
+        Knockback = 10f,
     };
 
     public static Weapon Bouncer => new()
@@ -87,7 +91,8 @@ public static class Weapons
         Name = "Bouncer",
         BaseDamage = 16,
         SpeedModifier = 1.2f,
-        Bouncyness = 1.6f,
+        Bouncyness = 2.6f,
+        Knockback = 12f,
     };
     public static Weapon Returner => new()
     {
@@ -96,6 +101,7 @@ public static class Weapons
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.4f,
         Bouncyness = 0.6f,
+        Knockback = 32f,
         OnHit = (self, c, target) =>
         {
             Vector2 toOwner = (c.Owner.Position2D - c.Position2D).normalized;
@@ -109,6 +115,7 @@ public static class Weapons
         Name = "Chaining",
         BaseDamage = 35,
         SpeedModifier = 1.1f,
+        Knockback = 5f,
         OnHit = (self, c, target) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4, c.velocity.magnitude * 0.5f);
@@ -123,7 +130,7 @@ public static class Weapons
                 if (dir.magnitude > c.velocity.magnitude * 0.5f)
                     continue;
 
-                c.velocity = dir.normalized * c.velocity.magnitude * self.SpeedModifier;
+                c.velocity = dir.normalized * c.velocity.magnitude;
                 break;
             }
         },
@@ -136,6 +143,7 @@ public static class Weapons
         BaseDamage = 34,
         SpeedModifier = 0.8f,
         PeriodTime = 0.4f,
+        Knockback = -10f,
         OnPeriod = (self, c) =>
         {
             float magnitude = c.velocity.magnitude * 1.2f;
@@ -151,6 +159,7 @@ public static class Weapons
         BaseDamage = 24,
         SpeedModifier = 1.1f,
         DisplayDamageFunc = w => Mathf.RoundToInt(24 * w.LevelModifier),
+        Knockback = 4f,
         OnProc = (self, c, target) =>
         {
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 6, 4.0f);
@@ -235,7 +244,7 @@ public static class Weapons
     public static Weapon ExtremeBalls => new()
     {
         // level 3
-        Name = "ExtremeBalls",
+        Name = "Extreme Balls",
         BaseDamage = 19,
         OnSpawn = (self, c) =>
         {
@@ -300,6 +309,7 @@ public static class Weapons
         SpeedModifier = 1.4f,
         SizeModifier = 0.7f,
         ProcCooldown = 0.3f,
+        Knockback = 6f,
         OnProc = (self, c, target) =>
         {
             bool recur = self.SizeModifier > .5f;
@@ -404,6 +414,7 @@ public static class Weapons
         // level 3
         Name = "Meteor",
         BaseDamage = 0,
+        Knockback = 0,
         DisplayDamageFunc = w => Mathf.RoundToInt(100 * w.LevelModifier),
         OnHit = (self, c, target) =>
         {
@@ -441,6 +452,10 @@ public static class Weapons
                 {
                     int damage = Mathf.RoundToInt(100 * self.LevelModifier);
                     Boids.Instance.DamageBoid(b, damage);
+
+                    // Shockwave force
+                    float force = 20f * self.LevelModifier;
+                    b.velocity += new Vector3(-dir.x, 0, -dir.y) * force / (b.Radius * 2.0f);
                 }
             }
         }

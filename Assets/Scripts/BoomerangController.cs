@@ -295,6 +295,7 @@ public class BoomerangController : MonoBehaviour
 
                 Boids.Instance.DamageBoid(b, Weapon.GetDamage());
                 Weapon.OnHit?.Invoke(Weapon, this, b);
+                b.velocity += new Vector3(velocity.x, 0, velocity.y).normalized * Weapon.KnockbackForce / (b.Radius * 2.0f);
 
                 hitBoid = b;
             }
