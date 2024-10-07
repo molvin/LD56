@@ -16,7 +16,6 @@ public class HUD : MonoBehaviour
     [Header("Kills")]
     public Image KillsFill;
     public TextMeshProUGUI Kills;
-    public TextMeshProUGUI KillsToNextLevel;
     public TextMeshProUGUI CurrentLevel;
     [Header("Weapons")]
     public RectTransform EquipmentFrame;
@@ -46,11 +45,10 @@ public class HUD : MonoBehaviour
         HealthFill.fillAmount = t;
     }
 
-    public void SetKills(int kills, int requiredKills, int currentLevel)
+    public void SetKills(int kills, int requiredKills, int previousRequired, int currentLevel)
     {
-        KillsFill.fillAmount = (kills / (float)requiredKills);
-        Kills.text = $"Kills: {kills}";
-        KillsToNextLevel.text = $"Kills to next level {requiredKills - kills}";
+        KillsFill.fillAmount = ((kills - previousRequired) / (float) (requiredKills - previousRequired));
+        Kills.text = $"{kills}/{requiredKills}";
         CurrentLevel.text = $"{currentLevel + 1}";
     }
 
@@ -198,7 +196,7 @@ public class HUD : MonoBehaviour
             FadeOut.color = c;
 
             yield return new WaitForSecondsRealtime(PostFadeOutTime);
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(2);
         }
         StartCoroutine(Coroutine());
     }

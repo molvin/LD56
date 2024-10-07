@@ -119,7 +119,7 @@ public class Boid : MonoBehaviour
             yield return new WaitForSeconds(1);
             if (UnityEngine.Random.Range(0, 100) == 1)
             {
-                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli_dark"), this.transform.position);
+                Audioman.getInstance()?.PlaySound("bulli_bulli_dark", transform.position);
             }
         }
     }
