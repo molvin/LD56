@@ -51,8 +51,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxSpeed: 8
-  MaxAcceleration: 55
-  DriftFriction: 9
+  MaxAcceleration: 85
+  DriftFriction: 11
   OverSpeedingFriction: 1
   AccelerationCurve:
     serializedVersion: 2
@@ -79,9 +79,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   StoppingTime: 0.15
-  DodgeCooldown: 1
-  DodgeDuration: 0.12
-  DodgeSpeed: 25
+  DodgeCooldown: 0.8
+  DodgeDuration: 0.14
+  DodgeSpeed: 30
   DodgeSpeedCurve:
     serializedVersion: 2
     m_Curve:
@@ -95,8 +95,17 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.06959083
     - serializedVersion: 3
-      time: 1.0045166
-      value: 0.9880676
+      time: 0.7691757
+      value: 0.9943582
+      inSlope: -0.043454587
+      outSlope: -0.043454587
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.0051162
+      value: 0.61869395
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -117,7 +126,9 @@ MonoBehaviour:
   TimeBeforeFadeout: 1
   HUD: {fileID: 8779048857396013772}
   ShopPrefab: {fileID: 667957165842390380, guid: 0db2ece4be7b22a48818279a97462bda, type: 3}
-  ShopRespawnTime: 1
+  ShopRespawnTime: 30
+  Stats: {fileID: 3481751476166892165}
+  ShopLevel: 0
   Collider: {fileID: 1428319193055811815}
   GroundLayer:
     serializedVersion: 2

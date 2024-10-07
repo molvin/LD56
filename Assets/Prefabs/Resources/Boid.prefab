@@ -131,6 +131,8 @@ MonoBehaviour:
   Anim: {fileID: 1247161771238179951}
   health: 10
   damage: 1
+  SpeedModifier: 1
+  DeathFriction: 3
   DeathDuration: 0.8
   DeathSizeCurve:
     serializedVersion: 2

@@ -388,7 +388,7 @@ public static class Weapons
             }
         }
     };
-    public static IEnumerable<Weapon> GetShop(int count)
+    public static IEnumerable<Weapon> GetShop(int count, int level)
     {
         // Returns X random weapons for now
         // TODO: filtering, weapon pool?
@@ -401,8 +401,8 @@ public static class Weapons
             if (func.ReturnType == typeof(Weapon))
             {
                 Weapon weapon = func.Invoke(null, null) as Weapon;
+                weapon.Level = level;
                 {
-                    // TODO: filter based on something
                     if (!weapon.NonBuyable)
                     {
                         weapons.Add(weapon);
