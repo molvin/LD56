@@ -107,6 +107,7 @@ public class HUD : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
             GetComponentInParent<Player>().Anim.SetBool("Running", false);
+            GetComponentInParent<Player>().transform.rotation.SetLookRotation((GetComponentInParent<Player>().transform.position - Camera.main.transform.position).normalized);
 
 
             bool choiceMade = false;
@@ -138,6 +139,7 @@ public class HUD : MonoBehaviour
                 RaycastHit hit = default;
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 hovering?.showDescription(false);
+
                 if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
                 {
                     hovering = hit.collider.GetComponentInChildren<WeaponCard>();
