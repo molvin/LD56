@@ -48,6 +48,10 @@ public class Player : MonoBehaviour
     public float SkinWidth;
     public float Bounciness = 0.1f;
     public float PushingForce;
+    public float PerBoidPush;
+    public int MaxBoidPushers = 10;
+    public LayerMask BoidLayer;
+    public float BoidPushRadius;
     [Header("Animation")]
     public Animator Anim;
 
@@ -324,6 +328,23 @@ public class Player : MonoBehaviour
 
         }
 
+        if(state == State.Running || state == State.Attacking)
+        {
+            var boids = Physics.OverlapSphere(transform.position + Vector3.down * Collider.height / 2.0f, BoidPushRadius, BoidLayer);
+            int count = 0;
+            for (int i = 0; i < boids.Length && count < MaxBoidPushers; i++)
+            {
+                Vector3 myPos = transform.position;
+                myPos.y = 0.0f;
+                Vector3 boidPos = boids[i].transform.position;
+                boidPos.y = 0.0f;
+
+                Vector3 dir = (myPos - boidPos).normalized;
+                velocity += dir * PerBoidPush * Time.deltaTime;
+                count++;
+            }
+        }
+        
         RaycastHit hitInfo;
         bool hit;
         

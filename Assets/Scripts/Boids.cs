@@ -14,6 +14,8 @@ public class Boids : MonoBehaviour
     private Player player;
 
     public List<Material> BoidMaterials;
+    public List<int> HealthThresholds;
+
     public Vector3 Space = Vector3.one * 50;
     public int SpawnRate = 3;
     public float VisualRange = 3f;
@@ -96,7 +98,7 @@ public class Boids : MonoBehaviour
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
 
-            Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1, BoidMaterials[difficulty]);
+            Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1);
             allBoids.Add(boid);
         }
     }
