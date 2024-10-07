@@ -54,11 +54,11 @@ MonoBehaviour:
   HealthThresholds: 
   Space: {x: 148.3, y: 16.9, z: 208.8}
   SpawnRate: 3
-  VisualRange: 6
+  VisualRange: 8
   MaxVelocity: 5
   MinVelocityFactor: 0.4
   CenteringFactor: 0.2
-  SeekingFactor: 10
+  SeekingFactor: 12
   AvoidDistance: 1.6
   AvoidFactor: 5
   MatchingFactor: 0.7

@@ -20,7 +20,7 @@ public class Boids : MonoBehaviour
     public Vector3 Space = Vector3.one * 50;
     public int SpawnRate = 3;
     public float VisualRange = 3f;
-    public float MaxVelocity = 6f;
+    public float MaxSpeed = 5f;
     public float MinVelocityFactor = 0.4f;
     public float CenteringFactor = 0.2f;
     public float SeekingFactor = 10.0f;
@@ -36,6 +36,8 @@ public class Boids : MonoBehaviour
     private int updateIndex = 0;
     private int lastSpawnTime = 0;
     private float startTime;
+
+    public float MaxVelocity(Boid boid) => MaxSpeed * boid.SpeedModifier;
 
     public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, allBoids.Count / 10), allBoids.Count);
     public float DeltaTime => Time.fixedDeltaTime * allBoids.Count / UpdateNumPerCycle;
@@ -123,7 +125,7 @@ public class Boids : MonoBehaviour
             int difficulty = (rand > 0.85 ? 2 : (rand > 0.55 ? 1 : 0));
 
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
-            Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
+            Vector3 velocity = new(Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f);
 
             Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1);
             allBoids.Add(boid);
@@ -188,13 +190,13 @@ public class Boids : MonoBehaviour
     }
     private void LimitSpeed(Boid boid)
     {
-        if (boid.velocity.magnitude > MaxVelocity)
+        if (boid.velocity.magnitude > MaxVelocity(boid))
         {
-            boid.velocity = boid.velocity.normalized * MaxVelocity;
+            boid.velocity = boid.velocity.normalized * MaxVelocity(boid);
         }
-        else if (boid.velocity.magnitude < MaxVelocity * MinVelocityFactor)
+        else if (boid.velocity.magnitude < MaxVelocity(boid) * MinVelocityFactor)
         {
-            boid.velocity = boid.velocity.normalized * MaxVelocity * MinVelocityFactor;
+            boid.velocity = boid.velocity.normalized * MaxVelocity(boid) * MinVelocityFactor;
         }
     }
     private void Seek(Boid boid)
