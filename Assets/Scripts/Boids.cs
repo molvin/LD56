@@ -49,6 +49,8 @@ public class Boids : MonoBehaviour
     private Vector3 MaxBounds;
     private Collider[] colliderBuffer = new Collider[1024];
 
+    private List<Audioman.LoopHolder> boid_step_loop = new ();
+
     public List<Boid> GetNearest(Vector3 pos, int num, float radius)
     {
         if (UseKDTree)
@@ -89,7 +91,8 @@ public class Boids : MonoBehaviour
         if (boid.IsDead)
         {
             allBoids.Remove(boid);
-            Destroy(boid.gameObject);
+            // Destroy(boid.gameObject);
+            boid.Die();
             killCount++;
             Debug.Log($"[{Time.time}]. kills: {killCount}");
         }
@@ -111,6 +114,21 @@ public class Boids : MonoBehaviour
         MaxBounds = transform.position + Space * 0.5f;
 
         Spawn(SpawnRate * 10);
+        for(int i = 0; i < 10; i++)
+        {
+            boid_step_loop.Add(Audioman.getInstance()?.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/Creature_step_loop"), this.transform.position, false));
+        }
+
+            
+    }
+
+    public void OnDestroy()
+    {
+        foreach (var item in boid_step_loop)
+        {
+            item?.Stop();
+        }
+        boid_step_loop.Clear();
     }
 
     private void Spawn(int num)
@@ -206,6 +224,30 @@ public class Boids : MonoBehaviour
 
         boid.velocity += toTarget.normalized * ((close ? 1f : 0.02f) * SeekingFactor * DeltaTime);
     }
+
+    private void AdjustStepSound()
+    {
+        var boids_near_player = allBoids
+           // .Where(boid => (player.transform.position - boid.position).magnitude < VisualRange * 1f)
+            .OrderBy(boid => (player.transform.position - boid.position).magnitude)
+            .ToList();
+
+        for(int i = 0; i < boid_step_loop.Count; i++)
+        {
+            if((boids_near_player.Count()-1) > i)
+            {
+                boid_step_loop[i].setWorldPosition(boids_near_player[i].position);
+                boid_step_loop[i].setVolume(1);
+
+            }
+            else
+            {
+                boid_step_loop[i].setVolume(0);
+            }
+        }
+      
+    }
+
     private void KeepWithinBounds(Boid boid)
     {
         Vector3 Margin = Space * BoundsMargin;
@@ -318,7 +360,8 @@ public class Boids : MonoBehaviour
 
             //boid.Position += boid.Velocity * Time.fixedDeltaTime;
             //allBoids[i].transform.position = boid.Position;
-
+            
         }
+        AdjustStepSound();
     }
 }

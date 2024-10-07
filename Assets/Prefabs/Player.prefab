@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2705008886073668929}
   - component: {fileID: 2411236606351500817}
   - component: {fileID: 3481751476166892165}
+  - component: {fileID: 5808136164697660109}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -161,14 +162,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e869c1d7e30f49541b96dcf04c801422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxHealth: 100
+  MaxHealth: 10
   CurrentHealth: 0
-  BoidDamage: 1
   MaxBoidDamageDealers: 10
-  BoidDamageRadius: 2
-  BoidDamageCooldown: 0.5
+  BoidDamageRadius: 1
+  BoidDamageCooldown: 0.8
   HUD: {fileID: 8779048857396013772}
   Player: {fileID: 2705008886073668929}
+--- !u!81 &5808136164697660109
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2405911678904267547}
+  m_Enabled: 1
 --- !u!1 &3577027730928161541
 GameObject:
   m_ObjectHideFlags: 0
