@@ -18,6 +18,7 @@ public class Boid : MonoBehaviour
 
     private int health = 10;
     public float damage = 1;
+    public float SpeedModifier = 1f;
 
     public bool IsDead => health <= 0;
 
@@ -98,6 +99,7 @@ public class Boid : MonoBehaviour
         float multiplier = Mathf.Pow(1.15f, level);
         boid.health *= Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level);
         boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
+        boid.SpeedModifier = 1.0f + Mathf.Log(multiplier) * .6f;
         boid.damage = multiplier;
 
         boid.SetHealth(boid.health);
