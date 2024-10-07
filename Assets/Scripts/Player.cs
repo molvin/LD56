@@ -438,7 +438,7 @@ public class Player : MonoBehaviour
             Level++;
             killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel + (1 + (Level * LevelUpFactor)));
 
-            // if ((Time.time - timeOfLastShop) > ShopRespawnTime)
+            if (shop == null)
             {
                 Vector3 point = Vector3.zero;
                 var shopSpawns = FindObjectOfType<ShopSpawns>();

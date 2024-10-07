@@ -5,7 +5,6 @@ using UnityEngine;
 public class Inventory : MonoBehaviour
 {
     public int MaxWeapons = 4;
-    public HUD HUD;
     private List<Weapon> ownedWeapons = new();
     private Queue<Weapon> weaponQueue = new();
     private Weapon lastAquired;
@@ -15,7 +14,7 @@ public class Inventory : MonoBehaviour
     public Vector3[] FollowPoints;
     public float FollowSpacing;
     public Follower FollowerPrefab;
-    private Dictionary<Weapon, Follower> followers = new();
+    private List<Follower> followers = new();
     
 
     private void Start()
@@ -26,9 +25,10 @@ public class Inventory : MonoBehaviour
 
     private void Update()
     {
-        for (int i = 0; i < MaxWeapons; i++)
+        for (int i = 0; i < followers.Count; i++)
         {
             FollowPoints[i] = transform.position - transform.forward * FollowSpacing * (i + 1);
+            followers[i].TargetPosition = FollowPoints[i];
         }
     }
 
@@ -42,11 +42,10 @@ public class Inventory : MonoBehaviour
         if (weaponQueue.Count == 0)
             return null;
         Weapon weapon = weaponQueue.Dequeue();
-        HUD.SetWeapons(weaponQueue);
 
-        // TODO: remove relevant follower
-        // followers[weapon].DeleteFollow();
-        // followers.Remove(weapon);
+        Follower follower = followers.First(x => x.Weapon == weapon);
+        ObjectPool.Return(follower);
+        followers.Remove(follower);
 
         return weapon;
     }
@@ -56,7 +55,9 @@ public class Inventory : MonoBehaviour
         if(ownedWeapons.Contains(weapon))
         {
             weaponQueue.Enqueue(weapon);
-            HUD.SetWeapons(weaponQueue);
+            Follower follower = ObjectPool.Get(FollowerPrefab);
+            follower.Init(weapon, transform);
+            followers.Add(follower);
         }
     }
 
@@ -77,7 +78,17 @@ public class Inventory : MonoBehaviour
         weapons.Remove(oldWeapon);
         weapons.Insert(0, newWeapon);
         weaponQueue = new Queue<Weapon>(weapons);
-        HUD.SetWeapons(weaponQueue);
+
+        {
+            Follower follower = followers.First(x => x.Weapon == oldWeapon);
+            ObjectPool.Return(follower);
+            followers.Remove(follower);
+        }
+        {
+            Follower follower = ObjectPool.Get(FollowerPrefab);
+            follower.Init(newWeapon, transform);
+            followers.Add(follower);
+        }
     }
 
     public Weapon GetRandom()
