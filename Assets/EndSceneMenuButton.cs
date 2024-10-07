@@ -19,6 +19,26 @@ public class EndSceneMenuButton : MonoBehaviour
     public Image FadeOut;
     void Start()
     {
+
+        IEnumerator Coroutine()
+        {
+            float t = FadeOutTime;
+            while (t > 0.0f)
+            {
+                t -= Time.unscaledDeltaTime;
+                Color color = FadeOut.color;
+                color.a = t / FadeOutTime;
+                FadeOut.color = color;
+                yield return null;
+            }
+            Color c = FadeOut.color;
+            c.a = 0.0f;
+            FadeOut.color = c;
+
+            yield return new WaitForSecondsRealtime(PostFadeOutTime);
+        }
+        StartCoroutine(Coroutine());
+
         Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position, true);
 
         for (int j = 0; j < numberOfMinions; j++)
@@ -45,7 +65,7 @@ public class EndSceneMenuButton : MonoBehaviour
         
       
     }
-
+  
 
     public void menu()
     {
