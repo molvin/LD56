@@ -46,8 +46,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01232af4cbf204e439ca099d1bb9c724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HatSelector: {fileID: 0}
+  HatSelector: {fileID: 7201116336675664622}
   TargetPosition: {x: 0, y: 0, z: 0}
+  Acceleration: 70
+  MaxDistance: 2
+  Friction: 8
+  Anim: {fileID: 8139384213814042192}
+  AnimationVelocityFactor: 0.3
 --- !u!114 &7201116336675664622
 MonoBehaviour:
   m_ObjectHideFlags: 0
