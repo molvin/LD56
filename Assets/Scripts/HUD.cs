@@ -6,6 +6,8 @@ using TMPro;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -98,6 +100,8 @@ public class HUD : MonoBehaviour
 
             //ShopParent.SetActive(true);
             var camera = Camera.main.GetComponentInParent<CameraController>();
+            bool found = Camera.main.GetComponent<Volume>().profile.TryGet(out DepthOfField dof);
+            dof.active = false;
             camera?.pause(true);
             Vector3 targetPosition = shop.CameraPos.transform.position;
             var smoothing = 10f;
@@ -154,6 +158,7 @@ public class HUD : MonoBehaviour
                 yield return null;
             }
             camera.transform.rotation = original_rotation;
+            dof.active = true;
             GetComponentInParent<Player>().Anim.updateMode = AnimatorUpdateMode.Normal;
 
             camera?.pause(false);
