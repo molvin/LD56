@@ -42,7 +42,7 @@ public class Weapon
     public int GetLevel() => Level + BaseLevel;
     public float KnockbackForce => Knockback * LevelModifier;
 
-    public float LevelModifier => Mathf.Pow(1.5f, Level);
+    public float LevelModifier => Mathf.Pow(1.35f, Level);
     public int GetDamage() => Mathf.RoundToInt(BaseDamage * LevelModifier);
     public int GetDisplayDamage() => DisplayDamageFunc != null ? DisplayDamageFunc.Invoke(this) : GetDamage();
 
