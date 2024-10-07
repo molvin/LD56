@@ -80,6 +80,8 @@ public class Player : MonoBehaviour
     private Audioman.LoopHolder footsteps;
     private List<Weapon> shopWeapons;
 
+    public float startTime = 0.0f;
+    public float dieTime = 0.0f;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
@@ -87,6 +89,7 @@ public class Player : MonoBehaviour
     {
         state = State.Running;
         timeOfLastShop = Time.time;
+        startTime = Time.time;
 
         UpdateKills(0);
 
@@ -273,6 +276,7 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
+        dieTime = Time.time;
         Anim.SetTrigger("Die");
         state = State.Dead;
         timeOfDeath = Time.time;
