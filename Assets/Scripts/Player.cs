@@ -107,9 +107,6 @@ public class Player : MonoBehaviour
 
         UpdateCollision();
 
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        Anim.SetBool("Running", state == State.Running && input.magnitude > 0.1f);
-
         if(shop != null)
         {
             Vector3 shopPos = shop.transform.position;
@@ -145,6 +142,11 @@ public class Player : MonoBehaviour
     private void Run()
     {
         Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+
+        Anim.SetBool("Running", state == State.Running && input.magnitude > 0.1f);
+        bool sliding = state == State.Running && ((input.magnitude < 0.1f && velocity.magnitude > MaxSpeed * 0.3f) || (Vector3.Dot(input.normalized, velocity.normalized) < 0.0f));
+        Anim.SetBool("Sliding", sliding);
+
         if (input.magnitude > 0.3f)
             dodgeDirection = input.normalized;
 
@@ -226,6 +228,7 @@ public class Player : MonoBehaviour
                 {
                     timeOfLastShot = Time.time;
                     state = State.Attacking;
+                    Anim.SetTrigger("Attack");
                 }
             }
         }
