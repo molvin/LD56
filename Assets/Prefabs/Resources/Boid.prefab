@@ -132,6 +132,7 @@ MonoBehaviour:
     MaxHealth: 150
   - Col: {r: 0.38679248, g: 0.12884694, b: 0.012771457, a: 1}
     MaxHealth: 250
+  WeaponHats: []
   DeathColor: {r: 0.5377358, g: 0.53012633, b: 0.53012633, a: 1}
   Anim: {fileID: 8901508683160704605}
   damage: 1

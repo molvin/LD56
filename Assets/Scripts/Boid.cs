@@ -14,6 +14,7 @@ public class Boid : MonoBehaviour
         public int MaxHealth;
     }
 
+
     public Rigidbody Rigidbody;
     public List<HealthMaterial> HealthMaterials;
     public Color DeathColor;
