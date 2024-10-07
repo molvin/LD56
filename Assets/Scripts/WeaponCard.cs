@@ -19,7 +19,7 @@ public class WeaponCard : MonoBehaviour
     {
         this.hoverable = hoverable;
         Name.text = w.Name;
-        Damage.text = $"{w.GetDamage()}";
+        Damage.text = $"{w.GetDisplayDamage()}";
         Description.text = w.Name;
 
         if(callback != null)

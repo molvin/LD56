@@ -34,7 +34,7 @@ public class BadController : MonoBehaviour
                 Vector3 toMouse = (mouseHit.point - transform.position);
                 Vector2 throwDirection = new Vector2(toMouse.x, toMouse.z).normalized;
                 Vector3 throwDir = new Vector3(throwDirection.x, 0, throwDirection.y);
-                BoomerangController boomerang = Instantiate(BoomerangPrefab);
+                BoomerangController boomerang = BoomerangController.New(BoomerangPrefab);
                 //boomerang.Owner = this;
                 boomerang.transform.position = transform.position + throwDir * 1.6f;
 

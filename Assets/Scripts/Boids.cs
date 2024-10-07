@@ -7,9 +7,9 @@ using UnityEngine;
 
 public class Boids : MonoBehaviour
 {
-    public const int MAX_BOIDS = 300;
+    public const int MAX_BOIDS = 400;
 
-    public static int killCount;
+    public int killCount;
     public static Boids Instance;
     private Player player;
 
@@ -18,7 +18,7 @@ public class Boids : MonoBehaviour
     public List<int> HealthThresholds;
 
     public Vector3 Space = Vector3.one * 50;
-    public int SpawnRate = 3;
+    public int SpawnRate = 2;
     public float VisualRange = 3f;
     public float MaxSpeed = 5f;
     public float MinVelocityFactor = 0.4f;
@@ -94,7 +94,7 @@ public class Boids : MonoBehaviour
             // Destroy(boid.gameObject);
             boid.Die();
             killCount++;
-            Debug.Log($"[{Time.time}]. kills: {killCount}");
+            player.UpdateKills(killCount);
         }
     }
 
@@ -113,7 +113,7 @@ public class Boids : MonoBehaviour
         MinBounds = transform.position - Space * 0.5f;
         MaxBounds = transform.position + Space * 0.5f;
 
-        Spawn(SpawnRate * 10);
+        Spawn(SpawnRate * 20);
         for(int i = 0; i < 10; i++)
         {
             boid_step_loop.Add(Audioman.getInstance()?.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/Creature_step_loop"), this.transform.position, false));
@@ -141,9 +141,20 @@ public class Boids : MonoBehaviour
         {
             float rand = Random.value;
             int difficulty = (rand > 0.85 ? 2 : (rand > 0.55 ? 1 : 0));
-
+            
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f);
+
+            // Give player a 30m "safe zone"
+            Vector2 pos = new Vector2(position.x, position.z);
+            Vector2 fromPlayer = (pos - player.Position2D);
+            if (fromPlayer.magnitude < 30)
+            {
+                pos = player.Position2D + fromPlayer.normalized * 30;
+                pos.x = Mathf.Clamp(pos.x, MinBounds.x, MaxBounds.x);
+                pos.y = Mathf.Clamp(pos.y, MinBounds.z, MaxBounds.z);
+                position = new Vector3(pos.x, position.y, pos.y);
+            }
 
             Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1);
             allBoids.Add(boid);

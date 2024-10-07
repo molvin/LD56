@@ -7,9 +7,6 @@ public class BoomerangController : MonoBehaviour
     public const float SMALL_NUMBER = 0.001f;
     public const float InternalHitCooldown = 0.225f;
 
-    public Material ThrowMat;
-    public Material ReturnMat;
-
     public const float PhaseTime = 3.0f;
     public const float MinLifeTime = 0.3f;
 
@@ -18,14 +15,22 @@ public class BoomerangController : MonoBehaviour
     public Player Owner;
     public Weapon Weapon;
 
-    public float StayTime = 1.6f;
-    public float Bouncyness = 0.24f;
-    public float InitialSpeed = 26f;
-    public float ReturnAcceleration = 16f;
-    public float ReturnJerk = 46f;
-    public float ReturnDrag = 0.1f;
-    public float StayEffect = 0.16f;
-    public float EndStayEffect = 0.92f;
+    private float stayTime = 1.6f;
+    public float StayTime => stayTime / Weapon.StayModifier;
+    private float bouncyness = 0.24f;
+    public float Bouncyness => bouncyness;
+    private float initialSpeed = 26f;
+    public float InitialSpeed => initialSpeed * Weapon.SpeedModifier * Weapon.InitialSpeedBoost;
+    private float returnAcceleration = 16f;
+    private float currentAcceleration;
+    private float returnJerk = 46f;
+    public float ReturnJerk => returnJerk * Weapon.SpeedModifier;
+    private float returnDrag = 0.1f;
+    public float ReturnDrag => returnDrag;
+    private float stayEffect = 0.16f;
+    public float StayEffect => stayEffect * Weapon.StayModifier;
+    private float endStayEffect = 0.92f;
+    public float EndStayEffect => endStayEffect * Weapon.StayModifier;
 
     public Vector2 velocity;
     private bool returning = false;
@@ -35,37 +40,64 @@ public class BoomerangController : MonoBehaviour
     private float lastPeriodProc;
 
     public bool Animated = false;
+
+    [System.Serializable]
+    public struct WeaponHat
+    {
+        public string WeaponName;
+        public GameObject Hat;
+        public Color Color;
+    }
+    public List<WeaponHat> WeaponHats;
+
     private List<Vector3> animationPoints;
-    public bool Temporary = false;
+    private bool Temporary = false;
 
     private Audioman.LoopHolder loopHolderSteps;
 
     private Dictionary<Boid, float> internalBoidCooldown = new();
     private float lastProcTime = 0f;
 
+
+
     public void UpdateHitCooldown(Boid b) => internalBoidCooldown[b] = Time.time;
     public bool IsInternalBoidCooldown(Boid b) => internalBoidCooldown.TryGetValue(b, out float time) && Time.time - time < InternalHitCooldown;
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
+    public static BoomerangController New(BoomerangController prefab)
+    {
+        return ObjectPool.Get(prefab);
+    }
 
+    private void Clear()
+    {
+        returning = false;
+        spawnTime = Time.time;
+        lastPeriodProc = Time.time;
+        stuckTime = 0f;
+        timeStayed = 0f;
+
+        Animated = false;
+        animationPoints = new();
+
+        loopHolderSteps?.Stop();
+    }
 
     public void Init(Player owner, Weapon weapon, Vector3 position, Vector2 throwDirection, Vector2 extraVelocity)
     {
+        Clear();
+
         Owner = owner;
         Weapon = weapon;
         Weapon.Reset();
+
+        Temporary = Weapon.NonBuyable;
+
         transform.position = position;
-        transform.localScale *= weapon.SizeModifier;
+        transform.localScale = Vector3.one * weapon.SizeModifier;
 
-        InitialSpeed *= weapon.InitialSpeedBoost * weapon.SpeedModifier;
-        ReturnAcceleration *= weapon.SpeedModifier;
-        ReturnJerk *= weapon.SpeedModifier;
-        StayEffect *= weapon.StayModifier;
-        EndStayEffect *= weapon.StayModifier;
-        StayTime /= weapon.StayModifier;
-
-        lastPeriodProc = Time.time;
+        currentAcceleration = returnAcceleration * weapon.SpeedModifier;
 
         velocity = throwDirection * InitialSpeed + extraVelocity;
 
@@ -76,23 +108,24 @@ public class BoomerangController : MonoBehaviour
         }
 
         GetComponentInChildren<Animator>()?.SetTrigger("Toss");
+
+        foreach(WeaponHat hat in WeaponHats)
+        {
+            if (weapon.Name == hat.WeaponName)
+            {
+                hat.Hat.gameObject.SetActive(true);
+                hat.Hat.GetComponent<MeshRenderer>().material.color = hat.Color;
+            }
+            else
+                hat.Hat.gameObject.SetActive(false);
+        }
     }
 
-    private void OnDestroy()
+    public void Delete()
     {
+        Weapon.OnEnd?.Invoke(Weapon, this);
         loopHolderSteps?.Stop();
-    }
-
-    private void Awake()
-    {
-        returning = false;
-        spawnTime = Time.time;
-    }
-    private void OnEnable()
-    {
-        returning = false;
-        spawnTime = Time.time;
-        lastPeriodProc = Time.time;
+        ObjectPool.Return(this);
     }
 
     public void Animate(List<Vector3> points)
@@ -148,12 +181,13 @@ public class BoomerangController : MonoBehaviour
         if (!GracePeriod && stuckTime > PhaseTime)
         {
             // TODO: Phase
-            Destroy(gameObject);
+            Delete();
+
             if (!Temporary)
                 Owner.PickUp(Weapon);
         }
 
-        GetComponentInChildren<SkinnedMeshRenderer>().material = returning ? ReturnMat : ThrowMat;
+        // GetComponentInChildren<SkinnedMeshRenderer>().material = returning ? ReturnMat : ThrowMat;
 
         Accelerate();
 
@@ -170,7 +204,9 @@ public class BoomerangController : MonoBehaviour
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
             }
-            Destroy(gameObject);
+
+            Delete();
+
             if (!Temporary)
                 Owner.PickUp(Weapon);
         }
@@ -182,8 +218,8 @@ public class BoomerangController : MonoBehaviour
 
         float deltaTime = Time.deltaTime * (returning && timeStayed < StayTime ? Mathf.Lerp(StayEffect, EndStayEffect, timeStayed / StayTime) : 1f);
 
-        velocity += accDir * ReturnAcceleration * deltaTime;
-        ReturnAcceleration += ReturnJerk * deltaTime;
+        velocity += accDir * currentAcceleration * deltaTime;
+        currentAcceleration += ReturnJerk * deltaTime;
 
         if (!returning && Vector2.Dot(velocity, accDir) > 0 && velocity.magnitude < InitialSpeed)
         {
@@ -282,6 +318,7 @@ public class BoomerangController : MonoBehaviour
 
                 Boids.Instance.DamageBoid(b, Weapon.GetDamage());
                 Weapon.OnHit?.Invoke(Weapon, this, b);
+                b.velocity += new Vector3(velocity.x, 0, velocity.y).normalized * Weapon.KnockbackForce / (b.Radius * 2.0f);
 
                 hitBoid = b;
             }
@@ -290,7 +327,7 @@ public class BoomerangController : MonoBehaviour
         if (hitBoid != null)
         {
             // Only play once vfx/sfx per hit & not on secondary projectiles
-            if (!Temporary)
+            if (!Temporary && Weapon.GetDamage() > 0)
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
                 Instantiate(
@@ -323,9 +360,7 @@ public class BoomerangController : MonoBehaviour
         {
             loopHolderSteps = auido_man.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position);
         }
-        loopHolderSteps.setVolume((velocity.magnitude / InitialSpeed ) * 2f);
+        loopHolderSteps.setVolume((velocity.magnitude / InitialSpeed) * 2f);
         loopHolderSteps.setWorldPosition(this.transform.position);
-
-
     }
 }

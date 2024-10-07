@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Animations;
 using UnityEngine.UIElements;
 
@@ -33,6 +34,10 @@ public class Player : MonoBehaviour
     public float ThrowSpeed;
     public BoomerangController BoomerangPrefab;
     public Inventory Inventory;
+    [Header("Leveling")]
+    public int Level = 0;
+    public int BaseKillsPerLevel;
+    public float LevelUpFactor;
     [Header("Death")]
     public float DeathStoppingTime;
     public float TimeBeforeFadeout;
@@ -40,6 +45,7 @@ public class Player : MonoBehaviour
     [Header("Shop")]
     public Shop ShopPrefab;
     public float ShopRespawnTime;
+    public PlayerStats Stats;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -54,6 +60,8 @@ public class Player : MonoBehaviour
     public float BoidPushRadius;
     [Header("Animation")]
     public Animator Anim;
+    public float BaseAnimSpeed = 1.0f;
+    public float DodgeAnimSpeed = 3.0f;
 
     private Vector3 velocity;
     private Vector3 deceleration;
@@ -75,6 +83,8 @@ public class Player : MonoBehaviour
     {
         state = State.Running;
         timeOfLastShop = Time.time;
+
+        UpdateKills(0);
     }
 
     private void Update()
@@ -97,10 +107,7 @@ public class Player : MonoBehaviour
 
         UpdateCollision();
 
-        // TODO: shop indicator
-        Anim.SetBool("Running", state == State.Running && velocity.magnitude > MaxSpeed * 0.3f);
-
-        if(shop != null)
+        if(shop != null && state != State.Dead)
         {
             Vector3 shopPos = shop.transform.position;
             Vector2 screenPoint = Camera.main.WorldToScreenPoint(shopPos);
@@ -135,6 +142,11 @@ public class Player : MonoBehaviour
     private void Run()
     {
         Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+
+        Anim.SetBool("Running", state == State.Running && input.magnitude > 0.1f);
+        bool sliding = state == State.Running && ((input.magnitude < 0.1f && velocity.magnitude > MaxSpeed * 0.3f) || (Vector3.Dot(input.normalized, velocity.normalized) < 0.0f));
+        Anim.SetBool("Sliding", sliding);
+
         if (input.magnitude > 0.3f)
             dodgeDirection = input.normalized;
 
@@ -177,6 +189,8 @@ public class Player : MonoBehaviour
         {
             timeOfLastDodge = Time.time;
             state = State.Dodging;
+            Anim.SetTrigger("Dodge");
+            Anim.speed = DodgeAnimSpeed;
         }
     }
 
@@ -191,6 +205,7 @@ public class Player : MonoBehaviour
         if (t > 1.0f)
         {
             state = State.Running;
+            Anim.speed = BaseAnimSpeed;
         }
 
     }
@@ -213,6 +228,7 @@ public class Player : MonoBehaviour
                 {
                     timeOfLastShot = Time.time;
                     state = State.Attacking;
+                    Anim.SetTrigger("Attack");
                 }
             }
         }
@@ -228,7 +244,7 @@ public class Player : MonoBehaviour
         {
             Weapon weapon = Inventory.UseNextWeapon();
 
-            BoomerangController boomerang = Instantiate(BoomerangPrefab);
+            BoomerangController boomerang = BoomerangController.New(BoomerangPrefab);
             boomerang.Init(this, weapon, transform.position + throwDir * 1.6f, new Vector2(throwDir.x, throwDir.z), new Vector2(velocity.x, velocity.z) * 0.5f);
             fired = true;
             Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw"), this.transform.position);
@@ -244,6 +260,7 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
+        Anim.SetTrigger("Die");
         state = State.Dead;
         timeOfDeath = Time.time;
     }
@@ -266,29 +283,16 @@ public class Player : MonoBehaviour
             float d = Vector3.Distance(transform.position, shop.transform.position);
             if(d < shop.Radius)
             {
-                HUD.Shop(Buy);
+                Stats.FullHeal();
+
+                HUD.Shop(Level, Buy);
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
             }
         }
         else
         {
-            if((Time.time - timeOfLastShop) > ShopRespawnTime)
-            {
-                Vector3 point = Vector3.zero;
-                var shopSpawns = FindObjectOfType<ShopSpawns>();
-                if (shopSpawns)
-                {
-                    point = shopSpawns.GetRandomPoint(this);
-                }
-                bool hit = Physics.Raycast(point + Vector3.up * 1000.0f, Vector3.down, out RaycastHit hitInfo, 10000.0f, GroundLayer);
-                if(hit)
-                {
-                    point = hitInfo.point;
-                }
-                shop = Instantiate(ShopPrefab, point, Quaternion.identity);
-                timeOfLastShop = Time.time;
-            }
+            
         }
     }
 
@@ -406,6 +410,12 @@ public class Player : MonoBehaviour
             pos.y = hitInfo.point.y + Collider.height / 2.0f;
             transform.position = pos;
         }
+
+        // Nav Mesh Snapping
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit navHit, transform.localScale.y * 4f, NavMesh.AllAreas))
+        {
+            transform.position = navHit.position + Vector3.up * transform.localScale.y;
+        }
     }
 
     public void PickUp(Weapon weapon)
@@ -413,15 +423,31 @@ public class Player : MonoBehaviour
         Inventory.AddWeapon(weapon);
     }
 
-
-
-    private void OnGUI()
+    public void UpdateKills(int kills)
     {
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
-        GUILayout.Label($"Velocity: {velocity}");
-        GUILayout.Label($"Speed: {velocity.magnitude}");
-        float overSpeedAmount = Mathf.Max(Vector3.Dot(input.normalized, velocity) - MaxSpeed, 0);
-        GUILayout.Label($"Overspeed: {overSpeedAmount}");
-    }
+        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * (1 + (Level * LevelUpFactor)));
+        if (kills >= killsForLevelUp)
+        {
+            Level++;
+            killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel + (1 + (Level * LevelUpFactor)));
 
+            // if ((Time.time - timeOfLastShop) > ShopRespawnTime)
+            {
+                Vector3 point = Vector3.zero;
+                var shopSpawns = FindObjectOfType<ShopSpawns>();
+                if (shopSpawns)
+                {
+                    point = shopSpawns.GetRandomPoint(this);
+                }
+                bool hit = Physics.Raycast(point + Vector3.up * 1000.0f, Vector3.down, out RaycastHit hitInfo, 10000.0f, GroundLayer);
+                if (hit)
+                {
+                    point = hitInfo.point;
+                }
+                shop = Instantiate(ShopPrefab, point, Quaternion.identity);
+                // timeOfLastShop = Time.time;
+            }
+        }
+        HUD.SetKills(kills, killsForLevelUp, Level);
+    }
 }

@@ -13,7 +13,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        AddNewWeapon(Weapons.TheUltimate);
+        AddNewWeapon(Weapons.ApexEploder);
     }
 
     public Weapon PeekNextWeapon()

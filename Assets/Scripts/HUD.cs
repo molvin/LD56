@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,6 +11,11 @@ public class HUD : MonoBehaviour
 {
     [Header("Health")]
     public Image HealthFill;
+    [Header("Kills")]
+    public Image KillsFill;
+    public TextMeshProUGUI Kills;
+    public TextMeshProUGUI KillsToNextLevel;
+    public TextMeshProUGUI CurrentLevel;
     [Header("Weapons")]
     public RectTransform EquipmentFrame;
     [Header("GameOver")]
@@ -38,6 +44,14 @@ public class HUD : MonoBehaviour
         HealthFill.fillAmount = t;
     }
 
+    public void SetKills(int kills, int requiredKills, int currentLevel)
+    {
+        KillsFill.fillAmount = (kills / (float)requiredKills);
+        Kills.text = $"Kills: {kills}";
+        KillsToNextLevel.text = $"Kills to next level {requiredKills - kills}";
+        CurrentLevel.text = $"{currentLevel + 1}";
+    }
+
     public void SetWeapons(IEnumerable<Weapon> weapons)
     {
         foreach(var card in weaponCards)
@@ -54,7 +68,7 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void Shop(Action<Weapon, Weapon> callback)
+    public void Shop(int level, Action<Weapon, Weapon> callback)
     {
         IEnumerator Coroutine()
         {
@@ -75,7 +89,7 @@ public class HUD : MonoBehaviour
                 WillReplace.gameObject.SetActive(false);
             }
 
-            var weapons = Weapons.GetShop(ShopChoices.Length).ToList();
+            var weapons = Weapons.GetShop(ShopChoices.Length, level).ToList();
             for(int i = 0; i < ShopChoices.Length; i++)
             {
                 Weapon w = weapons[i];
@@ -151,14 +165,14 @@ public class HUD : MonoBehaviour
             // left side 135-180, right side -180 - -135
             float angleSign = Mathf.Sign(angle);
             float t = (angle - 180 * angleSign) / (-45 * angleSign);
-            float x = Mathf.Lerp(0, Screen.width * angleSign, t);
+            float x = Mathf.Lerp(0, halfScreenWidth * angleSign, t);
             ShopIndicator.anchoredPosition = new Vector2(x, -halfScreenHeight);
         }
         else
         {
             float angleSign = Mathf.Sign(angle);
             float t = (angle - 45 * angleSign) / (angleSign * 90);
-            float y = Mathf.Lerp(Screen.height, -Screen.height, t);
+            float y = Mathf.Lerp(halfScreenHeight, -halfScreenHeight, t);
             ShopIndicator.anchoredPosition = new Vector2(angleSign * halfScreenWidth, y);
         }
         ShopIndicator.anchoredPosition -= ShopIndicator.anchoredPosition.normalized * ShopIndicatorCenterOffset;
