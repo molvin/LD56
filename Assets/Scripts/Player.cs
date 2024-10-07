@@ -40,6 +40,8 @@ public class Player : MonoBehaviour
     [Header("Shop")]
     public Shop ShopPrefab;
     public float ShopRespawnTime;
+    public PlayerStats Stats;
+    public int ShopLevel;
     [Header("Collision")]
     public CapsuleCollider Collider;
     public LayerMask GroundLayer;
@@ -266,7 +268,9 @@ public class Player : MonoBehaviour
             float d = Vector3.Distance(transform.position, shop.transform.position);
             if(d < shop.Radius)
             {
-                HUD.Shop(Buy);
+                Stats.FullHeal();
+
+                HUD.Shop(ShopLevel, Buy);
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
             }
@@ -307,6 +311,8 @@ public class Player : MonoBehaviour
         Destroy(shop.gameObject);
         shop = null;
         timeOfLastShop = Time.time;
+
+        ShopLevel++;
     }
 
     private void UpdateCollision()
@@ -412,7 +418,6 @@ public class Player : MonoBehaviour
     {
         Inventory.AddWeapon(weapon);
     }
-
 
 
     private void OnGUI()
