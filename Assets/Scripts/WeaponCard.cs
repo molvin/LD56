@@ -21,7 +21,7 @@ public class WeaponCard : MonoBehaviour
         Name.text = w.Name;
         Damage.text = $"{w.GetDisplayDamage()}";
 
-        Description.text = w.Name;
+        Description.text = w.Description;
 
         this.callback = callback;
     }
