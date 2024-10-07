@@ -9,7 +9,7 @@ public class Boids : MonoBehaviour
 {
     public const int MAX_BOIDS = 400;
 
-    public static int killCount;
+    public int killCount;
     public static Boids Instance;
     private Player player;
 
@@ -94,7 +94,6 @@ public class Boids : MonoBehaviour
             // Destroy(boid.gameObject);
             boid.Die();
             killCount++;
-            Debug.Log($"[{Time.time}]. kills: {killCount}");
             player.UpdateKills(killCount);
         }
     }

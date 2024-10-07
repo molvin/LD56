@@ -294,22 +294,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            if((Time.time - timeOfLastShop) > ShopRespawnTime)
-            {
-                Vector3 point = Vector3.zero;
-                var shopSpawns = FindObjectOfType<ShopSpawns>();
-                if (shopSpawns)
-                {
-                    point = shopSpawns.GetRandomPoint(this);
-                }
-                bool hit = Physics.Raycast(point + Vector3.up * 1000.0f, Vector3.down, out RaycastHit hitInfo, 10000.0f, GroundLayer);
-                if(hit)
-                {
-                    point = hitInfo.point;
-                }
-                shop = Instantiate(ShopPrefab, point, Quaternion.identity);
-                timeOfLastShop = Time.time;
-            }
+            
         }
     }
 
@@ -447,6 +432,23 @@ public class Player : MonoBehaviour
         {
             Level++;
             killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel + (1 + (Level * LevelUpFactor)));
+
+            // if ((Time.time - timeOfLastShop) > ShopRespawnTime)
+            {
+                Vector3 point = Vector3.zero;
+                var shopSpawns = FindObjectOfType<ShopSpawns>();
+                if (shopSpawns)
+                {
+                    point = shopSpawns.GetRandomPoint(this);
+                }
+                bool hit = Physics.Raycast(point + Vector3.up * 1000.0f, Vector3.down, out RaycastHit hitInfo, 10000.0f, GroundLayer);
+                if (hit)
+                {
+                    point = hitInfo.point;
+                }
+                shop = Instantiate(ShopPrefab, point, Quaternion.identity);
+                // timeOfLastShop = Time.time;
+            }
         }
         HUD.SetKills(kills, killsForLevelUp, Level);
     }
