@@ -55,9 +55,8 @@ public static class Weapons
 {
     public static Weapon Default => new()
     {
-        Name = "Default",
+        Name = "Bob",
         Description = "Returns to you, damaging vermins on the way",
-        NonBuyable = true,
     };
     public static Weapon Temporary => new()
     {

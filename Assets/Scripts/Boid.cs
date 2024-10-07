@@ -92,7 +92,10 @@ public class Boid : MonoBehaviour
         {
             Anim.SetBool("IsRunning", Rigidbody.velocity.magnitude >= 0.001f);
             Anim.SetFloat("RunSpeed", velocity.magnitude * AnimationVelocityFactor);
-            this.transform.forward = Rigidbody.velocity.normalized;
+            if (Rigidbody.velocity.magnitude > 0.001f)
+            {
+                this.transform.forward = Rigidbody.velocity.normalized;
+            }
         }
         else
         {
