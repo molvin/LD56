@@ -228,7 +228,7 @@ public class Player : MonoBehaviour
         {
             Weapon weapon = Inventory.UseNextWeapon();
 
-            BoomerangController boomerang = Instantiate(BoomerangPrefab);
+            BoomerangController boomerang = BoomerangController.New(BoomerangPrefab);
             boomerang.Init(this, weapon, transform.position + throwDir * 1.6f, new Vector2(throwDir.x, throwDir.z), new Vector2(velocity.x, velocity.z) * 0.5f);
             fired = true;
             Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw"), this.transform.position);
