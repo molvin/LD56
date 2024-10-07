@@ -2,7 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -53,11 +56,24 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void Shop(Action<Weapon, Weapon> callback)
+    public void Shop(Action<Weapon, Weapon> callback, Shop shop)
     {
         IEnumerator Coroutine()
         {
-            ShopParent.SetActive(true);
+            //ShopParent.SetActive(true);
+            var camera = Camera.main.GetComponentInParent<CameraController>();
+            camera?.pause(true);
+            Vector3 targetPosition = shop.transform.position;
+            var smoothing = 10f;
+            Vector3 camera_delta = camera.transform.position - camera.GetComponentInChildren<Camera>().transform.position;
+            targetPosition += camera_delta / 3f;
+            while ((camera.transform.position - targetPosition).magnitude > 0.1f)
+            {
+                camera.transform.position = Vector3.MoveTowards(camera.transform.position, targetPosition, smoothing * Time.unscaledDeltaTime);
+                yield return new WaitForEndOfFrame();
+            }
+
+
 
             bool choiceMade = false;
             Weapon chosenWeapon = null;
@@ -73,7 +89,7 @@ public class HUD : MonoBehaviour
             {
                 WillReplace.gameObject.SetActive(false);
             }
-
+            ShopChoices = shop.GetComponentsInChildren<WeaponCard>();
             var weapons = Weapons.GetShop(ShopChoices.Length).ToList();
             for(int i = 0; i < ShopChoices.Length; i++)
             {
@@ -83,8 +99,20 @@ public class HUD : MonoBehaviour
 
             while (!choiceMade && chosenWeapon == null)
             {
+                if(Input.GetMouseButtonDown(0))
+                {
+                    RaycastHit hit = default;
+                    var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
+                    {
+                        hit.collider.GetComponentInChildren<WeaponCard>()?.Call();
+                    }
+                }
+            
                 yield return null;
             }
+            camera?.pause(false);
+
             for (int i = 0; i < ShopChoices.Length; i++)
             {
                 ShopChoices[i].DeInit();

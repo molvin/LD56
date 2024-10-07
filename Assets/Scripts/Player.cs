@@ -266,7 +266,7 @@ public class Player : MonoBehaviour
             float d = Vector3.Distance(transform.position, shop.transform.position);
             if(d < shop.Radius)
             {
-                HUD.Shop(Buy);
+                HUD.Shop(Buy, shop);
                 state = State.Shopping;
                 Time.timeScale = 0.0f;
             }
