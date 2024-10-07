@@ -94,7 +94,7 @@ public class HUD : MonoBehaviour
                 Weapon w = weapons[i];
                 ShopChoices[i].Init(w, () => chosenWeapon = w, true);
             }
-            FindObjectOfType<Shop>().Init(weapons.ToArray());
+            FindObjectOfType<Shop>().Init(weapons.ToArray(), Inventory.AtMax ? weaponToReplace : null);
 
 
             //ShopParent.SetActive(true);
