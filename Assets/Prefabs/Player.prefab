@@ -163,7 +163,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxHealth: 100
   CurrentHealth: 0
-  BoidDamage: 1
   MaxBoidDamageDealers: 10
   BoidDamageRadius: 2
   BoidDamageCooldown: 0.5
