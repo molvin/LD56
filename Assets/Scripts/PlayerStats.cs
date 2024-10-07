@@ -7,7 +7,6 @@ public class PlayerStats : MonoBehaviour
     public float MaxHealth;
     public float CurrentHealth;
 
-    public float BoidDamage = 1;
     public int MaxBoidDamageDealers = 10;
     public float BoidDamageRadius = 1.0f;
     public float BoidDamageCooldown = 0.5f;
@@ -36,7 +35,7 @@ public class PlayerStats : MonoBehaviour
     {
         var boids = Boids.Instance.GetNearest(transform.position, MaxBoidDamageDealers);
 
-        int count = 0;
+        float dmg = 0;
         foreach(var boid in boids)
         {
             if (boid == null)
@@ -44,14 +43,14 @@ public class PlayerStats : MonoBehaviour
             float dist = Vector3.Distance(boid.transform.position, transform.position);
             if (dist < BoidDamageRadius)
             {
-                count++;
+                dmg += boid.damage;
             }
         }
 
-        if(count > 0 && (Time.time - lastBoidDamage) > BoidDamageCooldown)
+        if((int)dmg > 0 && (Time.time - lastBoidDamage) > BoidDamageCooldown)
         {
             lastBoidDamage = Time.time;
-            TakeDamage(BoidDamage * count);
+            TakeDamage((int)dmg);
         }
     }
 

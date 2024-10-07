@@ -4,21 +4,29 @@ using System.Linq;
 using UnityEngine;
 
 public delegate void Trigger(Weapon self, BoomerangController controller);
+public delegate void TargetTrigger(Weapon self, BoomerangController controller, Boid target);
+public delegate int DisplayDamage(Weapon self);
 
 public class Weapon
 {
     public bool NonBuyable = false;
 
     public string Name;
+
     public int BaseDamage = 15;
     public float SpeedModifier = 1.0f;
     public float InitialSpeedBoost = 1.0f;
     public float StayModifier = 1.0f;
     public float Bouncyness = 0.24f;
     public float PeriodTime = 10.0f;
+    public float ProcCooldown = 0.15f;
+    public float SizeModifier = 1.0f;
+
+    public DisplayDamage DisplayDamageFunc;
+
     public Trigger OnSpawn;
-    public Trigger OnHit;
-    public Trigger OnProc;
+    public TargetTrigger OnHit;
+    public TargetTrigger OnProc;
     public Trigger OnPeriod;
     public Trigger OnApex;
     public Trigger OnAnimationDone;
@@ -28,6 +36,7 @@ public class Weapon
     public int Level = 0;
 
     public int GetDamage() => Mathf.RoundToInt(BaseDamage * Mathf.Pow(1.5f, Level));
+    public int GetDisplayDamage() => DisplayDamageFunc != null ? DisplayDamageFunc.Invoke(this) : GetDamage();
 
     public void Reset()
     {
@@ -47,6 +56,7 @@ public static class Weapons
         BaseDamage = 10,
         NonBuyable = true,
         SpeedModifier = 1.6f,
+        SizeModifier = 0.7f,
         OnApex = (self, c) =>
         {
             GameObject.Destroy(c.gameObject);
@@ -78,7 +88,7 @@ public static class Weapons
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.4f,
         Bouncyness = 0.6f,
-        OnHit = (self, c) =>
+        OnHit = (self, c, target) =>
         {
             Vector2 toOwner = (c.Owner.Position2D - c.Position2D).normalized;
             c.velocity = toOwner * c.velocity.magnitude * 0.8f;
@@ -89,13 +99,13 @@ public static class Weapons
     {
         Name = "Chaining",
         BaseDamage = 35,
-        OnHit = (self, c) =>
+        OnHit = (self, c, target) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 3);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4);
 
             foreach (Boid b in boids)
             {
-                if (b == null || c.IsInternalBoidCooldown(b))
+                if (b == null || b == target || c.IsInternalBoidCooldown(b))
                     continue;
 
                 Vector2 dir = (b.Position2D - c.Position2D);
@@ -126,14 +136,14 @@ public static class Weapons
     {
         Name = "Zapper",
         SpeedModifier = 1.3f,
-        BaseDamage = 0,
-        OnProc = (self, c) =>
+        DisplayDamageFunc = w => Mathf.RoundToInt(20 * Mathf.Pow(1.5f, w.Level)),
+        OnProc = (self, c, target) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 6);
 
             foreach (Boid b in boids)
             {
-                if (b == null) continue;
+                if (b == null || b == target) continue;
 
                 float dist = Vector2.Distance(b.Position2D, c.Position2D);
                 if (dist < 4.0f)
@@ -149,7 +159,7 @@ public static class Weapons
     {
         Name = "Forker",
         SpeedModifier = 1.4f,
-        OnHit = (self, c) =>
+        OnHit = (self, c, target) =>
         {
             float rad = Mathf.Deg2Rad * 45;
             if ((self.activationCount & 1) == 0)
@@ -170,8 +180,8 @@ public static class Weapons
             BoomerangController boomerang = GameObject.Instantiate(c.Owner.BoomerangPrefab);
             boomerang.Init(c.Owner, Weapons.Temporary, c.transform.position, dir2, Vector2.zero);
             boomerang.Temporary = true;
-            boomerang.transform.localScale *= 0.7f;
             boomerang.Weapon.BaseDamage = self.BaseDamage;
+            boomerang.UpdateHitCooldown(target);
 
             self.activationCount++;
         }
@@ -195,13 +205,11 @@ public static class Weapons
             BoomerangController b1 = GameObject.Instantiate(c.Owner.BoomerangPrefab);
             b1.Init(c.Owner, Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
             b1.Temporary = true;
-            b1.transform.localScale *= 0.7f;
             b1.Weapon.BaseDamage = 12;
 
             BoomerangController b2 = GameObject.Instantiate(c.Owner.BoomerangPrefab);
             b2.Init(c.Owner, Weapons.Temporary, c.transform.position, dir2, Vector2.zero);
             b2.Temporary = true;
-            b2.transform.localScale *= 0.7f;
             b2.Weapon.BaseDamage = 12;
         }
     };
@@ -225,7 +233,6 @@ public static class Weapons
                 BoomerangController b = GameObject.Instantiate(c.Owner.BoomerangPrefab);
                 b.Init(c.Owner, Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
-                b.transform.localScale *= 0.7f;
             }
         }
     };
@@ -234,7 +241,8 @@ public static class Weapons
         Name = "The Ultimate",
         BaseDamage = 30,
         SpeedModifier = 1.1f,
-        OnProc = (self, c) =>
+        ProcCooldown = 0.3f,
+        OnProc = (self, c, target) =>
         {
             Vector2 dir = c.velocity.normalized;
 
@@ -251,8 +259,8 @@ public static class Weapons
                 BoomerangController b = GameObject.Instantiate(c.Owner.BoomerangPrefab);
                 b.Init(c.Owner, Weapons.TheRecurer, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
-                b.transform.localScale *= 0.7f;
                 b.Weapon.BaseDamage = Mathf.RoundToInt(self.BaseDamage * 0.6f);
+                b.UpdateHitCooldown(target);
             }
 
             self.activationCount++;
@@ -263,9 +271,11 @@ public static class Weapons
         Name = "The Recurer",
         NonBuyable = true,
         SpeedModifier = 1.4f,
-        OnProc = (self, c) =>
+        SizeModifier = 0.7f,
+        ProcCooldown = 0.3f,
+        OnProc = (self, c, target) =>
         {
-            bool recur = c.transform.localScale.x > .35f;
+            bool recur = self.SizeModifier > .35f;
 
             Vector2 dir = c.velocity.normalized;
 
@@ -280,10 +290,12 @@ public static class Weapons
                     dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
 
                 BoomerangController b = GameObject.Instantiate(c.Owner.BoomerangPrefab);
-                b.Init(c.Owner, recur ? Weapons.TheRecurer : Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
+                Weapon weapon = recur ? Weapons.TheRecurer : Weapons.Temporary;
+                weapon.SizeModifier = self.SizeModifier * 0.7f;
+                b.Init(c.Owner, weapon, c.transform.position, dir1, Vector2.zero);
                 b.Temporary = true;
-                b.transform.localScale = c.transform.localScale * 0.7f;
                 b.Weapon.BaseDamage = Mathf.RoundToInt(self.BaseDamage * 0.6f);
+                b.UpdateHitCooldown(target);
             }
 
             self.activationCount++;
@@ -308,7 +320,6 @@ public static class Weapons
             BoomerangController boomerang = GameObject.Instantiate(c.Owner.BoomerangPrefab);
             boomerang.Init(c.Owner, Weapons.Temporary, c.transform.position, dir, Vector2.zero);
             boomerang.Temporary = true;
-            boomerang.transform.localScale *= 0.7f;
 
             self.activationCount++;
         }
@@ -343,7 +354,8 @@ public static class Weapons
     {
         Name = "Meteor",
         BaseDamage = 0,
-        OnHit = (self, c) =>
+        DisplayDamageFunc = w => Mathf.RoundToInt(90 * Mathf.Pow(1.5f, w.Level)),
+        OnHit = (self, c, target) =>
         {
             if (self.activationCount == 0)
             {
@@ -351,7 +363,7 @@ public static class Weapons
                 List<Vector3> points = new()
                 {
                     c.transform.position + Vector3.up * 15f,
-                    c.transform.position + new Vector3(rand.x, 0, rand.y) * 6f,
+                    c.transform.position + new Vector3(target.velocity.x, 0, target.velocity.z),
                 };
                 c.Animate(points);
             }
