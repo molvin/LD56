@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Animations;
 using UnityEngine.UIElements;
 
@@ -411,6 +412,12 @@ public class Player : MonoBehaviour
             Vector3 pos = transform.position;
             pos.y = hitInfo.point.y + Collider.height / 2.0f;
             transform.position = pos;
+        }
+
+        // Nav Mesh Snapping
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit navHit, transform.localScale.y * 4f, NavMesh.AllAreas))
+        {
+            transform.position = navHit.position + Vector3.up * transform.localScale.y;
         }
     }
 
