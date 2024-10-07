@@ -73,6 +73,30 @@ public class HUD : MonoBehaviour
     {
         IEnumerator Coroutine()
         {
+            bool choiceMade = false;
+            Weapon chosenWeapon = null;
+            Weapon weaponToReplace = Inventory.GetRandom();
+
+            if (Inventory.AtMax)
+            {
+                WillReplace.gameObject.SetActive(true);
+                WillReplace.Init(weaponToReplace, null, true);
+            }
+            else
+            {
+                WillReplace.gameObject.SetActive(false);
+            }
+            ShopChoices = shop.GetComponentsInChildren<WeaponCard>();
+
+            var weapons = Weapons.GetShop(ShopChoices.Length, level).ToList();
+            for (int i = 0; i < ShopChoices.Length; i++)
+            {
+                Weapon w = weapons[i];
+                ShopChoices[i].Init(w, () => chosenWeapon = w, true);
+            }
+            FindObjectOfType<Shop>().Init(weapons.ToArray(), Inventory.AtMax ? weaponToReplace : null);
+
+
             //ShopParent.SetActive(true);
             var camera = Camera.main.GetComponentInParent<CameraController>();
             camera?.pause(true);
@@ -106,30 +130,9 @@ public class HUD : MonoBehaviour
             }
             GetComponentInParent<Player>().Anim.SetBool("Running", false);
             GetComponentInParent<Player>().transform.rotation.SetLookRotation((GetComponentInParent<Player>().transform.position - Camera.main.transform.position).normalized);
+           
+            // SkipShopButton.onClick.AddListener(() => choiceMade = true);
 
-
-            bool choiceMade = false;
-            Weapon chosenWeapon = null;
-            Weapon weaponToReplace = Inventory.GetRandom();
-            SkipShopButton.onClick.AddListener(() => choiceMade = true);
-
-            if (Inventory.AtMax)
-            {
-                WillReplace.gameObject.SetActive(true);
-                WillReplace.Init(weaponToReplace, null, true);
-            }
-            else
-            {
-                WillReplace.gameObject.SetActive(false);
-            }
-            ShopChoices = shop.GetComponentsInChildren<WeaponCard>();
-
-            var weapons = Weapons.GetShop(ShopChoices.Length, level).ToList();
-            for(int i = 0; i < ShopChoices.Length; i++)
-            {
-                Weapon w = weapons[i];
-                ShopChoices[i].Init(w, () => chosenWeapon = w, true);
-            }
 
             WeaponCard hovering = null;
             while (!choiceMade && chosenWeapon == null)

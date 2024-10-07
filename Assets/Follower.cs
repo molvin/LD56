@@ -17,17 +17,27 @@ public class Follower : MonoBehaviour
 
     public Weapon Weapon { get; private set; }
     private Transform owner;
+    private bool update;
 
-    public void Init(Weapon weapon, Transform owner)
+    public void Init(Weapon weapon, Transform owner, bool update = true)
     {
+        this.update = update;
         HatSelector.SetHat(weapon);
         Weapon = weapon;
-        this.owner = owner;
-        transform.position = owner.position;
+        if(owner)
+        {
+            this.owner = owner;
+            transform.position = owner.position;
+        }
     }
 
     private void Update()
     {
+        if (!update)
+        {
+            return;
+        }
+
         Vector3 toTarget = TargetPosition - transform.position;
         float distance = toTarget.magnitude;
         velocity += toTarget.normalized * Acceleration * (distance / MaxDistance) * Time.deltaTime;
