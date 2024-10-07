@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 405262275422362165}
   - component: {fileID: 438481166624714202}
   - component: {fileID: 4181067729010605237}
+  - component: {fileID: 6640686506554241225}
   m_Layer: 0
   m_Name: MeteorImpact
   m_TagString: Untagged
@@ -4888,3 +4889,16 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &6640686506554241225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 701441522393706090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 650a1c6568c24f047aeeecb8237f2203, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Lifetime: 2

@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
     private static ObjectPool instance;
 
-    private Dictionary<System.Type, List<GameObject>> pool = new();
+    private Dictionary<GameObject, List<GameObject>> pool = new();
+    private Dictionary<GameObject, GameObject> handles = new();
 
     private void Awake()
     {
@@ -15,28 +17,39 @@ public class ObjectPool : MonoBehaviour
 
     public static T Get<T>(T template) where T : MonoBehaviour
     {
-        if (!instance.pool.ContainsKey(typeof(T)))
+        return Get(template.gameObject).GetComponent<T>();
+    }
+    public static GameObject Get(GameObject gameObject)
+    {
+        if (!instance.pool.ContainsKey(gameObject))
         {
-            instance.pool[typeof(T)] = new();
+            instance.pool[gameObject] = new();
         }
 
-        List<GameObject> available = instance.pool[typeof(T)];
+        List<GameObject> available = instance.pool[gameObject];
         if (available.Count == 0)
         {
-            GameObject obj = Instantiate(template.gameObject, instance.transform);
+            GameObject obj = Instantiate(gameObject, instance.transform);
             available.Add(obj);
         }
 
-        T active = available[available.Count - 1].GetComponent<T>();
-        active.gameObject.SetActive(true);
+        GameObject active = available[available.Count - 1];
+        active.SetActive(true);
         available.RemoveAt(available.Count - 1);
+
+        instance.handles[active] = gameObject;
         return active;
     }
 
     public static void Return<T>(T obj) where T : MonoBehaviour
     {
-        obj.gameObject.SetActive(false);
+        Return(obj.gameObject);
+    }
+    public static void Return(GameObject obj)
+    {
+        obj.SetActive(false);
 
-        instance.pool[typeof(T)].Add(obj.gameObject);
+        var handle = instance.handles[obj];
+        instance.pool[handle].Add(obj);
     }
 }
