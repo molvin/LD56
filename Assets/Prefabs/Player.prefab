@@ -124,7 +124,7 @@ MonoBehaviour:
   BoomerangPrefab: {fileID: 5857261029421428862, guid: 53315f523db55dd43a4a3d2a673c98d2, type: 3}
   Inventory: {fileID: 2411236606351500817}
   Level: 0
-  BaseKillsPerLevel: 16
+  BaseKillsPerLevel: 20
   LevelUpFactor: 2
   DeathStoppingTime: 0.5
   TimeBeforeFadeout: 1
