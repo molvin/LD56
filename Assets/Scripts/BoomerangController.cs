@@ -327,7 +327,7 @@ public class BoomerangController : MonoBehaviour
         if (hitBoid != null)
         {
             // Only play once vfx/sfx per hit & not on secondary projectiles
-            if (!Temporary)
+            if (!Temporary && Weapon.GetDamage() > 0)
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
                 Instantiate(

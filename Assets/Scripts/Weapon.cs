@@ -111,8 +111,8 @@ public static class Weapons
 
     public static Weapon Chaining => new()
     {
-        // Level 3
         Name = "Chaining",
+        BaseLevel = 3,
         BaseDamage = 35,
         SpeedModifier = 1.1f,
         Knockback = 5f,
@@ -138,9 +138,9 @@ public static class Weapons
 
     public static Weapon Randomancer => new()
     {
-        // Level 2
         Name = "Randomancer",
         BaseDamage = 34,
+        BaseLevel = 2,
         SpeedModifier = 0.8f,
         PeriodTime = 0.4f,
         Knockback = -10f,
@@ -154,8 +154,8 @@ public static class Weapons
 
     public static Weapon Zapper => new()
     {
-        // level 3
         Name = "Zapper",
+        BaseLevel = 3,
         BaseDamage = 24,
         SpeedModifier = 1.1f,
         DisplayDamageFunc = w => Mathf.RoundToInt(24 * w.LevelModifier),
@@ -180,8 +180,8 @@ public static class Weapons
 
     public static Weapon Forker => new()
     {
-        // level 2
         Name = "Forker",
+        BaseLevel = 2,
         SpeedModifier = 1.4f,
         OnHit = (self, c, target) =>
         {
@@ -214,8 +214,8 @@ public static class Weapons
     };
     public static Weapon Multiballer => new()
     {
-        // Level 2
         Name = "Multiballer",
+        BaseLevel = 2,
         BaseDamage = 12,
         OnSpawn = (self, c) =>
         {
@@ -243,8 +243,8 @@ public static class Weapons
     };
     public static Weapon ExtremeBalls => new()
     {
-        // level 3
         Name = "Extreme Balls",
+        BaseLevel = 3,
         BaseDamage = 19,
         OnSpawn = (self, c) =>
         {
@@ -269,10 +269,41 @@ public static class Weapons
             }
         }
     };
+    public static Weapon BulletHell => new()
+    {
+        Name = "Bullet Hell",
+        BaseLevel = 4,
+        BaseDamage = 26,
+        OnSpawn = (self, c) =>
+        {
+            Vector2 dir = c.velocity.normalized;
+
+            for (int i = 0; i < 9; i++)
+            {
+                float rad = Mathf.Deg2Rad * Random.Range(-70, 70);
+                Vector2 dir1 = new(
+                    dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
+                    dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
+
+                Weapon weapon = Weapons.Temporary;
+                weapon.BaseDamage = 26;
+                weapon.InitialSpeedBoost = Random.Range(2.5f, 3.5f);
+                weapon.SpeedModifier = 0.7f;
+                weapon.Bouncyness = 2f;
+                weapon.Level = self.Level;
+                weapon.OnPeriod = weapon.OnApex;
+                weapon.OnApex = null;
+                weapon.PeriodTime = 1.5f;
+                
+                BoomerangController b = BoomerangController.New(c.Owner.BoomerangPrefab);
+                b.Init(c.Owner, weapon, c.transform.position, dir1, Vector2.zero);
+            }
+        }
+    };
     public static Weapon TheUltimate => new()
     {
-        // Level 4
         Name = "The Ultimate",
+        BaseLevel = 4,
         BaseDamage = 42,
         SpeedModifier = 1.1f,
         ProcCooldown = 0.3f,
@@ -345,8 +376,8 @@ public static class Weapons
     };
     public static Weapon TheOrb => new()
     {
-        // Level 4
         Name = "The Orb",
+        BaseLevel = 4,
         BaseDamage = 15,
         InitialSpeedBoost = 1.1f,
         SpeedModifier = 0.9f,
@@ -371,8 +402,8 @@ public static class Weapons
     };
     public static Weapon GravityPull => new()
     {
-        // level 2
         Name = "Gravity Pull",
+        BaseLevel = 2,
         BaseDamage = 4,
         PeriodTime = 0.1f,
         InitialSpeedBoost = 1.4f,
@@ -411,11 +442,11 @@ public static class Weapons
     };
     public static Weapon Meteor => new()
     {
-        // level 3
         Name = "Meteor",
+        BaseLevel = 3,
         BaseDamage = 0,
         Knockback = 0,
-        DisplayDamageFunc = w => Mathf.RoundToInt(100 * w.LevelModifier),
+        DisplayDamageFunc = w => Mathf.RoundToInt(120 * w.LevelModifier),
         OnHit = (self, c, target) =>
         {
             if (self.activationCount == 0)
@@ -450,7 +481,41 @@ public static class Weapons
                 Vector2 dir = (c.Position2D - b.Position2D);
                 if (dir.magnitude < aoe)
                 {
-                    int damage = Mathf.RoundToInt(100 * self.LevelModifier);
+                    int damage = Mathf.RoundToInt(120 * self.LevelModifier);
+                    Boids.Instance.DamageBoid(b, damage);
+
+                    // Shockwave force
+                    float force = 20f * self.LevelModifier;
+                    b.velocity += new Vector3(-dir.x, 0, -dir.y) * force / (b.Radius * 2.0f);
+                }
+            }
+        }
+    };
+    public static Weapon ApexEploder => new()
+    {
+        Name = "Apex Exploder",
+        BaseLevel = 2,
+        BaseDamage = 0,
+        Knockback = 0,
+        DisplayDamageFunc = w => Mathf.RoundToInt(60 * w.LevelModifier),
+        OnApex = (self, c) =>
+        {
+            GameObject impactFx = FxManager.Get("ApexExploder");
+            impactFx.transform.position = c.transform.position;
+
+            float aoe = 4f * self.LevelModifier;
+
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8, aoe);
+
+            foreach (Boid b in boids)
+            {
+                if (b == null)
+                    continue;
+
+                Vector2 dir = (c.Position2D - b.Position2D);
+                if (dir.magnitude < aoe)
+                {
+                    int damage = Mathf.RoundToInt(60 * self.LevelModifier);
                     Boids.Instance.DamageBoid(b, damage);
 
                     // Shockwave force

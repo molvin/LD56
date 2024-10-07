@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -68,11 +70,45 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void Shop(int level, Action<Weapon, Weapon> callback)
+
+    public void Shop(int level, Action<Weapon, Weapon> callback, Shop shop)
     {
         IEnumerator Coroutine()
         {
-            ShopParent.SetActive(true);
+            //ShopParent.SetActive(true);
+            var camera = Camera.main.GetComponentInParent<CameraController>();
+            camera?.pause(true);
+            Vector3 targetPosition = shop.CameraPos.transform.position;
+            var smoothing = 10f;
+            Vector3 camera_delta = camera.transform.position - camera.GetComponentInChildren<Camera>().transform.position;
+            //targetPosition += camera_delta / 3f;
+            Quaternion original_rotation = camera.transform.rotation;
+            Vector3 original_position = camera.transform.position;
+            var startTime = Time.unscaledTime;
+
+            // Calculate the journey length.
+            var journeyLength = Vector3.Distance(original_position, targetPosition);
+            var speed = 5f;
+            var player_original_position = GetComponentInParent<Player>().transform.position;
+            var player_target_pos = shop.PlayerPos.transform.position;
+            player_target_pos.y = player_original_position.y;
+            while ((camera.transform.position - targetPosition).magnitude > 0.1f)
+            {
+                // Distance moved equals elapsed time times speed..
+                float distCovered = (Time.unscaledTime - startTime) * speed;
+
+                // Fraction of journey completed equals current distance divided by total distance.
+                float fractionOfJourney = distCovered / journeyLength;
+
+                camera.transform.position = Vector3.Lerp(original_position, targetPosition, fractionOfJourney);
+                camera.transform.rotation = Quaternion.Lerp(original_rotation, shop.CameraPos.transform.rotation, fractionOfJourney);
+                GetComponentInParent<Player>().transform.position = Vector3.Lerp(player_original_position, player_target_pos, fractionOfJourney);
+                GetComponentInParent<Player>().Anim.updateMode = AnimatorUpdateMode.UnscaledTime;
+                yield return new WaitForEndOfFrame();
+            }
+            GetComponentInParent<Player>().Anim.SetBool("Running", false);
+            GetComponentInParent<Player>().transform.rotation.SetLookRotation((GetComponentInParent<Player>().transform.position - Camera.main.transform.position).normalized);
+
 
             bool choiceMade = false;
             Weapon chosenWeapon = null;
@@ -88,6 +124,7 @@ public class HUD : MonoBehaviour
             {
                 WillReplace.gameObject.SetActive(false);
             }
+            ShopChoices = shop.GetComponentsInChildren<WeaponCard>();
 
             var weapons = Weapons.GetShop(ShopChoices.Length, level).ToList();
             for(int i = 0; i < ShopChoices.Length; i++)
@@ -96,10 +133,31 @@ public class HUD : MonoBehaviour
                 ShopChoices[i].Init(w, () => chosenWeapon = w, true);
             }
 
+            WeaponCard hovering = null;
             while (!choiceMade && chosenWeapon == null)
             {
+                RaycastHit hit = default;
+                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                hovering?.showDescription(false);
+
+                if (Physics.Raycast(ray, out hit, float.MaxValue, LayerMask.GetMask("UI")))
+                {
+                    hovering = hit.collider.GetComponentInChildren<WeaponCard>();
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        hovering?.Call();
+                    }
+                    hovering?.showDescription(true);
+                }
+
+            
                 yield return null;
             }
+            camera.transform.rotation = original_rotation;
+            GetComponentInParent<Player>().Anim.updateMode = AnimatorUpdateMode.Normal;
+
+            camera?.pause(false);
+
             for (int i = 0; i < ShopChoices.Length; i++)
             {
                 ShopChoices[i].DeInit();
