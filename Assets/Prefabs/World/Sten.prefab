@@ -63,7 +63,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.14486955, z: -0, w: 0.9894508}
   m_LocalPosition: {x: 0.09, y: 0, z: -0.12}
-  m_LocalScale: {x: 3.6207082, y: 2.0238, z: 2.6253655}
+  m_LocalScale: {x: 3.3902864, y: 1.8950052, z: 2.4582872}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2542205913091122789}
@@ -137,8 +137,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Radius: 0.45731768
+  m_Center: {x: -7.471934e-11, y: 0, z: -0.058864277}
 --- !u!208 &8644679181774605563
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -149,7 +149,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 0
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
+  m_Extents: {x: 0.4, y: 0.35, z: 0.4}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
