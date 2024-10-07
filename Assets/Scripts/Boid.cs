@@ -1,10 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class Boid : MonoBehaviour
 {
+    [System.Serializable]
+    public struct HealthMaterial
+    {
+        public Material Mat;
+        public int MaxHealth;
+    }
+
     public Rigidbody Rigidbody;
+    public List<HealthMaterial> HealthMaterials;
     private new SkinnedMeshRenderer renderer;
 
     private int health = 10;
@@ -33,11 +42,27 @@ public class Boid : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
+        SetHealth(health - damage);
         // TODO: Hit effect
         renderer.enabled = false;
     }
-    
+
+    public void SetHealth(int health)
+    {
+        this.health = health;
+
+        foreach(HealthMaterial hpMat in HealthMaterials)
+        {
+            if(health > hpMat.MaxHealth)
+                continue;
+
+            renderer.material = hpMat.Mat;
+            return;
+        }
+
+        renderer.material = HealthMaterials[HealthMaterials.Count - 1].Mat;
+    }
+
     public void Update()
     {
         // TODO: Hit effect
@@ -64,18 +89,19 @@ public class Boid : MonoBehaviour
         }
     }
 
-    public static Boid CreateBoid(Vector3 position, Vector3 velocity, int level, Material material)
+    public static Boid CreateBoid(Vector3 position, Vector3 velocity, int level)
     {
         Boid boid = GameObject.Instantiate(Resources.Load<Boid>("boid"));
         boid.transform.position = position;
+        boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
 
         float multiplier = Mathf.Pow(1.15f, level);
         boid.health *= Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level);
         boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
         boid.damage = multiplier;
 
-        boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
-        boid.renderer.material = material;
+        boid.SetHealth(boid.health);
+
         boid.Rigidbody = boid.GetComponent<Rigidbody>();
         boid.Rigidbody.velocity = velocity;
 
