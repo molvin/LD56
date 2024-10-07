@@ -122,16 +122,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Rigidbody: {fileID: -6854883276934515846}
   HealthMaterials:
-  - Mat: {fileID: 2100000, guid: 7d240eb4f41a98a4e945f0c876927abb, type: 2}
+  - Col: {r: 1, g: 0.9307864, b: 0.042452812, a: 1}
     MaxHealth: 15
-  - Mat: {fileID: 2100000, guid: 6a21ad160a9b65242b8e89dcc7d4a61a, type: 2}
+  - Col: {r: 1, g: 0.11792451, b: 0.11792451, a: 1}
     MaxHealth: 50
-  - Mat: {fileID: 2100000, guid: 52ca267aa6efafe498b04b9354632815, type: 2}
+  - Col: {r: 0.6886792, g: 0.14618193, b: 0.64527947, a: 1}
     MaxHealth: 100
+  - Col: {r: 0.061483476, g: 0, b: 0.5943396, a: 1}
+    MaxHealth: 150
+  - Col: {r: 0.38679248, g: 0.12884694, b: 0.012771457, a: 1}
+    MaxHealth: 250
+  DeathColor: {r: 0.5377358, g: 0.53012633, b: 0.53012633, a: 1}
   Anim: {fileID: 8901508683160704605}
   damage: 1
   SpeedModifier: 1
   DeathFriction: 3
+  AnimationVelocityFactor: 0.3
   DeathDuration: 1.5
   DeathSizeCurve:
     serializedVersion: 2
@@ -250,6 +256,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8563482270646130439, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d92d1fb5cd66321478afabf4ba6e4622, type: 2}
     - target: {fileID: 919132149155446097, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_Name
       value: pea_good_final4

@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Security.Policy;
 using UnityEngine;
 
 public class Boid : MonoBehaviour
@@ -8,12 +10,13 @@ public class Boid : MonoBehaviour
     [System.Serializable]
     public struct HealthMaterial
     {
-        public Material Mat;
+        public Color Col;
         public int MaxHealth;
     }
 
     public Rigidbody Rigidbody;
     public List<HealthMaterial> HealthMaterials;
+    public Color DeathColor;
     private new SkinnedMeshRenderer renderer;
     public Animator Anim;
 
@@ -23,6 +26,7 @@ public class Boid : MonoBehaviour
     public float damage = 1;
     public float SpeedModifier = 1f;
     public float DeathFriction = 10;
+    public float AnimationVelocityFactor = 0.3f;
 
     public bool IsDead => health <= 0;
     public float DeathDuration = 1.0f;
@@ -60,16 +64,22 @@ public class Boid : MonoBehaviour
     {
         this.health = health;
 
+        if(IsDead)
+        {
+            renderer.material.color = DeathColor;
+            return;
+        }
+
         foreach(HealthMaterial hpMat in HealthMaterials)
         {
             if(health > hpMat.MaxHealth)
                 continue;
 
-            renderer.material = hpMat.Mat;
+            renderer.material.color = hpMat.Col;
             return;
         }
 
-        renderer.material = HealthMaterials[HealthMaterials.Count - 1].Mat;
+        renderer.material.color = HealthMaterials[HealthMaterials.Count - 1].Col;
     }
 
     public void Update()
@@ -80,7 +90,7 @@ public class Boid : MonoBehaviour
         if (!IsDead)
         {
             Anim.SetBool("IsRunning", Rigidbody.velocity.magnitude >= 0.001f);
-            Anim.SetFloat("RunSpeed", velocity.magnitude);
+            Anim.SetFloat("RunSpeed", velocity.magnitude * AnimationVelocityFactor);
             this.transform.forward = Rigidbody.velocity.normalized;
         }
         else

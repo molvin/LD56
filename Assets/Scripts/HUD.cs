@@ -201,14 +201,14 @@ public class HUD : MonoBehaviour
             // left side 135-180, right side -180 - -135
             float angleSign = Mathf.Sign(angle);
             float t = (angle - 180 * angleSign) / (-45 * angleSign);
-            float x = Mathf.Lerp(0, Screen.width * angleSign, t);
+            float x = Mathf.Lerp(0, halfScreenWidth * angleSign, t);
             ShopIndicator.anchoredPosition = new Vector2(x, -halfScreenHeight);
         }
         else
         {
             float angleSign = Mathf.Sign(angle);
             float t = (angle - 45 * angleSign) / (angleSign * 90);
-            float y = Mathf.Lerp(Screen.height, -Screen.height, t);
+            float y = Mathf.Lerp(halfScreenHeight, -halfScreenHeight, t);
             ShopIndicator.anchoredPosition = new Vector2(angleSign * halfScreenWidth, y);
         }
         ShopIndicator.anchoredPosition -= ShopIndicator.anchoredPosition.normalized * ShopIndicatorCenterOffset;

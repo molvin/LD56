@@ -7,9 +7,6 @@ public class BoomerangController : MonoBehaviour
     public const float SMALL_NUMBER = 0.001f;
     public const float InternalHitCooldown = 0.225f;
 
-    public Material ThrowMat;
-    public Material ReturnMat;
-
     public const float PhaseTime = 3.0f;
     public const float MinLifeTime = 0.3f;
 
@@ -167,7 +164,7 @@ public class BoomerangController : MonoBehaviour
                 Owner.PickUp(Weapon);
         }
 
-        GetComponentInChildren<SkinnedMeshRenderer>().material = returning ? ReturnMat : ThrowMat;
+        // GetComponentInChildren<SkinnedMeshRenderer>().material = returning ? ReturnMat : ThrowMat;
 
         Accelerate();
 
