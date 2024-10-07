@@ -83,13 +83,17 @@ public class HUD : MonoBehaviour
 
             while (!choiceMade && chosenWeapon == null)
             {
-
-                // TODO: while hovering an option or the will replace
-                //       show details window
-
-
                 yield return null;
             }
+            for (int i = 0; i < ShopChoices.Length; i++)
+            {
+                ShopChoices[i].DeInit();
+            }
+            if(WillReplace.gameObject.activeSelf)
+            {
+                WillReplace.DeInit();
+            }
+
             SkipShopButton.onClick.RemoveAllListeners();
 
             ShopParent.SetActive(false);
