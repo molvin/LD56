@@ -80,7 +80,7 @@ public class Audioman : MonoBehaviour
             audioSource.volume = volume;
         }, (Vector3 worl_pos) =>
         {
-
+            audioSource.transform.position = worl_pos;
         });
     }
 

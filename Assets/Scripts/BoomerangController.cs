@@ -258,7 +258,7 @@ public class BoomerangController : MonoBehaviour
     {
         if (Boids.Instance == null) return;
 
-        List<Boid> boids = Boids.Instance.GetNearest(transform.position, 8);
+        List<Boid> boids = Boids.Instance.GetNearest(transform.position, 8, 3.0f);
 
         Vector2 thisPos = new Vector2(transform.position.x, transform.position.z);
 

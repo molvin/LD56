@@ -13,13 +13,14 @@ public class Boids : MonoBehaviour
     public static Boids Instance;
     private Player player;
 
+    public LayerMask BoidLayer;
     public List<Material> BoidMaterials;
     public List<int> HealthThresholds;
 
     public Vector3 Space = Vector3.one * 50;
     public int SpawnRate = 3;
     public float VisualRange = 3f;
-    public float MaxVelocity = 6f;
+    public float MaxSpeed = 5f;
     public float MinVelocityFactor = 0.4f;
     public float CenteringFactor = 0.2f;
     public float SeekingFactor = 10.0f;
@@ -36,6 +37,8 @@ public class Boids : MonoBehaviour
     private int lastSpawnTime = 0;
     private float startTime;
 
+    public float MaxVelocity(Boid boid) => MaxSpeed * boid.SpeedModifier;
+
     public int UpdateNumPerCycle => Mathf.Min(Mathf.Max(DesiredUpdateNumPerCycle, allBoids.Count / 10), allBoids.Count);
     public float DeltaTime => Time.fixedDeltaTime * allBoids.Count / UpdateNumPerCycle;
 
@@ -44,13 +47,41 @@ public class Boids : MonoBehaviour
 
     private Vector3 MinBounds;
     private Vector3 MaxBounds;
+    private Collider[] colliderBuffer = new Collider[1024];
 
-    public List<Boid> GetNearest(Vector3 pos, int num)
+    private List<Audioman.LoopHolder> boid_step_loop = new ();
+
+    public List<Boid> GetNearest(Vector3 pos, int num, float radius)
+    {
+        if (UseKDTree)
+        {
+            return _GetNearest(pos, num);
+        }
+        else
+        {
+            return GetInRange(pos, radius);
+        }
+    }
+    private List<Boid> _GetNearest(Vector3 pos, int num)
     {
         if (tree == null)
             return new();
 
         return tree.NearestNeighbours(pos, num);
+    }
+    private List<Boid> GetInRange(Vector3 pos, float radius)
+    {
+        List<Boid> boids = new();
+
+        //int hits = Physics.OverlapSphereNonAlloc(pos, radius, colliderBuffer, BoidLayer);
+        colliderBuffer = Physics.OverlapSphere(pos, radius, BoidLayer);
+        int hits = colliderBuffer.Length;
+        for (int i = 0; i < hits; i++)
+        {
+            boids.Add(colliderBuffer[i].GetComponent<Boid>());
+        }
+
+        return boids;
     }
 
     public void DamageBoid(Boid boid, int damage)
@@ -83,6 +114,21 @@ public class Boids : MonoBehaviour
         MaxBounds = transform.position + Space * 0.5f;
 
         Spawn(SpawnRate * 10);
+        for(int i = 0; i < 10; i++)
+        {
+            boid_step_loop.Add(Audioman.getInstance()?.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/Creature_step_loop"), this.transform.position, false));
+        }
+
+            
+    }
+
+    public void OnDestroy()
+    {
+        foreach (var item in boid_step_loop)
+        {
+            item?.Stop();
+        }
+        boid_step_loop.Clear();
     }
 
     private void Spawn(int num)
@@ -97,7 +143,7 @@ public class Boids : MonoBehaviour
             int difficulty = (rand > 0.85 ? 2 : (rand > 0.55 ? 1 : 0));
 
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Random.value * Space.y, Random.value * Space.z);
-            Vector3 velocity = new(Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f, Random.value * MaxVelocity - MaxVelocity * 0.5f);
+            Vector3 velocity = new(Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f);
 
             Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1);
             allBoids.Add(boid);
@@ -162,13 +208,13 @@ public class Boids : MonoBehaviour
     }
     private void LimitSpeed(Boid boid)
     {
-        if (boid.velocity.magnitude > MaxVelocity)
+        if (boid.velocity.magnitude > MaxVelocity(boid))
         {
-            boid.velocity = boid.velocity.normalized * MaxVelocity;
+            boid.velocity = boid.velocity.normalized * MaxVelocity(boid);
         }
-        else if (boid.velocity.magnitude < MaxVelocity * MinVelocityFactor)
+        else if (boid.velocity.magnitude < MaxVelocity(boid) * MinVelocityFactor)
         {
-            boid.velocity = boid.velocity.normalized * MaxVelocity * MinVelocityFactor;
+            boid.velocity = boid.velocity.normalized * MaxVelocity(boid) * MinVelocityFactor;
         }
     }
     private void Seek(Boid boid)
@@ -178,6 +224,30 @@ public class Boids : MonoBehaviour
 
         boid.velocity += toTarget.normalized * ((close ? 1f : 0.02f) * SeekingFactor * DeltaTime);
     }
+
+    private void AdjustStepSound()
+    {
+        var boids_near_player = allBoids
+           // .Where(boid => (player.transform.position - boid.position).magnitude < VisualRange * 1f)
+            .OrderBy(boid => (player.transform.position - boid.position).magnitude)
+            .ToList();
+
+        for(int i = 0; i < boid_step_loop.Count; i++)
+        {
+            if((boids_near_player.Count()-1) > i)
+            {
+                boid_step_loop[i].setWorldPosition(boids_near_player[i].position);
+                boid_step_loop[i].setVolume(1);
+
+            }
+            else
+            {
+                boid_step_loop[i].setVolume(0);
+            }
+        }
+      
+    }
+
     private void KeepWithinBounds(Boid boid)
     {
         Vector3 Margin = Space * BoundsMargin;
@@ -265,11 +335,7 @@ public class Boids : MonoBehaviour
         {
             Boid boid = allBoids[updateIndex];
 
-            List<Boid> neighbours = null;
-            if (UseKDTree)
-            {
-                neighbours = tree.NearestNeighbours(boid.position, 10);
-            }
+            List<Boid> neighbours = GetNearest(boid.position, 10, VisualRange);
 
             Seek(boid);
             FlyTowardsCenter(boid, neighbours);
@@ -294,7 +360,8 @@ public class Boids : MonoBehaviour
 
             //boid.Position += boid.Velocity * Time.fixedDeltaTime;
             //allBoids[i].transform.position = boid.Position;
-
+            
         }
+        AdjustStepSound();
     }
 }

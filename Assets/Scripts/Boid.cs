@@ -20,6 +20,7 @@ public class Boid : MonoBehaviour
 
     public int health = 10;
     public float damage = 1;
+    public float SpeedModifier = 1f;
 
     public bool IsDead => health <= 0;
     public float DeathDuration = 1.0f;
@@ -100,7 +101,7 @@ public class Boid : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1);
-            if (UnityEngine.Random.Range(0 ,100) == 1)
+            if (UnityEngine.Random.Range(0, 100) == 1)
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli_dark"), this.transform.position);
             }
@@ -115,6 +116,7 @@ public class Boid : MonoBehaviour
 
         float multiplier = Mathf.Pow(1.15f, level);
         boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
+        boid.SpeedModifier = 1.0f + Mathf.Log(multiplier) * .6f;
         boid.damage = multiplier;
 
         boid.SetHealth(Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level));
