@@ -125,7 +125,6 @@ public class BoomerangController : MonoBehaviour
             RunAnimation();
             return;
         }
-        GetComponentInChildren<Animator>()?.SetBool("IsRunning", velocity.magnitude > SMALL_NUMBER);
 
 
         if (Time.time - lastPeriodProc > Weapon.PeriodTime)
@@ -158,6 +157,7 @@ public class BoomerangController : MonoBehaviour
         Move();
         RegulateMovementVolume();
 
+
         HitBoid();
 
         float catchRadius = 0.75f + Weapon.SizeModifier * 0.75f;
@@ -185,7 +185,10 @@ public class BoomerangController : MonoBehaviour
             timeStayed = 0f;
             Weapon.OnApex?.Invoke(Weapon, this);
         }
+        GetComponentInChildren<Animator>()?.SetBool("IsRunning", velocity.magnitude >= SMALL_NUMBER && returning);
+        GetComponentInChildren<Animator>()?.SetBool("Flying", velocity.magnitude >= SMALL_NUMBER && !returning);
 
+        GetComponentInChildren<Animator>()?.SetFloat("RunSpeed", velocity.magnitude);
         if (returning)
         {
             timeStayed += Time.deltaTime;
@@ -212,7 +215,14 @@ public class BoomerangController : MonoBehaviour
         Vector2 actual = new Vector2(transform.position.x, transform.position.z);
         Vector2 target = actual + velocity * Time.deltaTime;
         float y = transform.position.y;
-        transform.forward = new Vector3(velocity.normalized.x, 0, velocity.normalized.y);
+        if(returning)
+        {
+            transform.forward = new Vector3(velocity.normalized.x, 0, velocity.normalized.y);
+
+        } else
+        {
+            transform.up = new Vector3(velocity.normalized.x, 0, velocity.normalized.y);
+        }
 
         if (UnityEngine.AI.NavMesh.SamplePosition(
             new Vector3(target.x, transform.position.y - 1f, target.y),

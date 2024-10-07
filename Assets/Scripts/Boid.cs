@@ -5,7 +5,7 @@ using UnityEngine;
 public class Boid : MonoBehaviour
 {
     public Rigidbody Rigidbody;
-    private new MeshRenderer renderer;
+    private new SkinnedMeshRenderer renderer;
 
     private int health = 10;
     public float damage = 1;
@@ -42,6 +42,10 @@ public class Boid : MonoBehaviour
     {
         // TODO: Hit effect
         renderer.enabled = true;
+        this.transform.forward = Rigidbody.velocity.normalized;
+        GetComponentInChildren<Animator>()?.SetBool("IsRunning", Rigidbody.velocity.magnitude >= 0.001f);
+        GetComponentInChildren<Animator>()?.SetFloat("RunSpeed", velocity.magnitude);
+
     }
     public void Start()
     {
@@ -62,18 +66,17 @@ public class Boid : MonoBehaviour
 
     public static Boid CreateBoid(Vector3 position, Vector3 velocity, int level, Material material)
     {
-        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        sphere.transform.position = position;
-        Boid boid = sphere.AddComponent<Boid>();
+        Boid boid = GameObject.Instantiate(Resources.Load<Boid>("boid"));
+        boid.transform.position = position;
 
         float multiplier = Mathf.Pow(1.15f, level);
         boid.health *= Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level);
         boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
         boid.damage = multiplier;
 
-        boid.renderer = sphere.GetComponent<MeshRenderer>();
+        boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
         boid.renderer.material = material;
-        boid.Rigidbody = sphere.AddComponent<Rigidbody>();
+        boid.Rigidbody = boid.GetComponent<Rigidbody>();
         boid.Rigidbody.velocity = velocity;
 
         return boid;
