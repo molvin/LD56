@@ -133,37 +133,37 @@ MonoBehaviour:
   damage: 1
   SpeedModifier: 1
   DeathFriction: 3
-  DeathDuration: 0.8
+  DeathDuration: 1.5
   DeathSizeCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -0.49611503
-      outSlope: -0.49611503
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.07809675
+      outWeight: 0.12332481
     - serializedVersion: 3
-      time: 0.6096743
-      value: 1.1902112
-      inSlope: 0.31491867
-      outSlope: 0.31491867
+      time: 0.6863713
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.88573384
-      value: 1.1083208
-      inSlope: -0.660859
-      outSlope: -0.660859
+      time: 0.8902451
+      value: 1.1431206
+      inSlope: -1.2097669
+      outSlope: -1.2097669
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.245196
-      outWeight: 0.47757474
+      outWeight: 0.63007134
     - serializedVersion: 3
       time: 1
       value: 0
@@ -201,7 +201,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!1001 &820013738647446924
 PrefabInstance:
@@ -229,15 +229,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071068
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -245,7 +245,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 025998b322f1dda4386236b24c77ae39, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
