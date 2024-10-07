@@ -77,6 +77,7 @@ public class Player : MonoBehaviour
     private int previousKillsForLevelUp = 0;
     private Shop shop;
 
+    private Audioman.LoopHolder footsteps;
 
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
@@ -88,10 +89,16 @@ public class Player : MonoBehaviour
 
         UpdateKills(0);
 
+        footsteps = Audioman.getInstance()?.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/player_step_loop"), transform.position, false);
+        footsteps.setVolume(0);
     }
 
     private void Update()
     {
+        footsteps.setWorldPosition(transform.position);
+        float vel = velocity.magnitude;
+        footsteps.setVolume(Mathf.Clamp01(vel / 40f));
+
         switch (state)
         {
             case State.Running:
@@ -252,7 +259,7 @@ public class Player : MonoBehaviour
             BoomerangController boomerang = BoomerangController.New(BoomerangPrefab);
             boomerang.Init(this, weapon, transform.position + throwDir * 1.6f, new Vector2(throwDir.x, throwDir.z), new Vector2(velocity.x, velocity.z) * 0.5f);
             fired = true;
-            Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw"), this.transform.position);
+            Audioman.getInstance().PlaySound("throw", transform.position);
         }
 
 
@@ -291,8 +298,7 @@ public class Player : MonoBehaviour
 
                 Stats.FullHeal();
 
-                // NOTE: Upgrade shop every 2 levels
-                HUD.Shop(Level / 2, Buy, shop);
+                HUD.Shop(Level, Buy, shop);
 
                 state = State.Shopping;
                 Time.timeScale = 0.0f;

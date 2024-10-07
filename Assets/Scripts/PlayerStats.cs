@@ -58,7 +58,7 @@ public class PlayerStats : MonoBehaviour
     {
         CurrentHealth = Mathf.Clamp(CurrentHealth - dmg, 0, MaxHealth);
         HUD.SetHealth(CurrentHealth / MaxHealth);
-        Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/Hurt"), transform.position);
+        Audioman.getInstance().PlaySound("Hurt", transform.position);
         if(CurrentHealth <= 0)
         {
             Player.Die();

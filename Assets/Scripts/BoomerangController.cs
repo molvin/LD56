@@ -97,7 +97,7 @@ public class BoomerangController : MonoBehaviour
         Weapon.OnSpawn?.Invoke(Weapon, this);
         if (!Temporary)
         {
-            Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/throw_minion"), this.transform.position);
+            Audioman.getInstance().PlaySound("throw_minion", transform.position);
         }
 
         GetComponentInChildren<Animator>()?.SetTrigger("Toss");
@@ -186,7 +186,7 @@ public class BoomerangController : MonoBehaviour
         {
             if (!Temporary)
             {
-                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/back_to_pouch"), this.transform.position);
+                Audioman.getInstance()?.PlaySound("back_to_pouch", transform.position);
             }
 
             Delete();
@@ -267,7 +267,7 @@ public class BoomerangController : MonoBehaviour
             velocity -= projection * (1f + Bouncyness);
             if (!Temporary)
             {
-                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/wall_bonk"), this.transform.position);
+                Audioman.getInstance()?.PlaySound("wall_bonk", transform.position);
             }
         }
 
@@ -300,9 +300,10 @@ public class BoomerangController : MonoBehaviour
             {
                 UpdateHitCooldown(b);
 
+                b.velocity += new Vector3(velocity.x, 0, velocity.y).normalized * Weapon.KnockbackForce / (b.Radius * 2.0f);
+
                 Boids.Instance.DamageBoid(b, Weapon.GetDamage());
                 Weapon.OnHit?.Invoke(Weapon, this, b);
-                b.velocity += new Vector3(velocity.x, 0, velocity.y).normalized * Weapon.KnockbackForce / (b.Radius * 2.0f);
 
                 hitBoid = b;
             }
@@ -313,7 +314,7 @@ public class BoomerangController : MonoBehaviour
             // Only play once vfx/sfx per hit & not on secondary projectiles
             if (!Temporary && Weapon.GetDamage() > 0)
             {
-                Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/chomp"), this.transform.position);
+                Audioman.getInstance()?.PlaySound("chomp", transform.position);
                 Instantiate(
                     Resources.Load<GameObject>("Effects/BiteEffect"),
                     hitBoid.position + Vector3.up * 0.5f,
