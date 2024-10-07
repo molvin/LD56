@@ -76,15 +76,16 @@ public class Boid : MonoBehaviour
     {
         // TODO: Hit effect
         renderer.enabled = true;
-        this.transform.forward = Rigidbody.velocity.normalized;
 
         if (!IsDead)
         {
             Anim.SetBool("IsRunning", Rigidbody.velocity.magnitude >= 0.001f);
             Anim.SetFloat("RunSpeed", velocity.magnitude);
+            this.transform.forward = Rigidbody.velocity.normalized;
         }
         else
         {
+            Anim.SetBool("Dead", true);
             Rigidbody.velocity -= Rigidbody.velocity * DeathFriction * Time.deltaTime;
 
             float timeSinceDeath = Time.time - timeOfDeath;
