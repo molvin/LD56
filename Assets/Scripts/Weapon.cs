@@ -57,6 +57,7 @@ public static class Weapons
     {
         Name = "Default",
         Description = "Returns to you, damaging vermins on the way",
+        NonBuyable = true,
     };
     public static Weapon Temporary => new()
     {
@@ -74,7 +75,7 @@ public static class Weapons
 
     public static Weapon QuickDraw => new()
     {
-        Name = "Quick Draw",
+        Name = "Gonzales",
         Description = "Moves very far and fast",
         BaseDamage = 17,
         SpeedModifier = 2.2f,
@@ -83,7 +84,7 @@ public static class Weapons
 
     public static Weapon SlowBoy => new()
     {
-        Name = "Slow Boy",
+        Name = "Slouch",
         Description = "Slowly moves a short distance",
         BaseDamage = 15,
         SpeedModifier = 0.3f,
@@ -92,7 +93,7 @@ public static class Weapons
 
     public static Weapon Bouncer => new()
     {
-        Name = "Bouncer",
+        Name = "Hops",
         Description = "Bounces on any terrain it collides with",
         BaseDamage = 16,
         SpeedModifier = 1.2f,
@@ -101,7 +102,7 @@ public static class Weapons
     };
     public static Weapon Returner => new()
     {
-        Name = "Returner",
+        Name = "Kenny",
         Description = "Knocks vermins back then instantly returns",
         BaseDamage = 40,
         InitialSpeedBoost = 1.4f,
@@ -117,7 +118,7 @@ public static class Weapons
 
     public static Weapon Chaining => new()
     {
-        Name = "Chaining",
+        Name = "Bonaparte",
         Description = "Jumps from vermin to vermin when attacking",
         BaseLevel = 3,
         BaseDamage = 35,
@@ -145,7 +146,7 @@ public static class Weapons
 
     public static Weapon Randomancer => new()
     {
-        Name = "Randomancer",
+        Name = "Klaus",
         Description = "Randomly jerks in random directions",
         BaseDamage = 34,
         BaseLevel = 2,
@@ -162,7 +163,7 @@ public static class Weapons
 
     public static Weapon Zapper => new()
     {
-        Name = "Zapper",
+        Name = "Uri",
         Description = "When hitting vermin it zaps all nearby vermins",
         BaseLevel = 3,
         BaseDamage = 24,
@@ -189,7 +190,7 @@ public static class Weapons
 
     public static Weapon Forker => new()
     {
-        Name = "Forker",
+        Name = "Fork",
         Description = "Spawns a tiny critter when hitting vermins",
         BaseLevel = 2,
         SpeedModifier = 1.4f,
@@ -224,7 +225,7 @@ public static class Weapons
     };
     public static Weapon Multiballer => new()
     {
-        Name = "Multiballer",
+        Name = "Banger",
         Description = "Spawns two additional tinier critters",
         BaseLevel = 2,
         BaseDamage = 12,
@@ -254,7 +255,7 @@ public static class Weapons
     };
     public static Weapon ExtremeBalls => new()
     {
-        Name = "Extreme Balls",
+        Name = "Mash",
         Description = "Spawns four additional tinier critters",
         BaseLevel = 3,
         BaseDamage = 19,
@@ -283,7 +284,7 @@ public static class Weapons
     };
     public static Weapon BulletHell => new()
     {
-        Name = "Bullet Hell",
+        Name = "Gravy",
         Description = "Spawns nine additional tinier critters",
         BaseLevel = 4,
         BaseDamage = 26,
@@ -315,7 +316,7 @@ public static class Weapons
     };
     public static Weapon TheUltimate => new()
     {
-        Name = "The Ultimate",
+        Name = "Matt",
         Description = "When hitting vermin it spawns two additional tinier critters that in turn spawns even tinier critters",
         BaseLevel = 4,
         BaseDamage = 42,
@@ -390,7 +391,7 @@ public static class Weapons
     };
     public static Weapon TheOrb => new()
     {
-        Name = "The Orb",
+        Name = "Robin",
         Description = "Spawns tiny critters in a spiral pattern while moving",
         BaseLevel = 4,
         BaseDamage = 15,
@@ -417,7 +418,7 @@ public static class Weapons
     };
     public static Weapon GravityPull => new()
     {
-        Name = "Gravity Pull",
+        Name = "Harry",
         Description = "Moves slow and pulls all vermin towards it",
         BaseLevel = 2,
         BaseDamage = 4,
@@ -458,7 +459,7 @@ public static class Weapons
     };
     public static Weapon Meteor => new()
     {
-        Name = "Meteor",
+        Name = "Bub",
         Description = "When touching vermin it jumps up in the air and comes down slamming hard",
         BaseLevel = 3,
         BaseDamage = 0,
@@ -510,7 +511,7 @@ public static class Weapons
     };
     public static Weapon ApexEploder => new()
     {
-        Name = "Apex Exploder",
+        Name = "Jack",
         Description = "Creates an explosion when reaching its apex and returning back",
         BaseLevel = 2,
         BaseDamage = 0,
