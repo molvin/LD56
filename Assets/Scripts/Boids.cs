@@ -60,7 +60,8 @@ public class Boids : MonoBehaviour
         if (boid.IsDead)
         {
             allBoids.Remove(boid);
-            Destroy(boid.gameObject);
+            // Destroy(boid.gameObject);
+            boid.Die();
             killCount++;
             Debug.Log($"[{Time.time}]. kills: {killCount}");
         }

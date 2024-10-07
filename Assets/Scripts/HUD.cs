@@ -23,6 +23,7 @@ public class HUD : MonoBehaviour
     public WeaponCard[] ShopChoices;
     public WeaponCard WillReplace;
     public RectTransform ShopIndicator;
+    public float ShopIndicatorCenterOffset = 100;
 
     public WeaponCard WeaponCardPrefab;
     private List<WeaponCard> weaponCards = new();
@@ -160,7 +161,7 @@ public class HUD : MonoBehaviour
             float y = Mathf.Lerp(Screen.height, -Screen.height, t);
             ShopIndicator.anchoredPosition = new Vector2(angleSign * halfScreenWidth, y);
         }
-        ShopIndicator.anchoredPosition -= ShopIndicator.anchoredPosition.normalized * 50f;
+        ShopIndicator.anchoredPosition -= ShopIndicator.anchoredPosition.normalized * ShopIndicatorCenterOffset;
     }
 
     public void DisableShopIndicator()

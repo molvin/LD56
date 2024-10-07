@@ -43,7 +43,7 @@ public class PlayerStats : MonoBehaviour
             float dist = Vector3.Distance(boid.transform.position, transform.position);
             if (dist < BoidDamageRadius)
             {
-                dmg += boid.damage;
+                dmg = Mathf.Max(boid.damage, dmg);
             }
         }
 

@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b0c58b594266a478f9b47b130ab138, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Rigidbody: {fileID: 0}
+  Rigidbody: {fileID: -6854883276934515846}
   HealthMaterials:
   - Mat: {fileID: 2100000, guid: 7d240eb4f41a98a4e945f0c876927abb, type: 2}
     MaxHealth: 15
@@ -128,6 +128,52 @@ MonoBehaviour:
     MaxHealth: 50
   - Mat: {fileID: 2100000, guid: 52ca267aa6efafe498b04b9354632815, type: 2}
     MaxHealth: 100
+  Anim: {fileID: 1247161771238179951}
+  health: 10
+  damage: 1
+  DeathDuration: 0.8
+  DeathSizeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -0.49611503
+      outSlope: -0.49611503
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.07809675
+    - serializedVersion: 3
+      time: 0.6096743
+      value: 1.1902112
+      inSlope: 0.31491867
+      outSlope: 0.31491867
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.88573384
+      value: 1.1083208
+      inSlope: -0.660859
+      outSlope: -0.660859
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.245196
+      outWeight: 0.47757474
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -6.299743
+      outSlope: -6.299743
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.19418378
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!54 &-6854883276934515846
 Rigidbody:
   m_ObjectHideFlags: 0
