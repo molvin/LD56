@@ -5,4 +5,6 @@ using UnityEngine;
 public class Shop : MonoBehaviour
 {
     public float Radius;
+    public Transform CameraPos;
+    public Transform PlayerPos;
 }

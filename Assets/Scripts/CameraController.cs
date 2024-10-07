@@ -9,11 +9,28 @@ public class CameraController : MonoBehaviour
 
     private Vector3 velocity;
 
+    private bool _pause = false;
+
+    Vector3 original_position;
+    public void Start()
+    {
+        original_position = transform.position;
+    }
     private void Update()
     {
-        Vector3 targetPosition = Follow.transform.position;
-        targetPosition.y = transform.position.y;
+        if(!_pause)
+        {
+            Vector3 targetPosition = Follow.transform.position;
+            targetPosition.y = original_position.y;
 
-        transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, Smoothing);
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, Smoothing);
+        }
+
+    
+    }
+
+    public void pause(bool pause)
+    {
+        this._pause = pause;
     }
 }
