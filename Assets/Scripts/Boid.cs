@@ -82,7 +82,7 @@ public class Boid : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1);
-            if (UnityEngine.Random.Range(0 ,100) == 1)
+            if (UnityEngine.Random.Range(0, 100) == 1)
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli_dark"), this.transform.position);
             }
