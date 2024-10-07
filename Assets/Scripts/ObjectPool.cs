@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
-    public static ObjectPool instance;
+    private static ObjectPool instance;
 
     private Dictionary<System.Type, List<GameObject>> pool = new();
 
@@ -13,17 +13,17 @@ public class ObjectPool : MonoBehaviour
         instance = this;
     }
 
-    public T Get<T>(T template) where T : MonoBehaviour
+    public static T Get<T>(T template) where T : MonoBehaviour
     {
-        if (!pool.ContainsKey(typeof(T)))
+        if (!instance.pool.ContainsKey(typeof(T)))
         {
-            pool[typeof(T)] = new();
+            instance.pool[typeof(T)] = new();
         }
 
-        List<GameObject> available = pool[typeof(T)];
+        List<GameObject> available = instance.pool[typeof(T)];
         if (available.Count == 0)
         {
-            GameObject obj = Instantiate(template.gameObject, transform);
+            GameObject obj = Instantiate(template.gameObject, instance.transform);
             available.Add(obj);
         }
 
@@ -33,10 +33,10 @@ public class ObjectPool : MonoBehaviour
         return active;
     }
 
-    public void Return<T>(T obj) where T : MonoBehaviour
+    public static void Return<T>(T obj) where T : MonoBehaviour
     {
         obj.gameObject.SetActive(false);
 
-        pool[typeof(T)].Add(obj.gameObject);
+        instance.pool[typeof(T)].Add(obj.gameObject);
     }
 }

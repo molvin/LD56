@@ -18,7 +18,9 @@ public class Boid : MonoBehaviour
     private new SkinnedMeshRenderer renderer;
     public Animator Anim;
 
-    public int health = 10;
+
+    public const int BaseHealth = 10;
+    private int health;
     public float damage = 1;
     public float SpeedModifier = 1f;
 
@@ -87,7 +89,7 @@ public class Boid : MonoBehaviour
             float t = timeSinceDeath / DeathDuration;
             Radius = Mathf.LerpUnclamped(0.0f, deathStartRadius, DeathSizeCurve.Evaluate(t));
             if (t >= 1.0f)
-                Destroy(gameObject);
+                Delete();
         }
 
     }
@@ -108,9 +110,16 @@ public class Boid : MonoBehaviour
         }
     }
 
+    private static Boid boidResource = null;
+
     public static Boid CreateBoid(Vector3 position, Vector3 velocity, int level)
     {
-        Boid boid = GameObject.Instantiate(Resources.Load<Boid>("boid"));
+        if (boidResource == null)
+        {
+            boidResource = Resources.Load<Boid>("boid");
+        }
+
+        Boid boid = ObjectPool.Get(boidResource);
         boid.transform.position = position;
         boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
 
@@ -119,12 +128,17 @@ public class Boid : MonoBehaviour
         boid.SpeedModifier = 1.0f + Mathf.Log(multiplier) * .6f;
         boid.damage = multiplier;
 
-        boid.SetHealth(Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level));
+        boid.SetHealth(Mathf.RoundToInt(BaseHealth * multiplier * (1f + Mathf.Log(multiplier)) + level));
 
         boid.Rigidbody = boid.GetComponent<Rigidbody>();
         boid.Rigidbody.velocity = velocity;
 
         return boid;
+    }
+
+    private void Delete()
+    {
+        ObjectPool.Return(this);
     }
 
     public void Die()

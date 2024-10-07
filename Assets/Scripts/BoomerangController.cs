@@ -58,7 +58,7 @@ public class BoomerangController : MonoBehaviour
 
     public static BoomerangController New(BoomerangController prefab)
     {
-        return ObjectPool.instance.Get(prefab);
+        return ObjectPool.Get(prefab);
     }
 
     private void Clear()
@@ -104,7 +104,7 @@ public class BoomerangController : MonoBehaviour
     public void Delete()
     {
         loopHolderSteps?.Stop();
-        ObjectPool.instance.Return(this);
+        ObjectPool.Return(this);
     }
 
     public void Animate(List<Vector3> points)
