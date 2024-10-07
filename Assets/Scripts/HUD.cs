@@ -160,6 +160,7 @@ public class HUD : MonoBehaviour
             float y = Mathf.Lerp(Screen.height, -Screen.height, t);
             ShopIndicator.anchoredPosition = new Vector2(angleSign * halfScreenWidth, y);
         }
+        ShopIndicator.anchoredPosition -= ShopIndicator.anchoredPosition.normalized * 50f;
     }
 
     public void DisableShopIndicator()

@@ -17,9 +17,15 @@ public class Boid : MonoBehaviour
     private new SkinnedMeshRenderer renderer;
 
     private int health = 10;
+    public float damage = 1;
 
     public bool IsDead => health <= 0;
 
+    public float Radius
+    {
+        get { return transform.localScale.x * 0.5f; }
+        set { transform.localScale = Vector3.one * value * 2f; }
+    }
 
     public Vector2 Position2D => new Vector2(position.x, position.z);
     public Vector3 position 
@@ -89,8 +95,12 @@ public class Boid : MonoBehaviour
         boid.transform.position = position;
         boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
 
-        boid.SetHealth(Mathf.RoundToInt(boid.health * Mathf.Pow(2, level)));
+        float multiplier = Mathf.Pow(1.15f, level);
+        boid.health *= Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level);
+        boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
+        boid.damage = multiplier;
 
+        boid.SetHealth(boid.health);
 
         boid.Rigidbody = boid.GetComponent<Rigidbody>();
         boid.Rigidbody.velocity = velocity;

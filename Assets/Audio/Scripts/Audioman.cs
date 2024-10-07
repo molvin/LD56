@@ -69,8 +69,11 @@ public class Audioman : MonoBehaviour
         audioSource.Play();
         return new LoopHolder(() =>
         {
-            audioSource.Stop();
-            sfx_queue.Enqueue(audioSource);
+            if (audioSource)
+            {
+                audioSource.Stop();
+                sfx_queue.Enqueue(audioSource);
+            }
           
         }, (volume) =>
         {
