@@ -172,7 +172,7 @@ public static class Weapons
         Knockback = 4f,
         OnProc = (self, c, target) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 6, 4.0f);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 6, 6.0f);
 
             foreach (Boid b in boids)
             {
@@ -183,6 +183,10 @@ public static class Weapons
                 {
                     int damage = Mathf.RoundToInt(24 * self.LevelModifier);
                     Boids.Instance.DamageBoid(b, damage);
+
+                    GameObject zap = FxManager.Get("LineZap");
+                    zap.transform.position = c.transform.position;
+                    zap.GetComponent<MoveToPoint>().desiredPos = b.transform.position;
                 }
             }
         },
