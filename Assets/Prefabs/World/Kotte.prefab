@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 5776835812952447028}
   - component: {fileID: 3626291107608713505}
   - component: {fileID: 2486156754876645049}
+  - component: {fileID: 4625735742316944244}
   m_Layer: 7
   m_Name: Capsule
   m_TagString: Untagged
@@ -140,6 +141,22 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!208 &4625735742316944244
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7759588920161021420}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1001 &1656233963491415216
 PrefabInstance:
   m_ObjectHideFlags: 0

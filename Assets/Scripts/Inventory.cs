@@ -80,9 +80,12 @@ public class Inventory : MonoBehaviour
         weaponQueue = new Queue<Weapon>(weapons);
 
         {
-            Follower follower = followers.First(x => x.Weapon == oldWeapon);
-            ObjectPool.Return(follower);
-            followers.Remove(follower);
+            Follower follower = followers.FirstOrDefault(x => x.Weapon == oldWeapon);
+            if(follower)
+            {
+                ObjectPool.Return(follower);
+                followers.Remove(follower);
+            }
         }
         {
             Follower follower = ObjectPool.Get(FollowerPrefab);
