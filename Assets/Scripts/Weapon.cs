@@ -269,6 +269,37 @@ public static class Weapons
             }
         }
     };
+    public static Weapon BulletHell => new()
+    {
+        Name = "Bullet Hell",
+        BaseLevel = 4,
+        BaseDamage = 26,
+        OnSpawn = (self, c) =>
+        {
+            Vector2 dir = c.velocity.normalized;
+
+            for (int i = 0; i < 9; i++)
+            {
+                float rad = Mathf.Deg2Rad * Random.Range(-70, 70);
+                Vector2 dir1 = new(
+                    dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
+                    dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
+
+                Weapon weapon = Weapons.Temporary;
+                weapon.BaseDamage = 26;
+                weapon.InitialSpeedBoost = Random.Range(2.5f, 3.5f);
+                weapon.SpeedModifier = 0.7f;
+                weapon.Bouncyness = 2f;
+                weapon.Level = self.Level;
+                weapon.OnPeriod = weapon.OnApex;
+                weapon.OnApex = null;
+                weapon.PeriodTime = 1.5f;
+                
+                BoomerangController b = BoomerangController.New(c.Owner.BoomerangPrefab);
+                b.Init(c.Owner, weapon, c.transform.position, dir1, Vector2.zero);
+            }
+        }
+    };
     public static Weapon TheUltimate => new()
     {
         Name = "The Ultimate",
