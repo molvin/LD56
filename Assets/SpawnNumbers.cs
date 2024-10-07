@@ -35,6 +35,7 @@ public class SpawnNumbers : MonoBehaviour
         yield return new WaitForSeconds(secs_to_number);
 
 
+        Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position, true);
 
         for (int i = 0; i < numbers.Count(); i++)
         {

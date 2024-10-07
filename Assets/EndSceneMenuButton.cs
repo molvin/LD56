@@ -13,6 +13,8 @@ public class EndSceneMenuButton : MonoBehaviour
     public Transform minionSpawn;
     void Start()
     {
+        Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position, true);
+
         for (int j = 0; j < numberOfMinions; j++)
         {
             setMinionDestination(gameObject, Instantiate(minionPrefab, RandomNavmeshLocation(20), Quaternion.identity));
