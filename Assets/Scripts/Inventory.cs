@@ -13,7 +13,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        AddNewWeapon(Weapons.GravityPull);
+        AddNewWeapon(Weapons.Default);
     }
 
     public Weapon PeekNextWeapon()
