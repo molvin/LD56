@@ -20,7 +20,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        AddNewWeapon(Weapons.Default);
+        AddNewWeapon(Weapons.GravityPull);
         FollowPoints = new Vector3[MaxWeapons];
     }
 
