@@ -23,6 +23,7 @@ public class Boid : MonoBehaviour
     private int health;
     public float damage = 1;
     public float SpeedModifier = 1f;
+    public float DeathFriction = 10;
 
     public bool IsDead => health <= 0;
     public float DeathDuration = 1.0f;
@@ -85,6 +86,8 @@ public class Boid : MonoBehaviour
         }
         else
         {
+            Rigidbody.velocity -= Rigidbody.velocity * DeathFriction * Time.deltaTime;
+
             float timeSinceDeath = Time.time - timeOfDeath;
             float t = timeSinceDeath / DeathDuration;
             Radius = Mathf.LerpUnclamped(0.0f, deathStartRadius, DeathSizeCurve.Evaluate(t));

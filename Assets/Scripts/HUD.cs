@@ -54,7 +54,7 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void Shop(Action<Weapon, Weapon> callback)
+    public void Shop(int level, Action<Weapon, Weapon> callback)
     {
         IEnumerator Coroutine()
         {
@@ -75,7 +75,7 @@ public class HUD : MonoBehaviour
                 WillReplace.gameObject.SetActive(false);
             }
 
-            var weapons = Weapons.GetShop(ShopChoices.Length).ToList();
+            var weapons = Weapons.GetShop(ShopChoices.Length, level).ToList();
             for(int i = 0; i < ShopChoices.Length; i++)
             {
                 Weapon w = weapons[i];
