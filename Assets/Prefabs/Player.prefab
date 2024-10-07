@@ -122,13 +122,15 @@ MonoBehaviour:
   ThrowSpeed: 25
   BoomerangPrefab: {fileID: 5857261029421428862, guid: 53315f523db55dd43a4a3d2a673c98d2, type: 3}
   Inventory: {fileID: 2411236606351500817}
+  Level: 0
+  BaseKillsPerLevel: 100
+  LevelUpFactor: 2
   DeathStoppingTime: 0.5
   TimeBeforeFadeout: 1
   HUD: {fileID: 8779048857396013772}
   ShopPrefab: {fileID: 667957165842390380, guid: 0db2ece4be7b22a48818279a97462bda, type: 3}
   ShopRespawnTime: 30
   Stats: {fileID: 3481751476166892165}
-  ShopLevel: 0
   Collider: {fileID: 1428319193055811815}
   GroundLayer:
     serializedVersion: 2
