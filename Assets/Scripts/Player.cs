@@ -107,7 +107,7 @@ public class Player : MonoBehaviour
 
         UpdateCollision();
 
-        if(shop != null)
+        if(shop != null && state != State.Dead)
         {
             Vector3 shopPos = shop.transform.position;
             Vector2 screenPoint = Camera.main.WorldToScreenPoint(shopPos);
