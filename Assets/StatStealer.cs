@@ -28,6 +28,6 @@ public class StatStealer : MonoBehaviour
         this.kills = b != null ? b.killCount : this.kills;
         var p = FindAnyObjectByType<Player>();
         this.level = p != null ? p.Level : this.level;
-        this.surviveTime = p != null ? p.startTime- p.dieTime : surviveTime;
+        this.surviveTime = p != null ?  p.dieTime - p.startTime : surviveTime;
     }
 }
