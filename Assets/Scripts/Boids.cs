@@ -13,6 +13,7 @@ public class Boids : MonoBehaviour
     public static Boids Instance;
     private Player player;
 
+    public LayerMask BoidLayer;
     public List<Material> BoidMaterials;
     public Vector3 Space = Vector3.one * 50;
     public int SpawnRate = 3;
@@ -42,6 +43,7 @@ public class Boids : MonoBehaviour
 
     private Vector3 MinBounds;
     private Vector3 MaxBounds;
+    private Collider[] colliderBuffer;
 
     public List<Boid> GetNearest(Vector3 pos, int num)
     {
@@ -49,6 +51,17 @@ public class Boids : MonoBehaviour
             return new();
 
         return tree.NearestNeighbours(pos, num);
+    }
+    public List<Boid> GetInRange(Vector3 pos, float radius)
+    {
+        if (Physics.OverlapSphereNonAlloc(pos, radius, colliderBuffer, BoidLayer) > 0)
+        {
+            return colliderBuffer.Select(c => c.GetComponent<Boid>()).ToList();
+        }
+        else
+        {
+            return new();
+        }
     }
 
     public void DamageBoid(Boid boid, int damage)
