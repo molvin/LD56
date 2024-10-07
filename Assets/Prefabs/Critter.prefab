@@ -163,6 +163,9 @@ MonoBehaviour:
   - WeaponName: Apex Eploder
     Hat: {fileID: 3918597874078470786}
     Color: {r: 0.7216732, g: 0, b: 0.9137255, a: 1}
+  - WeaponName: Bullet Hell
+    Hat: {fileID: 6013338100356447350}
+    Color: {r: 0.7829001, g: 0.91194963, b: 0.8692607, a: 1}
 --- !u!1001 &670787381093085233
 PrefabInstance:
   m_ObjectHideFlags: 0
