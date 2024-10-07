@@ -17,13 +17,16 @@ public class HatSelector : MonoBehaviour
     {
         foreach (WeaponHat hat in WeaponHats)
         {
+            hat.Hat.gameObject.SetActive(false);
+        }
+
+        foreach (WeaponHat hat in WeaponHats)
+        {
             if (weapon.Name == hat.WeaponName)
             {
                 hat.Hat.gameObject.SetActive(true);
                 hat.Hat.GetComponent<MeshRenderer>().material.color = hat.Color;
             }
-            else
-                hat.Hat.gameObject.SetActive(false);
         }
     }
 }

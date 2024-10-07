@@ -20,7 +20,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        AddNewWeapon(Weapons.Default);
+        AddNewWeapon(Weapons.Bouncer);
         FollowPoints = new Vector3[MaxWeapons];
     }
 
