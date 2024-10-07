@@ -59,7 +59,7 @@ public static class Weapons
         SizeModifier = 0.7f,
         OnApex = (self, c) =>
         {
-            GameObject.Destroy(c.gameObject);
+            c.Delete();
         },
     };
 
@@ -177,9 +177,8 @@ public static class Weapons
 
             c.velocity = dir1 * c.velocity.magnitude;
 
-            BoomerangController boomerang = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+            BoomerangController boomerang = BoomerangController.New(c.Owner.BoomerangPrefab);
             boomerang.Init(c.Owner, Weapons.Temporary, c.transform.position, dir2, Vector2.zero);
-            boomerang.Temporary = true;
             boomerang.Weapon.BaseDamage = self.BaseDamage;
             boomerang.UpdateHitCooldown(target);
 
@@ -202,14 +201,12 @@ public static class Weapons
                 dir.x * Mathf.Sin(-rad) + dir.y * Mathf.Cos(-rad));
 
 
-            BoomerangController b1 = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+            BoomerangController b1 = BoomerangController.New(c.Owner.BoomerangPrefab);
             b1.Init(c.Owner, Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
-            b1.Temporary = true;
             b1.Weapon.BaseDamage = 12;
 
-            BoomerangController b2 = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+            BoomerangController b2 = BoomerangController.New(c.Owner.BoomerangPrefab);
             b2.Init(c.Owner, Weapons.Temporary, c.transform.position, dir2, Vector2.zero);
-            b2.Temporary = true;
             b2.Weapon.BaseDamage = 12;
         }
     };
@@ -230,9 +227,8 @@ public static class Weapons
                     dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
                     dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
 
-                BoomerangController b = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+                BoomerangController b = BoomerangController.New(c.Owner.BoomerangPrefab);
                 b.Init(c.Owner, Weapons.Temporary, c.transform.position, dir1, Vector2.zero);
-                b.Temporary = true;
             }
         }
     };
@@ -256,9 +252,8 @@ public static class Weapons
                     dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
                     dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
 
-                BoomerangController b = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+                BoomerangController b = BoomerangController.New(c.Owner.BoomerangPrefab);
                 b.Init(c.Owner, Weapons.TheRecurer, c.transform.position, dir1, Vector2.zero);
-                b.Temporary = true;
                 b.Weapon.BaseDamage = Mathf.RoundToInt(self.BaseDamage * 0.6f);
                 b.UpdateHitCooldown(target);
             }
@@ -275,7 +270,7 @@ public static class Weapons
         ProcCooldown = 0.3f,
         OnProc = (self, c, target) =>
         {
-            bool recur = self.SizeModifier > .35f;
+            bool recur = self.SizeModifier > .5f;
 
             Vector2 dir = c.velocity.normalized;
 
@@ -289,11 +284,10 @@ public static class Weapons
                     dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
                     dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
 
-                BoomerangController b = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+                BoomerangController b = BoomerangController.New(c.Owner.BoomerangPrefab);
                 Weapon weapon = recur ? Weapons.TheRecurer : Weapons.Temporary;
                 weapon.SizeModifier = self.SizeModifier * 0.7f;
                 b.Init(c.Owner, weapon, c.transform.position, dir1, Vector2.zero);
-                b.Temporary = true;
                 b.Weapon.BaseDamage = Mathf.RoundToInt(self.BaseDamage * 0.6f);
                 b.UpdateHitCooldown(target);
             }
@@ -302,7 +296,7 @@ public static class Weapons
         },
         OnApex = (self, c) =>
         {
-            GameObject.Destroy(c.gameObject);
+            c.Delete();
         },
     };
     public static Weapon TheOrb => new()
@@ -317,9 +311,8 @@ public static class Weapons
                 dir.x * Mathf.Cos(rad) - dir.y * Mathf.Sin(rad),
                 dir.x * Mathf.Sin(rad) + dir.y * Mathf.Cos(rad));
 
-            BoomerangController boomerang = GameObject.Instantiate(c.Owner.BoomerangPrefab);
+            BoomerangController boomerang = BoomerangController.New(c.Owner.BoomerangPrefab);
             boomerang.Init(c.Owner, Weapons.Temporary, c.transform.position, dir, Vector2.zero);
-            boomerang.Temporary = true;
 
             self.activationCount++;
         }
