@@ -13,6 +13,7 @@ public class Weapon
 
     public string Name;
     public string Description;
+    public int Color;
 
     public int BaseDamage = 15;
     public float SpeedModifier = 1.0f;
@@ -57,10 +58,12 @@ public static class Weapons
     {
         Name = "Bob",
         Description = "Returns to you, damaging vermins on the way",
+        Color = 1,
     };
     public static Weapon Temporary => new()
     {
         Name = "Temporary",
+        Color = 0,
         BaseDamage = 10,
         NonBuyable = true,
         SpeedModifier = 1.6f,
@@ -76,6 +79,7 @@ public static class Weapons
     {
         Name = "Gonzales",
         Description = "Moves very far and fast",
+        Color = 2,
         BaseDamage = 17,
         SpeedModifier = 2.2f,
         Knockback = 10f,
@@ -85,6 +89,7 @@ public static class Weapons
     {
         Name = "Slouch",
         Description = "Slowly moves a short distance",
+        Color = 3,
         BaseDamage = 15,
         SpeedModifier = 0.3f,
         Knockback = 10f,
@@ -94,6 +99,7 @@ public static class Weapons
     {
         Name = "Hops",
         Description = "Bounces on any terrain it collides with",
+        Color = 4,
         BaseDamage = 16,
         SpeedModifier = 1.2f,
         Bouncyness = 3.2f,
@@ -103,6 +109,7 @@ public static class Weapons
     {
         Name = "Kenny",
         Description = "Knocks vermins back then instantly returns",
+        Color = 5,
         BaseDamage = 40,
         InitialSpeedBoost = 1.4f,
         SpeedModifier = 0.4f,
@@ -119,6 +126,7 @@ public static class Weapons
     {
         Name = "Bonaparte",
         Description = "Jumps from vermin to vermin when attacking",
+        Color = 6,
         BaseLevel = 3,
         BaseDamage = 35,
         SpeedModifier = 1.1f,
@@ -147,6 +155,7 @@ public static class Weapons
     {
         Name = "Klaus",
         Description = "Randomly jerks in random directions",
+        Color = 7,
         BaseDamage = 34,
         BaseLevel = 2,
         SpeedModifier = 0.8f,
@@ -164,6 +173,7 @@ public static class Weapons
     {
         Name = "Uri",
         Description = "When hitting vermin it zaps all nearby vermins",
+        Color = 8,
         BaseLevel = 3,
         BaseDamage = 24,
         SpeedModifier = 1.1f,
@@ -195,6 +205,7 @@ public static class Weapons
     {
         Name = "Fork",
         Description = "Spawns a tiny critter when hitting vermins",
+        Color = 9,
         BaseLevel = 2,
         SpeedModifier = 1.4f,
         OnHit = (self, c, target) =>
@@ -230,6 +241,7 @@ public static class Weapons
     {
         Name = "Banger",
         Description = "Spawns two additional tinier critters",
+        Color = 10,
         BaseLevel = 2,
         BaseDamage = 12,
         OnSpawn = (self, c) =>
@@ -260,6 +272,7 @@ public static class Weapons
     {
         Name = "Mash",
         Description = "Spawns four additional tinier critters",
+        Color = 11,
         BaseLevel = 3,
         BaseDamage = 19,
         OnSpawn = (self, c) =>
@@ -289,6 +302,7 @@ public static class Weapons
     {
         Name = "Gravy",
         Description = "Spawns nine additional tinier critters",
+        Color = 12,
         BaseLevel = 4,
         BaseDamage = 26,
         OnSpawn = (self, c) =>
@@ -321,6 +335,7 @@ public static class Weapons
     {
         Name = "Matt",
         Description = "When hitting vermin it spawns two additional tinier critters that in turn spawns even tinier critters",
+        Color = 13,
         BaseLevel = 4,
         BaseDamage = 42,
         SpeedModifier = 1.1f,
@@ -355,6 +370,7 @@ public static class Weapons
     public static Weapon TheRecurer => new()
     {
         Name = "The Recurer",
+        Color = 0,
         NonBuyable = true,
         SpeedModifier = 1.4f,
         SizeModifier = 0.7f,
@@ -397,6 +413,7 @@ public static class Weapons
     {
         Name = "Robin",
         Description = "Spawns tiny critters in a spiral pattern while moving",
+        Color = 14,
         BaseLevel = 4,
         BaseDamage = 15,
         InitialSpeedBoost = 1.1f,
@@ -424,6 +441,7 @@ public static class Weapons
     {
         Name = "Harry",
         Description = "Moves slow and pulls all vermin towards it",
+        Color = 15,
         BaseLevel = 2,
         BaseDamage = 4,
         PeriodTime = 0.1f,
@@ -465,6 +483,7 @@ public static class Weapons
     {
         Name = "Bub",
         Description = "When touching vermin it jumps up in the air and comes down slamming hard",
+        Color = 16,
         BaseLevel = 3,
         BaseDamage = 0,
         Knockback = 0,
@@ -517,6 +536,7 @@ public static class Weapons
     {
         Name = "Jack",
         Description = "Creates an explosion when reaching its apex and returning back",
+        Color = 17,
         BaseLevel = 2,
         BaseDamage = 0,
         InitialSpeedBoost = 0.7f,

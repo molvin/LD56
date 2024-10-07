@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class BoomerangController : MonoBehaviour
@@ -58,6 +59,8 @@ public class BoomerangController : MonoBehaviour
 
     public Vector2 Position2D => new Vector2(transform.position.x, transform.position.z);
 
+    public Color Color1;
+    public Color Color2;
     public static BoomerangController New(BoomerangController prefab)
     {
         return ObjectPool.Get(prefab);
@@ -89,6 +92,8 @@ public class BoomerangController : MonoBehaviour
 
         transform.position = position;
         transform.localScale = Vector3.one * weapon.SizeModifier;
+
+        GetComponentInChildren<SkinnedMeshRenderer>().material.color = Color.Lerp(Color1, Color2, Weapon.Color / 17f);
 
         currentAcceleration = returnAcceleration * weapon.SpeedModifier;
 

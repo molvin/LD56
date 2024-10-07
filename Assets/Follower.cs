@@ -14,6 +14,8 @@ public class Follower : MonoBehaviour
     public Animator Anim;
     public float AnimationVelocityFactor;
     private Vector3 velocity;
+    public Color Color1;
+    public Color Color2;
 
     public Weapon Weapon { get; private set; }
     private Transform owner;
@@ -24,6 +26,9 @@ public class Follower : MonoBehaviour
         this.update = update;
         HatSelector.SetHat(weapon);
         Weapon = weapon;
+
+        GetComponentInChildren<SkinnedMeshRenderer>().material.color = Color.Lerp(Color1, Color2, Weapon.Color / 17f);
+
         if(owner)
         {
             this.owner = owner;
