@@ -7,6 +7,7 @@ public class CameraController : MonoBehaviour
     public Transform Follow;
     public float Smoothing;
 
+
     private Vector3 velocity;
 
     private bool _pause = false;
