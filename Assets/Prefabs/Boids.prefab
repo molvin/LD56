@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a727988cb938749898ce266c2b6396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  killCount: 0
   BoidLayer:
     serializedVersion: 2
     m_Bits: 4096
@@ -53,7 +54,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: d830d760a292190409e8d66166187234, type: 2}
   HealthThresholds: 
   Space: {x: 148.3, y: 16.9, z: 208.8}
-  SpawnRate: 2
+  SpawnRate: 1.8
   VisualRange: 8
   MaxSpeed: 5
   MinVelocityFactor: 0.4

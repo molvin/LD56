@@ -18,7 +18,7 @@ public class Boids : MonoBehaviour
     public List<int> HealthThresholds;
 
     public Vector3 Space = Vector3.one * 50;
-    public int SpawnRate = 2;
+    public float SpawnRate = 1.8f;
     public float VisualRange = 3f;
     public float MaxSpeed = 5f;
     public float MinVelocityFactor = 0.4f;
@@ -113,7 +113,7 @@ public class Boids : MonoBehaviour
         MinBounds = transform.position - Space * 0.5f;
         MaxBounds = transform.position + Space * 0.5f;
 
-        Spawn(SpawnRate * 20);
+        Spawn(Mathf.RoundToInt(SpawnRate * 30));
         for(int i = 0; i < 10; i++)
         {
             boid_step_loop.Add(Audioman.getInstance()?.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/Creature_step_loop"), this.transform.position, false));
@@ -333,7 +333,7 @@ public class Boids : MonoBehaviour
         {
             lastSpawnTime = currentTime;
             int extra = currentTime / 60;
-            Spawn(SpawnRate + extra);
+            Spawn(Mathf.RoundToInt(SpawnRate) + extra);
         }
 
         if (allBoids.Count == 0)
