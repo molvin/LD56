@@ -11,7 +11,7 @@ public class CustomSelectable : Selectable
     override
     public void OnSelect(BaseEventData eventData)
     {
-        Audioman.getInstance().PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position, true);
+        Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli"), this.transform.position, true);
         controller.setMinionDestination(this.gameObject);
 
     }

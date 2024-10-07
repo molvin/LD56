@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6624961781267796714}
-  - component: {fileID: 77379885262831223}
   - component: {fileID: 2507154657309516689}
   m_Layer: 0
   m_Name: StatStealer
@@ -33,18 +32,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &77379885262831223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7686397559806939644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8955663f40a4a5247abf81756e246715, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2507154657309516689
 MonoBehaviour:
   m_ObjectHideFlags: 0

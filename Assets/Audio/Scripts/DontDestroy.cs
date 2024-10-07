@@ -8,6 +8,7 @@ public class DontDestroy : MonoBehaviour
     private static DontDestroy instance;
     void Awake()
     {
+        Debug.Log("awake");
         DontDestroyOnLoad(gameObject);
 
         if (instance == null)

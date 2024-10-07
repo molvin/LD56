@@ -51,7 +51,7 @@ public class MenuMinionController : MonoBehaviour
     {
         scatter();
         Debug.Log("Start_game");
-        loop_holder?.Stop();
+        getLoopHolder()?.Stop();
 
         StartCoroutine(callAfterSec(0.5f, () => {
                 SceneManager.LoadScene(1);
@@ -114,7 +114,16 @@ public class MenuMinionController : MonoBehaviour
 
     void Start()
     {
-        loop_holder = Audioman.getInstance().PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position, true);
+        getLoopHolder();
+    }
+
+    public LoopHolder getLoopHolder() {
+        if (loop_holder == null)
+        {
+            loop_holder = Audioman.getInstance()?.PlayLoop(Resources.Load<AudioLoopConfiguration>("object/creature_step_loop"), this.transform.position, true);
+
+        }
+        return loop_holder;
     }
 
     // Update is called once per frame
@@ -145,9 +154,9 @@ public class MenuMinionController : MonoBehaviour
             total_velocity_magnitude += item.velocity.magnitude;
         }
         var avr_velocity = total_velocity_magnitude / minions.Count;
-       // Debug.Log(avr_velocity / 10f);
+        // Debug.Log(avr_velocity / 10f);
 
-        loop_holder?.setVolume((avr_velocity / 10f));
+        getLoopHolder()?.setVolume((avr_velocity / 10f));
 
     }
 
