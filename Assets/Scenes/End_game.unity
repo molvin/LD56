@@ -250,10 +250,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1898388687}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: -938, y: -484}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &309119034
 MonoBehaviour:
@@ -1193,7 +1193,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minionPrefab: {fileID: 5701778217567596114, guid: 86a2b322ff8220b43a3bf2c6adb99864, type: 3}
-  numberOfMinions: 180
+  numberOfMinions: 253
   minionSpawn: {fileID: 1823720508}
   FadeOutTime: 1
   PostFadeOutTime: 0.5

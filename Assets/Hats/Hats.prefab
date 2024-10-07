@@ -539,7 +539,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 11e6cc547980c2e46b5364fa4576dda7, type: 2}
     - target: {fileID: 919132149155446097, guid: 345b8c95df70f354bbc6c750ce6267e7, type: 3}
       propertyPath: m_Name
-      value: fork
+      value: Fork
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 345b8c95df70f354bbc6c750ce6267e7, type: 3}
       propertyPath: m_IsActive
