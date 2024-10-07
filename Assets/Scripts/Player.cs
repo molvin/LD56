@@ -60,6 +60,8 @@ public class Player : MonoBehaviour
     public float BoidPushRadius;
     [Header("Animation")]
     public Animator Anim;
+    public float BaseAnimSpeed = 1.0f;
+    public float DodgeAnimSpeed = 3.0f;
 
     private Vector3 velocity;
     private Vector3 deceleration;
@@ -105,8 +107,8 @@ public class Player : MonoBehaviour
 
         UpdateCollision();
 
-        // TODO: shop indicator
-        Anim.SetBool("Running", state == State.Running && velocity.magnitude > MaxSpeed * 0.3f);
+        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        Anim.SetBool("Running", state == State.Running && input.magnitude > 0.1f);
 
         if(shop != null)
         {
@@ -185,6 +187,8 @@ public class Player : MonoBehaviour
         {
             timeOfLastDodge = Time.time;
             state = State.Dodging;
+            Anim.SetTrigger("Dodge");
+            Anim.speed = DodgeAnimSpeed;
         }
     }
 
@@ -199,6 +203,7 @@ public class Player : MonoBehaviour
         if (t > 1.0f)
         {
             state = State.Running;
+            Anim.speed = BaseAnimSpeed;
         }
 
     }
@@ -252,6 +257,7 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
+        Anim.SetTrigger("Die");
         state = State.Dead;
         timeOfDeath = Time.time;
     }
