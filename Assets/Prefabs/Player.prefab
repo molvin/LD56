@@ -128,6 +128,12 @@ MonoBehaviour:
   SkinWidth: 0.03
   Bounciness: 0.75
   PushingForce: 15
+  PerBoidPush: 20
+  MaxBoidPushers: 10
+  BoidLayer:
+    serializedVersion: 2
+    m_Bits: 4096
+  BoidPushRadius: 1
   Anim: {fileID: 245646292914298393}
 --- !u!114 &2411236606351500817
 MonoBehaviour:

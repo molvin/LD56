@@ -137,8 +137,6 @@ public class HUD : MonoBehaviour
         float halfScreenWidth = (Screen.width / canvas.scaleFactor) / 2f;
         float halfScreenHeight = (Screen.height / canvas.scaleFactor) / 2f;
 
-        Debug.Log($"{angle}, {halfScreenWidth}, {halfScreenHeight}");
-
         if(Mathf.Abs(angle) < 45)
         {
             // up -45 <-> 45
