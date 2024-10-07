@@ -101,7 +101,7 @@ public static class Weapons
         BaseDamage = 35,
         OnHit = (self, c, target) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 4, c.velocity.magnitude * 0.5f);
 
             foreach (Boid b in boids)
             {
@@ -139,7 +139,7 @@ public static class Weapons
         DisplayDamageFunc = w => Mathf.RoundToInt(20 * Mathf.Pow(1.5f, w.Level)),
         OnProc = (self, c, target) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 6);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 6, 4.0f);
 
             foreach (Boid b in boids)
             {
@@ -334,7 +334,7 @@ public static class Weapons
         StayModifier = 0.3f,
         OnPeriod = (self, c) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 12);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 12, 12.0f);
 
             foreach (Boid b in boids)
             {
@@ -372,7 +372,7 @@ public static class Weapons
         },
         OnAnimationDone = (self, c) =>
         {
-            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8);
+            List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8, 5f);
 
             foreach (Boid b in boids)
             {

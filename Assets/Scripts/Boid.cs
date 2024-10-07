@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -15,11 +16,17 @@ public class Boid : MonoBehaviour
     public Rigidbody Rigidbody;
     public List<HealthMaterial> HealthMaterials;
     private new SkinnedMeshRenderer renderer;
+    public Animator Anim;
 
-    private int health = 10;
+    public int health = 10;
     public float damage = 1;
+    public float SpeedModifier = 1f;
 
     public bool IsDead => health <= 0;
+    public float DeathDuration = 1.0f;
+    public AnimationCurve DeathSizeCurve;
+    private float timeOfDeath;
+    private float deathStartRadius;
 
     public float Radius
     {
@@ -68,8 +75,20 @@ public class Boid : MonoBehaviour
         // TODO: Hit effect
         renderer.enabled = true;
         this.transform.forward = Rigidbody.velocity.normalized;
-        GetComponentInChildren<Animator>()?.SetBool("IsRunning", Rigidbody.velocity.magnitude >= 0.001f);
-        GetComponentInChildren<Animator>()?.SetFloat("RunSpeed", velocity.magnitude);
+
+        if (!IsDead)
+        {
+            Anim.SetBool("IsRunning", Rigidbody.velocity.magnitude >= 0.001f);
+            Anim.SetFloat("RunSpeed", velocity.magnitude);
+        }
+        else
+        {
+            float timeSinceDeath = Time.time - timeOfDeath;
+            float t = timeSinceDeath / DeathDuration;
+            Radius = Mathf.LerpUnclamped(0.0f, deathStartRadius, DeathSizeCurve.Evaluate(t));
+            if (t >= 1.0f)
+                Destroy(gameObject);
+        }
 
     }
     public void Start()
@@ -82,7 +101,7 @@ public class Boid : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(1);
-            if (UnityEngine.Random.Range(0 ,100) == 1)
+            if (UnityEngine.Random.Range(0, 100) == 1)
             {
                 Audioman.getInstance()?.PlaySound(Resources.Load<AudioOneShotClipConfiguration>("object/bulli_bulli_dark"), this.transform.position);
             }
@@ -96,15 +115,22 @@ public class Boid : MonoBehaviour
         boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
 
         float multiplier = Mathf.Pow(1.15f, level);
-        boid.health *= Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level);
         boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
+        boid.SpeedModifier = 1.0f + Mathf.Log(multiplier) * .6f;
         boid.damage = multiplier;
 
-        boid.SetHealth(boid.health);
+        boid.SetHealth(Mathf.RoundToInt(boid.health * multiplier * (1f + Mathf.Log(multiplier)) + level));
 
         boid.Rigidbody = boid.GetComponent<Rigidbody>();
         boid.Rigidbody.velocity = velocity;
 
         return boid;
+    }
+
+    public void Die()
+    {
+        Anim.SetBool("Dead", true);
+        timeOfDeath = Time.time;
+        deathStartRadius = Radius;
     }
 }

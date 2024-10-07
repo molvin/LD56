@@ -33,7 +33,7 @@ public class PlayerStats : MonoBehaviour
 
     private void ApplyBoidDamage()
     {
-        var boids = Boids.Instance.GetNearest(transform.position, MaxBoidDamageDealers);
+        var boids = Boids.Instance.GetNearest(transform.position, MaxBoidDamageDealers, BoidDamageRadius);
 
         float dmg = 0;
         foreach(var boid in boids)
@@ -43,7 +43,7 @@ public class PlayerStats : MonoBehaviour
             float dist = Vector3.Distance(boid.transform.position, transform.position);
             if (dist < BoidDamageRadius)
             {
-                dmg += boid.damage;
+                dmg = Mathf.Max(boid.damage, dmg);
             }
         }
 
