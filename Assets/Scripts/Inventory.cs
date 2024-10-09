@@ -96,6 +96,8 @@ public class Inventory : MonoBehaviour
 
     public Weapon GetRandom()
     {
-        return ownedWeapons[Random.Range(0, ownedWeapons.Count)];
+        int count = Mathf.Min(ownedWeapons.Count, 2);
+        return ownedWeapons.OrderBy(w => w.GetLevel()).ToList()[Random.Range(0, count)];
+        //return ownedWeapons[Random.Range(0, ownedWeapons.Count)];
     }
 }

@@ -125,7 +125,7 @@ MonoBehaviour:
   Inventory: {fileID: 2411236606351500817}
   Level: 0
   BaseKillsPerLevel: 34
-  LevelUpFactor: 1.228
+  LevelUpFactor: 1.23
   DeathStoppingTime: 0.5
   TimeBeforeFadeout: 1
   HUD: {fileID: 8779048857396013772}
