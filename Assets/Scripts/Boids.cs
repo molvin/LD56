@@ -140,7 +140,11 @@ public class Boids : MonoBehaviour
         for (int i = 0; i < numToSpawn; i++)
         {
             float rand = Random.value;
-            int difficulty = (rand > 0.85 ? 2 : (rand > 0.55 ? 1 : 0));
+            int difficulty = level * (rand > 0.9 ? 3 : (rand > 0.65 ? 2 : 0));
+            if (difficulty == 0)
+            {
+                difficulty = Random.Range(0, level);
+            }
             
             Vector3 position = MinBounds + new Vector3(Random.value * Space.x, Space.y, Random.value * Space.z);
             Vector3 velocity = new(Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f, Random.value * MaxSpeed - MaxSpeed * 0.5f);
@@ -156,7 +160,7 @@ public class Boids : MonoBehaviour
                 position = new Vector3(pos.x, position.y, pos.y);
             }
 
-            Boid boid = Boid.CreateBoid(position, velocity, (level + 1) * (difficulty + 1) - 1);
+            Boid boid = Boid.CreateBoid(position, velocity, difficulty);
             allBoids.Add(boid);
         }
     }
@@ -332,8 +336,8 @@ public class Boids : MonoBehaviour
         if (currentTime != lastSpawnTime)
         {
             lastSpawnTime = currentTime;
-            int extra = currentTime / 60;
-            Spawn(Mathf.RoundToInt(SpawnRate) + extra);
+            float extra = currentTime / 60f;
+            Spawn(Mathf.RoundToInt(SpawnRate * (1f + extra)));
         }
 
         if (allBoids.Count == 0)

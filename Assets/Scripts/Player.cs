@@ -36,8 +36,8 @@ public class Player : MonoBehaviour
     public Inventory Inventory;
     [Header("Leveling")]
     public int Level = 0;
-    public int BaseKillsPerLevel = 16;
-    public float LevelUpFactor;
+    public int BaseKillsPerLevel = 40;
+    public float LevelUpFactor = 1.3f;
     [Header("Death")]
     public float DeathStoppingTime;
     public float TimeBeforeFadeout;
@@ -442,22 +442,24 @@ public class Player : MonoBehaviour
         Inventory.AddWeapon(weapon);
     }
 
+    private int CalculateKillsForLevelUp()
+    {
+        float baseMulti = Mathf.Pow(LevelUpFactor, Level);
+        float multi = baseMulti * (1f + Mathf.Log(baseMulti)) + Level + 1;
+        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * multi - (BaseKillsPerLevel - Level));
+        return killsForLevelUp;
+    }
+
     public void UpdateKills(int kills)
     {
-        float baseMulti = Mathf.Pow(1.15f, Level);
-        float multi = baseMulti * (1f + Mathf.Log(baseMulti)) + Level;
-        int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * multi);
 
-        //int killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * ((Mathf.Pow(LevelUpFactor, Level))));
+        int killsForLevelUp = CalculateKillsForLevelUp();
         if (kills >= killsForLevelUp)
         {
             Level++;
             previousKillsForLevelUp = killsForLevelUp;
 
-            baseMulti = Mathf.Pow(1.15f, Level);
-            multi = baseMulti * (1f + Mathf.Log(baseMulti)) + Level;
-            killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * multi);
-            //killsForLevelUp = Mathf.RoundToInt(BaseKillsPerLevel * ((Mathf.Pow(LevelUpFactor, Level))));
+            killsForLevelUp = CalculateKillsForLevelUp();
 
             if (shop == null)
             {

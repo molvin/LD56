@@ -140,12 +140,12 @@ public class Boid : MonoBehaviour
         boid.transform.position = position;
         boid.renderer = boid.GetComponentInChildren<SkinnedMeshRenderer>();
 
-        float multiplier = Mathf.Pow(1.15f, level);
-        boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .8f);
-        boid.SpeedModifier = 1.0f + Mathf.Log(multiplier) * .6f;
-        boid.damage = multiplier;
+        float multiplier = Mathf.Pow(1.18f, level);
+        boid.Radius = 0.5f * (1.0f + Mathf.Log(multiplier) * .45f);
+        boid.SpeedModifier = 1.0f + Mathf.Log(multiplier) * .51f;
+        boid.damage = Mathf.Pow(1.05f, level);
 
-        boid.SetHealth(Mathf.RoundToInt(BaseHealth * multiplier * (1f + Mathf.Log(multiplier)) + level));
+        boid.SetHealth(Mathf.RoundToInt(BaseHealth * (multiplier * (1f + Mathf.Log(multiplier))) + level));
 
         boid.Rigidbody = boid.GetComponent<Rigidbody>();
         boid.Rigidbody.velocity = velocity;

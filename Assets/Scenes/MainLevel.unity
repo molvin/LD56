@@ -18204,10 +18204,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 2705008886073668929, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
-      propertyPath: LevelUpFactor
-      value: 1.2
-      objectReference: {fileID: 0}
     - target: {fileID: 5732735082239329094, guid: d8224c94ac13d1c4f9dfae444bed183b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10.849999

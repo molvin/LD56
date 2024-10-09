@@ -40,9 +40,10 @@ public class Weapon
     public int BaseLevel = 0;
     public int Level = 0;
     public int GetLevel() => Level + BaseLevel;
-    public float KnockbackForce => Knockback * LevelModifier;
 
-    public float LevelModifier => Mathf.Pow(1.35f, Level);
+    private float Multi => Mathf.Pow(1.15f, Level);
+    public float LevelModifier => Multi * (1f + Mathf.Log(Multi));
+    public float AoeModifier => 1.0f + LevelModifier * 0.1f;
     public int GetDamage() => Mathf.RoundToInt(BaseDamage * LevelModifier);
     public int GetDisplayDamage() => DisplayDamageFunc != null ? DisplayDamageFunc.Invoke(this) : GetDamage();
 
@@ -453,8 +454,9 @@ public static class Weapons
             GameObject fx = FxManager.GetWithKey("MagnetPull", self);
             fx.transform.position = c.transform.position;
 
-            float aoe = 8f * self.LevelModifier;
-            float force = 3.5f * self.LevelModifier;
+            float aoe = 8f * self.AoeModifier;
+            const float minForce = 2.5f;
+            const float maxForce = 4.5f;
 
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 12, aoe);
 
@@ -468,6 +470,7 @@ public static class Weapons
                 if (dir.magnitude < aoe)
                 {
                     Vector3 vec = new(dir.x, 0, dir.y);
+                    float force = Mathf.Lerp(minForce, maxForce, Mathf.Clamp01(vec.magnitude / aoe));
                     b.velocity += vec.normalized * force;
                 }
             }
@@ -510,7 +513,7 @@ public static class Weapons
             GameObject shockwave = FxManager.Get("MeteorImpact");
             shockwave.transform.position = c.transform.position;
 
-            float aoe = 4f * self.LevelModifier;
+            float aoe = 4f * self.AoeModifier;
 
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8, aoe);
 
@@ -526,7 +529,7 @@ public static class Weapons
                     Boids.Instance.DamageBoid(b, damage);
 
                     // Shockwave force
-                    float force = 20f * self.LevelModifier;
+                    const float force = 20f;
                     b.velocity += new Vector3(-dir.x, 0, -dir.y) * force / (b.Radius * 2.0f);
                 }
             }
@@ -547,7 +550,7 @@ public static class Weapons
             GameObject impactFx = FxManager.Get("ApexExploder");
             impactFx.transform.position = c.transform.position;
 
-            float aoe = 4f * self.LevelModifier;
+            float aoe = 4f * self.AoeModifier;
 
             List<Boid> boids = Boids.Instance.GetNearest(c.transform.position, 8, aoe);
 
@@ -563,7 +566,7 @@ public static class Weapons
                     Boids.Instance.DamageBoid(b, damage);
 
                     // Shockwave force
-                    float force = 20f * self.LevelModifier;
+                    float force = 20f;
                     b.velocity += new Vector3(-dir.x, 0, -dir.y) * force / (b.Radius * 2.0f);
                 }
             }

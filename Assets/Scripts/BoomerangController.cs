@@ -305,7 +305,7 @@ public class BoomerangController : MonoBehaviour
             {
                 UpdateHitCooldown(b);
 
-                b.velocity += new Vector3(velocity.x, 0, velocity.y).normalized * Weapon.KnockbackForce / (b.Radius * 2.0f);
+                b.velocity += new Vector3(velocity.x, 0, velocity.y).normalized * Weapon.Knockback;
 
                 Boids.Instance.DamageBoid(b, Weapon.GetDamage());
                 Weapon.OnHit?.Invoke(Weapon, this, b);
